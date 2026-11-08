@@ -3,190 +3,177 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="theme-color" content="#1C1616">
+<meta name="theme-color" content="#d7141a">
 <meta name="referrer" content="no-referrer">
 <title>Спецмазь и Доктор Шустер</title>
 <link rel="manifest" href="manifest.json">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--acc:#E0141E;--acc2:#FF5A62;--soft:rgba(224,20,30,.18);--bg:#1C1616;--card:#2A2222;--card2:#352B2B;--ink:#FFFFFF;--ink2:#EDE4E2;--mut:#BFB2AF;--line:rgba(255,255,255,.12)}
-body.mood{--acc:#1F6FD6;--acc2:#6BA6F5;--soft:rgba(31,111,214,.22);--bg:#141A24;--card:#202836;--card2:#2A3344}
+:root{--ink2:#3a3532;--acc:#d7141a;--acc2:#b0101a;--soft:#fff0ee;--bg:#f6f4f2;--card:#fff;--ink:#1d1b1a;--mut:#8a8580;--line:#ece7e3}
+body.mood{--acc:#1f6fd6;--acc2:#1756aa;--soft:#eaf2ff;--bg:#f2f5fa}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Montserrat,system-ui,sans-serif;font-size:19px;transition:background .3s}
+html,body{margin:0;font-size:19px;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;transition:background .3s}
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
-input,textarea,select{font:inherit;font-size:19px;width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--card2);color:var(--ink)}
-input::placeholder,textarea::placeholder{color:var(--mut)}
-textarea{min-height:110px;resize:vertical}
-#app{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:100px;position:relative}
-header{position:sticky;top:0;z-index:20;background:var(--bg);padding:14px 16px 12px;transition:background .3s}
+input,textarea,select{font:inherit;font-size:19px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+textarea{min-height:90px;resize:vertical}
+#app{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:104px;position:relative}
+header{position:sticky;top:0;z-index:20;background:var(--bg);padding:12px 16px 10px;transition:background .3s}
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:26px}
-.logo .mark{width:46px;height:46px;border-radius:14px;background:var(--acc);display:grid;place-items:center;color:#fff;font-size:24px;overflow:hidden}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:26px;letter-spacing:-.3px}
+.logo .mark{width:46px;height:46px;border-radius:10px;background:var(--acc);display:grid;place-items:center;color:#fff;font-size:26px;overflow:hidden}
 .logo .mark img{width:100%;height:100%;object-fit:cover}
-.bell{position:relative;width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:24px}
-.bell b{position:absolute;top:-4px;right:-4px;background:var(--acc);color:#fff;font-size:14px;min-width:24px;height:24px;border-radius:12px;display:grid;place-items:center;padding:0 6px}
-.switch{display:grid;grid-template-columns:1fr 1fr;background:rgba(0,0,0,.35);border-radius:32px;padding:5px;margin-top:12px;position:relative}
-.switch button{height:56px;border-radius:28px;font-weight:800;font-size:20px;z-index:1;transition:color .25s;color:var(--ink2)}
-.switch .pill{position:absolute;top:5px;bottom:5px;width:calc(50% - 5px);left:5px;border-radius:28px;background:#E0141E;transition:left .3s,background .3s}
-body.mood .switch .pill{left:50%;background:#1F6FD6}
+.bell{position:relative;width:52px;height:52px;border-radius:12px;background:#fff;display:grid;place-items:center;font-size:26px}
+.bell b{position:absolute;top:-4px;right:-4px;background:var(--acc);color:#fff;font-size:14px;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+.switch{display:grid;grid-template-columns:1fr 1fr;background:#fff;border-radius:16px;padding:4px;margin-top:10px;position:relative}
+.switch button{padding:15px 0;border-radius:12px;font-weight:800;font-size:20px;z-index:1;transition:color .25s;color:var(--mut)}
+.switch .pill{position:absolute;top:4px;bottom:4px;width:calc(50% - 4px);left:4px;border-radius:12px;background:#d7141a;transition:left .3s,background .3s}
+body.mood .switch .pill{left:50%;background:#1f6fd6}
 body:not(.mood) .switch .h,body.mood .switch .m{color:#fff}
-main{padding:4px 14px}
-.stories{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 12px;scrollbar-width:none}
+main{padding:4px 16px}
+.stories{display:flex;gap:12px;overflow-x:auto;padding:6px 2px 12px;scrollbar-width:none}
 .stories::-webkit-scrollbar{display:none}
-.story{flex:0 0 auto;width:84px;text-align:center;font-size:14px;font-weight:600;color:var(--ink2)}
-.story .ring{width:78px;height:78px;border-radius:50%;padding:3px;background:var(--acc);margin:0 auto 6px}
-.story.seen .ring{background:#5a5050}
-.story .ring>*{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid var(--bg);display:block;background:var(--card)}
+.story{flex:0 0 auto;width:84px;text-align:center;font-size:14px;font-weight:600;color:var(--mut)}
+.story .ring{width:78px;height:78px;border-radius:50%;padding:3px;background:conic-gradient(var(--acc),#ffb000,var(--acc));margin:0 auto 4px}
+.story.seen .ring{background:#d6d1cc}
+.story .ring>*{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid var(--bg);display:block;background:#fff}
 .story span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.quick{display:flex;gap:10px;margin:0 0 14px;flex-wrap:wrap}
-.quick button{height:56px;padding:0 20px;border-radius:28px;background:var(--card2);font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px}
-.quick button.on{background:var(--acc);color:#fff}
-/* full-screen card */
-.card{background:var(--card);border-radius:26px;overflow:hidden;margin-bottom:16px;position:relative}
-.feedcard .fc{position:relative;height:calc(100svh - 120px);min-height:520px;max-height:860px}
-.feedcard .slider{position:absolute;inset:0;aspect-ratio:auto;background:var(--card2)}
-.shade{position:absolute;left:0;right:0;bottom:0;height:62%;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.55) 35%,rgba(0,0,0,.88));pointer-events:none}
-.ovl{position:absolute;left:0;right:0;bottom:0;padding:22px 20px 22px;color:#fff}
-.ovl h3{margin:0 0 8px;font-size:30px;line-height:1.15;font-weight:800;cursor:pointer}
-.ovl p{margin:0;font-size:20px;line-height:1.45;color:#F0E8E6;cursor:pointer}
-.favbtn{position:absolute;top:14px;right:14px;width:56px;height:56px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:28px;display:grid;place-items:center;z-index:3}
-.favbtn.on{color:#FF5A62}
-.row{display:flex;align-items:center;gap:10px}
+.card{background:var(--card);border-radius:22px;overflow:hidden;margin-bottom:16px;box-shadow:0 1px 0 rgba(0,0,0,.03)}
+.card .cb{padding:12px 16px 14px}
+.card h3{margin:0 0 4px;font-size:23px;letter-spacing:-.2px}
+.card p{margin:0;color:#4b4642;font-size:18px;line-height:1.45}
+.row{display:flex;align-items:center;gap:8px}
 .between{justify-content:space-between}
-.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.tag{font-size:16px;font-weight:600;padding:6px 12px;border-radius:20px;background:rgba(255,255,255,.16);color:#fff}
-.mp{display:flex;gap:12px;margin-top:12px;font-size:16px;color:var(--mut);align-items:center;flex-wrap:wrap}
-.ovl .mp{color:#E0D5D2}
-.mp a{color:inherit;text-decoration:none;border-bottom:1px dotted currentColor;padding:4px 0}
-.ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:var(--card2)}
-.fav.on{color:#FF5A62}
-.badge{font-size:15px;font-weight:700;padding:5px 10px;border-radius:10px;background:#FFD54A;color:#3A2A00}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:16px;font-weight:600;padding:4px 10px;border-radius:20px;background:var(--soft);color:var(--acc2)}
+.mp{display:flex;gap:12px;margin-top:10px;font-size:16px;color:var(--mut);align-items:center;flex-wrap:wrap}
+.mp a{color:var(--mut);text-decoration:none;border-bottom:1px dotted #c5beb8}
+.ic{width:50px;height:50px;border-radius:12px;display:grid;place-items:center;font-size:25px;background:var(--soft)}
+.fav.on{color:var(--acc)}
+.badge{font-size:14px;font-weight:700;padding:3px 8px;border-radius:8px;background:#fff4d6;color:#8a5a00}
 /* slider */
-.slider{position:relative;aspect-ratio:3/4;background:var(--card2);overflow:hidden}
+.slider{position:relative;aspect-ratio:3/4;background:#eee;overflow:hidden}
 .track{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;touch-action:pan-x pan-y}
 .track::-webkit-scrollbar{display:none}
 .slider.zoomed .track{overflow:hidden;touch-action:none}
 .slide{flex:0 0 100%;height:100%;scroll-snap-align:center;position:relative;overflow:hidden}
 .media{position:absolute;inset:0;transform-origin:0 0;transition:transform .55s cubic-bezier(.2,.8,.2,1)}
 .media video,.media img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
-.hint{position:absolute;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 0 0 0 rgba(255,255,255,.8);animation:pulse 1.8s infinite;pointer-events:none;display:grid;place-items:center;font-size:16px;color:var(--acc);font-weight:900}
+.hint{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 0 0 0 rgba(255,255,255,.8);animation:pulse 1.8s infinite;pointer-events:none;display:grid;place-items:center;font-size:14px;color:var(--acc);font-weight:900}
 .slider.zoomed .hint{opacity:0}
 @keyframes pulse{70%{box-shadow:0 0 0 14px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
-.dots{position:absolute;top:18px;left:0;right:0;display:flex;justify-content:center;gap:6px;pointer-events:none;z-index:2}
-.dots i{width:9px;height:9px;border-radius:5px;background:rgba(255,255,255,.55);transition:width .2s}
-.dots i.on{width:24px;background:#fff}
-.arrow{position:absolute;top:40%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:28px;display:grid;place-items:center;z-index:2}
+.dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px;pointer-events:none}
+.dots i{width:7px;height:7px;border-radius:4px;background:rgba(255,255,255,.55);transition:width .2s}
+.dots i.on{width:18px;background:#fff}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.85);font-size:23px;display:none}
+@media(hover:hover){.slider:hover .arrow{display:grid;place-items:center}}
 .slider.zoomed .arrow{display:none!important}
-.arrow.l{left:10px}.arrow.r{right:10px}
-.zlabel{position:absolute;left:12px;top:12px;background:rgba(0,0,0,.65);color:#fff;font-size:16px;font-weight:700;padding:8px 14px;border-radius:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:2}
+.arrow.l{left:8px}.arrow.r{right:8px}
+.zlabel{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.6);color:#fff;font-size:16px;font-weight:700;padding:5px 10px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none}
 .slider.zoomed .zlabel{opacity:1}
 /* nav */
-nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;background:rgba(18,14,14,.92);backdrop-filter:blur(10px);padding-bottom:env(safe-area-inset-bottom)}
-body.mood nav{background:rgba(14,18,26,.92)}
-nav .in{display:flex;width:100%;max-width:520px}
-nav button{flex:1;height:88px;font-size:14px;font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
-nav button span{font-size:28px;filter:grayscale(1);opacity:.7}
-nav button.on{color:#fff}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav .in{display:flex;width:100%;max-width:480px}
+nav button{flex:1;padding:10px 0 12px;font-size:14px;font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button span{font-size:29px;filter:grayscale(1);opacity:.6}
+nav button.on{color:var(--acc)}
 nav button.on span{filter:none;opacity:1}
-h2{font-size:28px;margin:10px 0 14px}
-h4{margin:20px 0 10px;font-size:20px}
-.box{background:var(--card);border-radius:24px;padding:18px;margin-bottom:16px}
-.btn{background:var(--acc);color:#fff;font-weight:800;font-size:19px;min-height:58px;padding:14px 22px;border-radius:30px;text-align:center;display:inline-flex;align-items:center;justify-content:center}
-.btn.white{background:#fff;color:#1B1B1B;margin-top:16px}
-.btn.ghost{background:var(--card2);color:var(--ink)}
-.btn.sm{min-height:48px;padding:10px 16px;font-size:17px;border-radius:24px}
+h2{font-size:29px;margin:8px 0 12px;letter-spacing:-.3px}
+h4{margin:16px 0 8px;font-size:20px}
+.box{background:#fff;border-radius:20px;padding:16px;margin-bottom:14px}
+.btn{background:var(--acc);color:#fff;font-weight:800;padding:16px 22px;border-radius:14px;text-align:center;display:inline-block}
+.btn.ghost{background:var(--soft);color:var(--acc2)}
+.btn.sm{padding:12px 16px;font-size:17px;border-radius:11px}
 .btn:disabled{opacity:.45}
-.wide{width:100%;display:flex}
-.muted{color:var(--mut);font-size:17px;line-height:1.45}
-.chips{display:flex;flex-wrap:wrap;gap:10px}
-.chip{min-height:50px;padding:10px 18px;border-radius:26px;background:var(--card2);font-size:18px;font-weight:700;border:2px solid transparent}
-.chip.on{background:var(--acc);color:#fff}
+.wide{width:100%;display:block}
+.muted{color:var(--mut);font-size:17px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:12px 18px;border-radius:20px;background:#fff;font-size:17px;font-weight:700;border:1.5px solid var(--line)}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .search{position:relative}
-.search input{padding-left:52px;border-radius:30px;border:0;height:62px;font-size:20px}
-.search::before{content:'🔍';position:absolute;left:18px;top:17px;font-size:22px}
-mark{background:#FFD54A;color:#1B1B1B;border-radius:3px;padding:0 2px}
+.search input{padding-left:48px;border-radius:18px;border:0;height:60px}
+.search::before{content:'🔍';position:absolute;left:13px;top:13px;font-size:22px}
+mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 /* sheet */
-.sheet{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
-.sheet .in{background:var(--bg);color:var(--ink);width:100%;max-width:520px;max-height:94vh;overflow:auto;border-radius:28px 28px 0 0;padding:18px 18px 34px;animation:up .25s}
-.sheet .close{position:sticky;top:0;float:right;width:52px;height:52px;border-radius:50%;background:var(--card2);font-size:22px;z-index:4}
+.sheet{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.sheet .in{background:var(--bg);width:100%;max-width:480px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:16px 16px 30px;animation:up .25s}
+.sheet .close{position:sticky;top:0;float:right;width:36px;height:36px;border-radius:50%;background:#fff;font-size:23px;z-index:2}
 @keyframes up{from{transform:translateY(40px);opacity:.5}}
 @keyframes fade{from{opacity:0}}
-.rich h1,.rich h2{font-size:25px;margin:22px 0 10px}
-.rich p{font-size:20px;line-height:1.6;margin:0 0 12px;color:var(--ink2)}
-.rich ul{padding-left:24px;margin:0 0 12px}.rich li{margin-bottom:8px;line-height:1.55;font-size:20px;color:var(--ink2)}
-.rich .tipb{background:var(--soft);border-radius:16px;padding:14px 16px;margin:14px 0;font-weight:600;font-size:19px}
-.prod{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border-radius:18px;padding:14px 16px;margin-bottom:10px;font-size:18px}
-.sheet .slider{border-radius:22px}
+.rich h1,.rich h2{font-size:26px;margin:18px 0 8px}
+.rich p{color:var(--ink2);font-size:20px;line-height:1.6;margin:0 0 10px}
+.rich ul{padding-left:20px;margin:0 0 10px}.rich li{margin-bottom:6px;line-height:1.5}
+.rich .tipb{background:var(--soft);border-left:4px solid var(--acc);border-radius:12px;padding:12px 14px;margin:12px 0;font-weight:600}
+.prod{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border-radius:16px;padding:12px 14px;margin-bottom:8px}
+.prod .mp{margin:4px 0 0}
 /* story viewer */
 .sv{position:fixed;inset:0;z-index:60;background:#000;display:flex;align-items:center;justify-content:center}
-.sv .st{position:relative;width:100%;max-width:520px;height:100%;max-height:100vh}
+.sv .st{position:relative;width:100%;max-width:480px;height:100%;max-height:100vh}
 .sv .media{position:absolute;inset:0}
 .sv .media video,.sv .media img{object-fit:contain}
 .sv .bars{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:4px;z-index:2}
-.sv .bars i{flex:1;height:4px;background:rgba(255,255,255,.35);border-radius:2px;overflow:hidden}
+.sv .bars i{flex:1;height:3px;background:rgba(255,255,255,.35);border-radius:2px;overflow:hidden}
 .sv .bars i b{display:block;height:100%;width:0;background:#fff}
-.sv .x{position:absolute;top:24px;right:12px;color:#fff;font-size:32px;z-index:3;width:56px;height:56px}
-.sv .ttl{position:absolute;top:30px;left:16px;right:80px;color:#fff;font-weight:800;font-size:20px;z-index:2;text-shadow:0 1px 4px #0008}
-.sv .go{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:3;background:#fff;color:#1B1B1B}
+.sv .x{position:absolute;top:22px;right:12px;color:#fff;font-size:34px;z-index:3}
+.sv .ttl{position:absolute;top:24px;left:14px;color:#fff;font-weight:800;z-index:2;text-shadow:0 1px 4px #0008}
+.sv .go{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:3}
 .sv .tapL,.sv .tapR{position:absolute;top:0;bottom:0;width:35%;z-index:1}.sv .tapL{left:0}.sv .tapR{right:0}
 /* body map */
-.bodymap{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}.bodymap .chips{justify-content:center}
-.bodymap svg .z{fill:var(--soft);stroke:var(--acc2);stroke-width:2;cursor:pointer;transition:fill .2s}
+.bodymap{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:center}
+.bodymap svg .z{fill:var(--soft);stroke:var(--acc);stroke-width:2;cursor:pointer;transition:fill .2s}
 .bodymap svg .z:hover,.bodymap svg .z.on{fill:var(--acc)}
-.bodymap svg circle,.bodymap svg rect[fill]{fill:#4a4040}
 /* game */
-.board{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;background:var(--card);padding:8px;border-radius:22px;touch-action:none;user-select:none}
-.cell{aspect-ratio:1;border-radius:12px;background:var(--card2);display:grid;place-items:center;font-size:30px;transition:transform .15s,opacity .2s}
-.cell.sel{transform:scale(.86);box-shadow:0 0 0 3px var(--acc2) inset}
+.board{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:#fff;padding:8px;border-radius:20px;touch-action:none;user-select:none}
+.cell{aspect-ratio:1;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:34px;transition:transform .15s,opacity .2s}
+.cell.sel{transform:scale(.86);box-shadow:0 0 0 3px var(--acc) inset}
 .cell.pop{transform:scale(0);opacity:0}
 .gstat{display:flex;gap:10px;margin-bottom:10px}
-.gstat div{flex:1;background:var(--card);border-radius:18px;padding:12px;text-align:center}
-.gstat b{display:block;font-size:28px}
-.prog{height:12px;border-radius:6px;background:var(--card2);overflow:hidden;margin:8px 0 6px}
+.gstat div{flex:1;background:#fff;border-radius:14px;padding:10px;text-align:center}
+.gstat b{display:block;font-size:29px}
+.prog{height:10px;border-radius:5px;background:#fff;overflow:hidden;margin:8px 0 4px;position:relative}
 .prog i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
 /* coupons */
-.coupon{display:flex;background:var(--card2);border-radius:20px;overflow:hidden;margin-bottom:12px}
-.coupon .pc{background:var(--acc);color:#fff;font-weight:900;font-size:28px;width:96px;display:grid;place-items:center}
-.coupon .ci{padding:14px;flex:1}
+.coupon{display:flex;background:#fff;border-radius:18px;overflow:hidden;margin-bottom:10px}
+.coupon .pc{background:var(--acc);color:#fff;font-weight:900;font-size:31px;width:86px;display:grid;place-items:center;border-right:3px dashed var(--bg)}
+.coupon .ci{padding:12px;flex:1}
 .coupon.used{opacity:.45}
-.code{font-family:ui-monospace,monospace;font-weight:800;font-size:19px;background:rgba(255,255,255,.12);padding:6px 10px;border-radius:10px}
+.code{font-family:ui-monospace,monospace;font-weight:800;background:var(--soft);padding:4px 8px;border-radius:8px}
 /* wheel */
-.wheelw{position:relative;width:290px;height:290px;margin:14px auto}
-.wheel{width:100%;height:100%;border-radius:50%;transition:transform 4s cubic-bezier(.15,.85,.1,1);border:6px solid #fff}
-.wheelw::after{content:'▼';position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:32px;color:#fff}
-.streak{display:flex;gap:6px;justify-content:center;margin:10px 0}
-.streak i{width:38px;height:38px;border-radius:11px;background:var(--card2);display:grid;place-items:center;font-style:normal;font-size:16px;font-weight:800;color:var(--mut)}
+.wheelw{position:relative;width:260px;height:260px;margin:10px auto}
+.wheel{width:100%;height:100%;border-radius:50%;transition:transform 4s cubic-bezier(.15,.85,.1,1);border:6px solid #fff;box-shadow:0 4px 18px rgba(0,0,0,.12)}
+.wheelw::after{content:'▼';position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:36px;color:var(--ink)}
+.streak{display:flex;gap:6px;justify-content:center;margin:6px 0}
+.streak i{width:30px;height:30px;border-radius:9px;background:#fff;display:grid;place-items:center;font-style:normal;font-size:16px;font-weight:800;color:var(--mut)}
 .streak i.on{background:var(--acc);color:#fff}
-.hol{display:flex;align-items:center;gap:12px;background:var(--card2);border-radius:18px;padding:14px;margin-bottom:10px}
-.hol .d{width:60px;text-align:center;font-weight:900;font-size:26px;color:var(--acc2);line-height:1}
+/* holidays */
+.hol{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:12px;margin-bottom:8px}
+.hol .d{width:52px;text-align:center;font-weight:900;font-size:26px;color:var(--acc);line-height:1}
 .hol .d small{display:block;font-size:14px;color:var(--mut);font-weight:700}
-.hol b{font-size:19px}
-.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#fff;color:#1B1B1B;padding:16px 22px;border-radius:18px;font-weight:700;font-size:18px;z-index:90;animation:up .2s;max-width:90%}
-.empty{text-align:center;color:var(--mut);padding:40px 10px;font-size:20px}
-.social{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.social a{background:var(--card2);border-radius:18px;padding:14px 4px;text-align:center;text-decoration:none;color:var(--ink);font-size:15px;font-weight:700}
-.social a span{display:block;font-size:26px;margin-bottom:4px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#1d1b1a;color:#fff;padding:12px 18px;border-radius:14px;font-weight:600;font-size:18px;z-index:90;animation:up .2s;max-width:90%}
+.empty{text-align:center;color:var(--mut);padding:30px 10px}
+.social{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.social a{background:#fff;border-radius:14px;padding:12px 4px;text-align:center;text-decoration:none;color:var(--ink);font-size:16px;font-weight:700}
+.social a span{display:block;font-size:29px;margin-bottom:2px}
 /* editor */
-.zed{position:relative;aspect-ratio:3/4;background:var(--card2);border-radius:18px;overflow:hidden;touch-action:none;user-select:none}
+.zed{position:relative;aspect-ratio:3/4;background:#ddd;border-radius:16px;overflow:hidden;touch-action:none;user-select:none}
 .zed video,.zed img{width:100%;height:100%;object-fit:cover;pointer-events:none}
-.zed .zr{position:absolute;border:3px solid #fff;background:rgba(224,20,30,.3);box-shadow:0 0 0 1px rgba(0,0,0,.4);border-radius:6px}
-.zed .zr span{position:absolute;left:5px;top:3px;font-size:14px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000}
-.thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px}
-.thumbs .t{flex:0 0 72px;height:96px;border-radius:12px;overflow:hidden;border:3px solid transparent;position:relative;background:var(--card2)}
-.thumbs .t.on{border-color:var(--acc2)}
+.zed .zr{position:absolute;border:2.5px solid #fff;background:rgba(215,20,26,.25);box-shadow:0 0 0 1px rgba(0,0,0,.3);border-radius:6px}
+.zed .zr span{position:absolute;left:4px;top:3px;font-size:14px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000}
+.thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.thumbs .t{flex:0 0 64px;height:85px;border-radius:10px;overflow:hidden;border:3px solid transparent;position:relative;background:#ddd}
+.thumbs .t.on{border-color:var(--acc)}
 .thumbs .t video,.thumbs .t img{width:100%;height:100%;object-fit:cover}
-.field{margin-bottom:14px}
-.field label{display:block;font-size:16px;font-weight:700;color:var(--mut);margin-bottom:6px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-table{width:100%;border-collapse:collapse;font-size:16px}
-td,th{padding:10px 6px;border-bottom:1px solid var(--line);text-align:left}
-th{color:var(--mut);font-weight:700;font-size:14px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:16px;font-weight:700;color:var(--mut);margin-bottom:5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+table{width:100%;border-collapse:collapse;font-size:17px}
+td,th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--mut);font-weight:700;font-size:16px}
 td.n,th.n{text-align:right}
-.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.kpis div{background:var(--card);border-radius:18px;padding:14px}
-.kpis b{display:block;font-size:30px}
-.seg{display:flex;background:var(--card);border-radius:30px;padding:4px;margin-bottom:14px}
-.seg button{flex:1;height:52px;border-radius:26px;font-weight:700;font-size:17px;color:var(--mut)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpis div{background:#fff;border-radius:16px;padding:12px}
+.kpis b{display:block;font-size:31px}
+.seg{display:flex;background:#fff;border-radius:12px;padding:3px;margin-bottom:12px}
+.seg button{flex:1;padding:8px 0;border-radius:10px;font-weight:700;font-size:17px;color:var(--mut)}
 .seg button.on{background:var(--acc);color:#fff}
 </style>
 </head>
@@ -276,7 +263,7 @@ const st=()=>Store.state;
 const mode=()=>st().mode||'health';
 const now=()=>Date.now();
 function visiblePosts(m){return Store.posts.filter(p=>(!m||p.mode===m)&&(Store.isAdmin||!p.hidden)&&(Store.isAdmin||!p.publishAt||p.publishAt<=now())).sort((a,b)=>(b.publishAt||0)-(a.publishAt||0))}
-function setMode(m){st().mode=m;document.body.classList.toggle('mood',m==='mood');document.querySelector('meta[name=theme-color]').content=m==='mood'?'#141A24':'#1C1616';saveState();App.bodyZone='';render()}
+function setMode(m){st().mode=m;document.body.classList.toggle('mood',m==='mood');document.querySelector('meta[name=theme-color]').content=m==='mood'?'#1f6fd6':'#d7141a';saveState();App.bodyZone='';render()}
 function track(kind,id,extra){const s=st();if(kind==='view'){s.views[id]=(s.views[id]||0)+1}else if(kind==='click'){s.clicks[id]=s.clicks[id]||{};s.clicks[id][extra]=(s.clicks[id][extra]||0)+1}saveState()}
 
 // ================= media + zoom slider =================
@@ -316,38 +303,38 @@ function render(){
  bindSliders($('#app'));afterRender();
 }
 function cardHTML(p,hl){const f=st().favs.includes(p.id);const pr=(p.products||[])[0];const sched=p.publishAt&&p.publishAt>now();
- const H=x=>hl?highlight(x,hl):esc(x);
- return `<div class="card feedcard"><div class="fc">${sliderHTML(p)}<div class="shade"></div><button class="favbtn fav ${f?'on':''}" data-fav="${p.id}" aria-label="В избранное">${f?'♥':'♡'}</button>
- <div class="ovl"><h3 data-open="${p.id}">${H(p.title)}</h3><p data-open="${p.id}">${H(p.text)}</p>${sched?`<div class="tags"><span class="badge">⏰ Выйдет ${new Date(p.publishAt).toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>`:''}
- ${(p.tags||[]).length?`<div class="tags">${p.tags.map(t=>`<span class="tag" data-tagq="${esc(t)}">#${esc(t)}</span>`).join('')}</div>`:''}
- <button class="btn white" data-open="${p.id}">Читать совет</button>${pr?mpRow(pr,p.id):''}</div></div></div>`}
+ const H=s=>hl?highlight(s,hl):esc(s);
+ return `<div class="card feedcard">${sliderHTML(p)}<div class="cb"><div class="row between"><h3 data-open="${p.id}" style="cursor:pointer">${H(p.title)}</h3><button class="ic fav ${f?'on':''}" data-fav="${p.id}">${f?'♥':'♡'}</button></div>
+ <p data-open="${p.id}" style="cursor:pointer">${H(p.text)}</p>${sched?`<div class="tags"><span class="badge">⏰ Выйдет ${new Date(p.publishAt).toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>`:''}
+ <div class="tags">${(p.tags||[]).map(t=>`<span class="tag" data-tagq="${esc(t)}">#${esc(t)}</span>`).join('')}</div>
+ ${pr?mpRow(pr,p.id):''}</div></div>`}
 function mpRow(pr,pid){const l=Object.keys(MP).filter(k=>pr[k]);if(!l.length)return'';return `<div class="mp">Купить: ${l.map(k=>`<a href="${esc(pr[k])}" target="_blank" rel="noopener" data-mp="${k}" data-pid="${pid}">${MP[k]}</a>`).join(' · ')}</div>`}
 function highlight(s,q){const t=esc(s);if(!q)return t;const words=q.trim().split(/\s+/).filter(w=>w.length>1).map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));if(!words.length)return t;return t.replace(new RegExp('('+words.join('|')+')','gi'),'<mark>$1</mark>')}
 function viewFeed(){const m=mode();const ps=visiblePosts(m);const stories=ps.filter(p=>p.story&&(p.slides||[]).length);
  let h='';
  if(stories.length)h+=`<div class="stories">${stories.map(p=>`<div class="story ${st().seenStories.includes(p.id)?'seen':''}" data-story="${p.id}"><div class="ring"><img src="${esc(p.slides[0].type==='image'?p.slides[0].src:p.slides[0].poster)}" loading="lazy"></div><span>${esc(p.title)}</span></div>`).join('')}</div>`;
- h+=`<div class="quick">${m==='health'?`<button class="${App.bodyZone?'on':''}" data-act="bodymap">🩹 ${App.bodyZone?BODY[App.bodyZone]:'Где беспокоит?'}</button>`:`<button data-act="cal">🎉 Праздники</button>`}<button data-tab="game">🎁 Скидки</button></div>`;
+ if(m==='health')h+=bodyMapHTML();else h+=holidaysHTML(true);
  let list=ps;if(m==='health'&&App.bodyZone)list=ps.filter(p=>(p.zones||[]).includes(App.bodyZone));
  if(App.bodyZone)h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:20px">Про «${BODY[App.bodyZone]}»</b><button class="btn sm ghost" data-act="clearzone">Все посты</button></div>`;
  h+=list.length?list.slice(0,App.feedN||12).map(p=>cardHTML(p)).join('')+(list.length>(App.feedN||12)?`<button class="btn ghost wide" data-act="more" style="margin-bottom:16px">Показать ещё</button>`:''):(Store.loading?'<div class="empty">Загружаю посты с Диска…</div>':Store.err?`<div class="empty">${esc(Store.err)}</div>`:`<div class="empty">Пока нет постов${App.bodyZone?' про эту зону':''}</div>`);
  return h}
 function bodyMapHTML(){const z=App.bodyZone;const Z=(k,el)=>el.replace('<','<').replace(/^<(\w+)/,`<$1 class="z ${z===k?'on':''}" data-zone="${k}"`);
  return `<div class="box"><div class="bodymap"><svg viewBox="0 0 150 300" width="130" height="260">
- <circle cx="75" cy="30" r="22" fill="#4a4040"/>${Z('neck','<rect x="64" y="52" width="22" height="16" rx="6"/>')}
+ <circle cx="75" cy="30" r="22" fill="#eee"/>${Z('neck','<rect x="64" y="52" width="22" height="16" rx="6"/>')}
  ${Z('shoulders','<path d="M30 72 Q75 60 120 72 L120 92 L30 92 Z"/>')}
  ${Z('back','<rect x="45" y="94" width="60" height="50" rx="8"/>')}${Z('lower','<rect x="45" y="146" width="60" height="30" rx="8"/>')}
  ${Z('arms','<path d="M14 94 h26 v90 h-18 z M110 94 h26 l-8 90 h-18 z"/>')}
- <rect x="48" y="178" width="22" height="50" rx="8" fill="#4a4040"/><rect x="80" y="178" width="22" height="50" rx="8" fill="#4a4040"/>
- ${Z('knees','<path d="M47 230 h24 v22 h-24 z M79 230 h24 v22 h-24 z"/>')}<rect x="49" y="254" width="20" height="26" rx="6" fill="#4a4040"/><rect x="81" y="254" width="20" height="26" rx="6" fill="#4a4040"/>
+ <rect x="48" y="178" width="22" height="50" rx="8" fill="#eee"/><rect x="80" y="178" width="22" height="50" rx="8" fill="#eee"/>
+ ${Z('knees','<path d="M47 230 h24 v22 h-24 z M79 230 h24 v22 h-24 z"/>')}<rect x="49" y="254" width="20" height="26" rx="6" fill="#eee"/><rect x="81" y="254" width="20" height="26" rx="6" fill="#eee"/>
  ${Z('feet','<path d="M42 282 h30 v12 h-30 z M78 282 h30 v12 h-30 z"/>')}</svg>
- <div><b style="font-size:17px">Где беспокоит?</b><p class="muted" style="margin:6px 0 10px">Нажмите на зону, покажем советы и подходящее средство.</p>
+ <div><b style="font-size:22px">Где беспокоит?</b><p class="muted" style="margin:6px 0 10px">Нажмите на зону, покажем советы и подходящее средство.</p>
  <div class="chips">${Object.entries(BODY).map(([k,v])=>`<button class="chip ${z===k?'on':''}" data-zone="${k}">${v}</button>`).join('')}</div></div></div>
  ${z?recoHTML(z):''}</div>`}
 function recoHTML(z){const p=visiblePosts('health').find(p=>(p.zones||[]).includes(z)&&(p.products||[]).length);if(!p)return'';const pr=p.products[0];
  return `<div class="prod" style="margin:12px 0 0;background:var(--soft)"><div><b>Подойдёт: ${esc(pr.name)}</b>${mpRow(pr,p.id)}</div></div>`}
 function upcomingHolidays(){const t=today();return (Store.config.holidays||[]).filter(h=>h.date>=t).sort((a,b)=>a.date.localeCompare(b.date))}
 function holidaysHTML(short){const hs=upcomingHolidays().slice(0,short?2:20);if(!hs.length)return'';
- return `<div class="box"><div class="row between"><b style="font-size:17px">🎉 Скоро праздник</b>${short?`<button class="btn sm ghost" data-act="cal">Календарь</button>`:''}</div><div style="margin-top:10px">${hs.map(holRow).join('')}</div></div>`}
+ return `<div class="box"><div class="row between"><b style="font-size:22px">🎉 Скоро праздник</b>${short?`<button class="btn sm ghost" data-act="cal">Календарь</button>`:''}</div><div style="margin-top:10px">${hs.map(holRow).join('')}</div></div>`}
 function holRow(h){const d=new Date(h.date+'T00:00');const days=Math.ceil((d-new Date(today()+'T00:00'))/DAY);const on=st().holRem.includes(h.date);
  return `<div class="hol" style="background:var(--bg)"><div class="d">${d.getDate()}<small>${d.toLocaleString('ru',{month:'short'})}</small></div><div style="flex:1"><b>${esc(h.title)}</b><div class="muted">${days===0?'Сегодня':'через '+days+' дн.'}${h.tag?` · <a href="#" data-tagq="${esc(h.tag)}" style="color:var(--acc)">идеи подарков</a>`:''}</div></div><button class="btn sm ${on?'':'ghost'}" data-rem="${h.date}">${on?'🔔 Напомню':'Напомнить'}</button></div>`}
 function viewSearch(){const q=App.q.trim().toLowerCase();const src=visiblePosts(App.qAll?null:mode());
@@ -382,7 +369,7 @@ function openStory(id){const list=visiblePosts(mode()).filter(p=>p.story&&(p.sli
  const d=document.createElement('div');d.className='sv';document.body.appendChild(d);let tm=null;
  function show(){const p=list[pi];if(!st().seenStories.includes(p.id)){st().seenStories.push(p.id);saveState()}track('view',p.id);const s=p.slides[si];
   d.innerHTML=`<div class="st"><div class="bars">${p.slides.map((_,i)=>`<i><b style="width:${i<si?100:0}%"></b></i>`).join('')}</div><div class="ttl">${esc(p.title)}</div><button class="x">✕</button>
-  <div class="media">${mediaHTML(s)}</div><div class="tapL"></div><div class="tapR"></div><button class="btn white go" data-go="${p.id}">Читать пост</button></div>`;
+  <div class="media">${mediaHTML(s)}</div><div class="tapL"></div><div class="tapR"></div><button class="btn go" data-go="${p.id}">Читать пост</button></div>`;
   d.querySelectorAll('video').forEach(v=>{v.muted=true;v.play().catch(()=>{})});const bar=d.querySelectorAll('.bars b')[si];bar.style.transition='width 5s linear';requestAnimationFrame(()=>requestAnimationFrame(()=>bar.style.width='100%'));
   clearTimeout(tm);tm=setTimeout(next,5000);
   d.querySelector('.x').onclick=close;d.querySelector('.tapL').onclick=prev;d.querySelector('.tapR').onclick=next;d.querySelector('.go').onclick=()=>{close();openPost(p.id)}}
@@ -451,11 +438,11 @@ function endGame(){const g=App.game;App.game=null;const s=st();s.games.best=Math
 const PRIZES=[{t:'+1 игра',g:1},{t:'5%',p:5},{t:'+2 игры',g:2},{t:'+1 игра',g:1},{t:'7%',p:7},{t:'+3 игры',g:3},{t:'5%',p:5},{t:'10%',p:10}];
 const PRW=[18,14,14,18,10,8,14,4];
 function wheelBox(){const s=st();const t=today();const done=s.wheel.date===t;const yest=new Date(Date.now()-DAY).toISOString().slice(0,10);const streak=done?s.wheel.streak:(s.wheel.date===yest?s.wheel.streak:0);
- return `<div class="box"><div class="row between"><div><b style="font-size:17px">🎡 Бонус дня</b><div class="muted">${done?'Сегодня: '+esc(s.wheel.last)+'. Приходите завтра!':'Крутите колесо раз в день'}</div></div><button class="btn sm" data-act="wheel" ${done?'disabled':''}>Крутить</button></div>
+ return `<div class="box"><div class="row between"><div><b style="font-size:22px">🎡 Бонус дня</b><div class="muted">${done?'Сегодня: '+esc(s.wheel.last)+'. Приходите завтра!':'Крутите колесо раз в день'}</div></div><button class="btn sm" data-act="wheel" ${done?'disabled':''}>Крутить</button></div>
  <div class="streak">${[1,2,3,4,5,6,7].map(i=>`<i class="${i<=streak?'on':''}">${i===7?'🎁':i}</i>`).join('')}</div><p class="muted" style="text-align:center;margin:0">7 дней подряд: скидка 10% в подарок</p></div>`}
 function openWheel(){const cols=['#d7141a','#ffb000','#1f6fd6','#2fa84f','#ff6fa5','#7a4cc2','#ff8a00','#1d1b1a'];const seg=360/PRIZES.length;
  const grad=PRIZES.map((_,i)=>`${cols[i]} ${i*seg}deg ${(i+1)*seg}deg`).join(',');
- sheet(`<h2 style="text-align:center">Бонус дня</h2><div class="wheelw"><div class="wheel" id="wheel" style="background:conic-gradient(${grad})">${PRIZES.map((p,i)=>`<div style="position:absolute;left:50%;top:50%;transform:rotate(${i*seg+seg/2}deg) translateY(-104px) translateX(-50%);color:#fff;font-weight:900;font-size:16px;transform-origin:0 0;white-space:nowrap">${p.t}</div>`).join('')}</div></div>
+ sheet(`<h2 style="text-align:center">Бонус дня</h2><div class="wheelw"><div class="wheel" id="wheel" style="background:conic-gradient(${grad})">${PRIZES.map((p,i)=>`<div style="position:absolute;left:50%;top:50%;transform:rotate(${i*seg+seg/2}deg) translateY(-92px) translateX(-50%);color:#fff;font-weight:900;font-size:15px;transform-origin:0 0;white-space:nowrap">${p.t}</div>`).join('')}</div></div>
  <button class="btn wide" id="spin">Крутить!</button><p id="wres" style="text-align:center;font-weight:800;font-size:18px"></p>`);
  $('#spin').onclick=()=>{const s=st();const t=today();if(s.wheel.date===t)return;$('#spin').disabled=true;
   let r=Math.random()*100,k=0;for(;k<PRW.length;k++){if(r<PRW[k])break;r-=PRW[k]}k=Math.min(k,PRIZES.length-1);
@@ -470,15 +457,15 @@ function refCode(){const s=st();if(!s.ref.code){s.ref.code=('DRUG'+(Store.uid||u
 function viewMe(){const s=st();const m=mode();const cfg=Store.config;const active=s.coupons.filter(c=>!c.used&&c.exp>now());const allTags=[...new Set(visiblePosts(null).flatMap(p=>p.tags||[]))];
  const soc=(cfg[m]||{}).social||{};const SOC=[['vk','ВК','🅥'],['tg','Telegram','✈️'],['yt','YouTube','▶️'],['ok','ОК','🟠']].filter(x=>soc[x[0]]);
  return `<h2>Профиль</h2>
- <div class="box"><div class="row between"><b style="font-size:17px">🎟️ Мои скидки</b><span class="muted">${active.length} активн.</span></div><div style="margin-top:10px">${s.coupons.length?s.coupons.slice(0,30).map(couponHTML).join(''):'<p class="muted">Скидки из игры и бонуса дня будут здесь. Код вводится при оформлении заказа на маркетплейсе.</p>'}</div></div>
- <div class="box"><b style="font-size:17px">👫 Пригласи друга</b><p class="muted">Поделитесь приложением с вашим кодом. Друг получит скидку ${cfg.referralPercent||10}%, и вы тоже.</p>
+ <div class="box"><div class="row between"><b style="font-size:22px">🎟️ Мои скидки</b><span class="muted">${active.length} активн.</span></div><div style="margin-top:10px">${s.coupons.length?s.coupons.slice(0,30).map(couponHTML).join(''):'<p class="muted">Скидки из игры и бонуса дня будут здесь. Код вводится при оформлении заказа на маркетплейсе.</p>'}</div></div>
+ <div class="box"><b style="font-size:22px">👫 Пригласи друга</b><p class="muted">Поделитесь приложением с вашим кодом. Друг получит скидку ${cfg.referralPercent||10}%, и вы тоже.</p>
   <div class="row between" style="margin:10px 0"><span class="code" style="font-size:18px">${refCode()}</span><button class="btn sm" data-act="share">Поделиться</button></div>
   ${s.ref.used?'<p class="muted">Код друга уже применён ✓</p>':`<div class="row"><input id="refin" placeholder="Код друга"><button class="btn sm" data-act="applyref">ОК</button></div>`}</div>
  ${m==='mood'?holidaysHTML(false):''}
- <div class="box"><b style="font-size:17px">🔔 Уведомления</b><p class="muted">О каких темах сообщать (если ничего не выбрать, то обо всех):</p><div class="chips">${allTags.map(t=>`<button class="chip ${s.topics.includes(t)?'on':''}" data-topic="${esc(t)}">#${esc(t)}</button>`).join('')}</div>
+ <div class="box"><b style="font-size:22px">🔔 Уведомления</b><p class="muted">О каких темах сообщать (если ничего не выбрать, то обо всех):</p><div class="chips">${allTags.map(t=>`<button class="chip ${s.topics.includes(t)?'on':''}" data-topic="${esc(t)}">#${esc(t)}</button>`).join('')}</div>
   <button class="btn ghost wide" data-act="pushperm" style="margin-top:12px">Получать на телефон</button></div>
- ${SOC.length?`<div class="box"><b style="font-size:17px">Мы в соцсетях</b><div class="social" style="margin-top:10px">${SOC.map(x=>`<a href="${esc(soc[x[0]])}" target="_blank" rel="noopener"><span>${x[2]}</span>${x[1]}</a>`).join('')}</div></div>`:''}
- <div class="box"><b style="font-size:17px">📲 Приложение на экран</b><p class="muted">Android: меню браузера ⋮ → «Добавить на главный экран». iPhone: «Поделиться» → «На экран Домой».</p></div>`}
+ ${SOC.length?`<div class="box"><b style="font-size:22px">Мы в соцсетях</b><div class="social" style="margin-top:10px">${SOC.map(x=>`<a href="${esc(soc[x[0]])}" target="_blank" rel="noopener"><span>${x[2]}</span>${x[1]}</a>`).join('')}</div></div>`:''}
+ <div class="box"><b style="font-size:22px">📲 Приложение на экран</b><p class="muted">Android: меню браузера ⋮ → «Добавить на главный экран». iPhone: «Поделиться» → «На экран Домой».</p></div>`}
 function shareApp(){const t=`Полезные советы и скидки Спецмазь и Доктор Шустер. Мой код на скидку: ${refCode()}\n${location.href.split('#')[0]}`;
  if(navigator.share){navigator.share({text:t}).catch(()=>copy(t))}else copy(t)}
 
@@ -558,7 +545,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
  else if(d.fav){const f=st().favs;const i=f.indexOf(d.fav);if(i>=0)f.splice(i,1);else{f.push(d.fav);toast('В избранном')}saveState();document.querySelectorAll(`[data-fav="${d.fav}"]`).forEach(b=>{b.classList.toggle('on',i<0);b.textContent=i<0?'♥':'♡'});if(App.tab==='favs'&&!$('#sheet'))render()}
  else if(d.open){openPost(d.open)}
  else if(d.story){openStory(d.story)}
- else if(d.zone){App.bodyZone=App.bodyZone===d.zone?'':d.zone;closeSheet();render();scrollTo(0,0)}
+ else if(d.zone){App.bodyZone=App.bodyZone===d.zone?'':d.zone;render()}
  else if(d.tagq){ev.preventDefault();closeSheet();App.tab='search';App.q=d.tagq;render();scrollTo(0,0)}
  else if(d.rem){const r=st().holRem;const i=r.indexOf(d.rem);if(i>=0)r.splice(i,1);else{r.push(d.rem);toast('Напомним за 3 дня')}saveState();if($('#sheet'))$('#sheet').querySelectorAll(`[data-rem="${d.rem}"]`).forEach(b=>{b.textContent=i<0?'🔔 Напомню':'Напомнить';b.classList.toggle('ghost',i>=0)});render()}
  else if(d.qall!==undefined){App.qAll=d.qall==='1';render()}
