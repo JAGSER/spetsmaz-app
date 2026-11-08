@@ -220,7 +220,7 @@ const isVid=f=>f.media_type==='video'||/\.(mp4|webm|mov)$/i.test(f.name);
 const isMedia=f=>f.type==='file'&&(isVid(f)||f.media_type==='image'||/\.(png|jpe?g|webp|gif)$/i.test(f.name));
 function slideOf(f){return isVid(f)?{src:f.file,poster:f.preview||'',type:'video',path:f.path}:{src:f.preview||f.file,full:f.file,type:'image',path:f.path}}
 const MONTHS=/(январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр)/i;
-function cleanFolder(n){return n.replace(/^\+/,'').replace(/\s*\((карусель|карсуель)\)/ig,'').replace(/^(Спецмазь|Шустер)\s*/i,'').replace(/(Карусель|Карсуель)\s*/i,'').trim()||n}
+function cleanFolder(n){let t=n.replace(/^\+/,'').replace(/\s*\((карусель|карсуель)\)/ig,'').replace(/^(Спецмазь|Шустер)\s*/i,'').replace(/(Карусель|Карсуель)\s*/i,'').trim()||n;const m=t.match(/^(20\d\d)\s+(.+)$/);return m?m[2]+' '+m[1]:t}
 function cleanFile(n){return n.replace(/\.[^.]+$/,'').replace(/^\d+[\s._-]*/,'').trim()}
 const isCar=n=>/карус|карсуел/i.test(n||'');
 async function crawl(){const posts=[];
