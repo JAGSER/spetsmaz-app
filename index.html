@@ -7,6 +7,7 @@
 <meta name="referrer" content="no-referrer">
 <title>Спецмазь и Доктор Шустер</title>
 <link rel="manifest" href="manifest.json">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="cb0ec999-076a-4bd0-ad61-49313a08c950"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--nav:rgba(255,255,255,.96);--card:#fff;--ink2:#3a3532;--acc:#d7141a;--acc2:#b0101a;--soft:#fff0ee;--bg:#f6f4f2;--card:#fff;--ink:#1d1b1a;--mut:#8a8580;--line:#ece7e3}
@@ -271,6 +272,17 @@ main.tabin{animation:tabin .35s cubic-bezier(.2,.8,.2,1)}
 .cell{transition:transform .18s,opacity .2s}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 nav button{font-size:12px!important}.switch button{font-size:17px!important}.logo{font-size:21px!important}.seg button{white-space:nowrap}
+.sim{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.simc{background:var(--card);border-radius:16px;overflow:hidden;text-align:left;padding:0;display:flex;flex-direction:column}
+.simc img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.simc span{padding:8px 10px 10px;font-size:calc(15px*var(--fz,1));font-weight:700;line-height:1.25;color:var(--ink)}
+.onb{text-align:center;padding:10px 4px 6px}
+.onbi{font-size:84px;line-height:1;margin:6px 0 10px;animation:pop .5s cubic-bezier(.3,1.8,.5,1)}
+.onb h2{margin:6px 0 10px}
+.onb p{font-size:calc(19px*var(--fz,1));line-height:1.5;color:var(--ink2);margin:0 0 18px}
+.onbd{display:flex;justify-content:center;gap:8px;margin-bottom:18px}
+.onbd i{width:10px;height:10px;border-radius:5px;background:var(--line);transition:width .3s}
+.onbd i.on{width:28px;background:var(--acc)}
 </style>
 </head>
 <body>
@@ -336,7 +348,7 @@ async function crawl(){const posts=[];
  return {posts,meta}}
 function applyMeta(){const M=Store.meta;Store.config=Object.assign(clone(DEFAULT_CONFIG),M.config||{});
  const byMode={health:[],mood:[]};
- const AU=Store.auto||{};Store.posts=Store.base.map(b=>{const m=M.posts[b.id]||{};const au=AU[b.id]||{};const p=Object.assign({},b,{title:au.title||b.title,text:b.kind==='carousel'?'Карусель · '+b.group:b.group,body:'',tags:au.tags||[],zones:[],products:[],publishAt:b.created},m);
+ const AU=Store.auto||{};Store.posts=Store.base.map(b=>{const m=M.posts[b.id]||{};const au=AU[b.id]||{};const p=Object.assign({},b,{title:au.title||b.title,text:b.kind==='carousel'?'Карусель · '+b.group:b.group,body:'',tags:au.tags||[],zones:au.zones||[],products:[],publishAt:b.created},m);
   p.slides=b.slides.map(s=>Object.assign({},s,{zones:(m.slideZones||{})[s.path]||[]}));if(p.story===undefined)byMode[p.mode].push(p);return p});
  Object.values(byMode).forEach(a=>a.sort((x,y)=>y.publishAt-x.publishAt).forEach((p,i)=>p.story=i<8));}
 async function initStore(){
@@ -363,7 +375,7 @@ const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigat
 function isDark(){const t=(Store.state&&Store.state.theme)||'auto';return t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches)}
 function applyTheme(){document.body.classList.toggle('dark',isDark());applyFS()}
 function applyFS(){const z=[1,1.12,1.25][(Store.state&&Store.state.fs)||0]||1;document.body.style.zoom='';document.documentElement.style.setProperty('--fz',z)}
-async function doInstall(){if(DEFERRED){DEFERRED.prompt();try{await DEFERRED.userChoice}catch(e){}DEFERRED=null;return}
+async function doInstall(){ut('Установка нажата');if(DEFERRED){DEFERRED.prompt();try{await DEFERRED.userChoice}catch(e){}DEFERRED=null;return}
  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);sheet(`<h2>Установить приложение</h2>${ios?'<p class="muted" style="font-size:calc(19px*var(--fz,1))">1. Нажмите кнопку «Поделиться» внизу Safari (квадрат со стрелкой).<br><br>2. Выберите «На экран Домой».<br><br>3. Нажмите «Добавить».</p>':'<p class="muted" style="font-size:calc(19px*var(--fz,1))">1. Нажмите меню браузера ⋮ в правом верхнем углу.<br><br>2. Выберите «Установить приложение» или «Добавить на главный экран».<br><br>3. Подтвердите.</p>'}`)}
 // ================= app state =================
 const App={tab:'feed',q:'',qAll:false,bodyZone:'',game:null,adminTab:'posts',edit:null};
@@ -371,8 +383,9 @@ const st=()=>Store.state;
 const mode=()=>st().mode||'health';
 const now=()=>Date.now();
 function visiblePosts(m){return Store.posts.filter(p=>(!m||p.mode===m)&&(Store.isAdmin||!p.hidden)&&(Store.isAdmin||!p.publishAt||p.publishAt<=now())).sort((a,b)=>(b.publishAt||0)-(a.publishAt||0))}
-function setMode(m){const prev=st().mode;const changed=prev&&prev!==m;st().mode=m;document.body.classList.toggle('mood',m==='mood');document.querySelector('meta[name=theme-color]').content=m==='mood'?'#1E9E58':'#d7141a';saveState();App.bodyZone='';render();if(changed){const dir=m==='mood'?1:-1;const mn=document.querySelector('main');if(mn)mn.animate([{opacity:0,transform:`translateX(${dir*60}px)`},{opacity:1,transform:'none'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});const mk=document.querySelector('.logo .mark');if(mk)mk.animate([{transform:'rotateY(90deg) scale(.6)'},{transform:'none'}],{duration:450,easing:'cubic-bezier(.3,1.6,.5,1)'});const pl=document.querySelector('.switch .pill');if(pl)pl.animate([{left:dir>0?'3px':'50%',background:dir>0?'#d7141a':'#1E9E58'},{left:dir>0?'50%':'3px',background:dir>0?'#1E9E58':'#d7141a'}],{duration:420,easing:'cubic-bezier(.3,1.3,.5,1)'});const lg=document.querySelector('.logo');if(lg)lg.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:350})}}
-function track(kind,id,extra){const s=st();if(kind==='view'){s.views[id]=(s.views[id]||0)+1}else if(kind==='click'){s.clicks[id]=s.clicks[id]||{};s.clicks[id][extra]=(s.clicks[id][extra]||0)+1}saveState()}
+function setMode(m){if(st().mode&&st().mode!==m)ut('Раздел',{mode:m});const prev=st().mode;const changed=prev&&prev!==m;st().mode=m;document.body.classList.toggle('mood',m==='mood');document.querySelector('meta[name=theme-color]').content=m==='mood'?'#1E9E58':'#d7141a';saveState();App.bodyZone='';render();if(changed){const dir=m==='mood'?1:-1;const mn=document.querySelector('main');if(mn)mn.animate([{opacity:0,transform:`translateX(${dir*60}px)`},{opacity:1,transform:'none'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});const mk=document.querySelector('.logo .mark');if(mk)mk.animate([{transform:'rotateY(90deg) scale(.6)'},{transform:'none'}],{duration:450,easing:'cubic-bezier(.3,1.6,.5,1)'});const pl=document.querySelector('.switch .pill');if(pl)pl.animate([{left:dir>0?'3px':'50%',background:dir>0?'#d7141a':'#1E9E58'},{left:dir>0?'50%':'3px',background:dir>0?'#1E9E58':'#d7141a'}],{duration:420,easing:'cubic-bezier(.3,1.3,.5,1)'});const lg=document.querySelector('.logo');if(lg)lg.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:350})}}
+function ut(n,d){try{window.umami&&umami.track(n,d)}catch(e){}}
+function track(kind,id,extra){const P=Store.posts.find(x=>x.id===id);if(kind==='view')ut('Пост открыт',{title:P?P.title:id,mode:P?P.mode:''});else if(kind==='click')ut('Маркетплейс',{mp:MP[extra]||extra,title:P?P.title:id});const s=st();if(kind==='view'){s.views[id]=(s.views[id]||0)+1}else if(kind==='click'){s.clicks[id]=s.clicks[id]||{};s.clicks[id][extra]=(s.clicks[id][extra]||0)+1}saveState()}
 
 // ================= media + zoom slider =================
 function mediaHTML(sl,auto=true){if(!auto&&sl.type==='video'&&sl.poster)return `<img src="${esc(sl.poster)}" alt="" loading="lazy">`;return sl.type==='image'?`<img src="${esc(sl.src)}" alt="" loading="lazy">`:`<video src="${esc(sl.src)}" poster="${esc(sl.poster||'')}" muted loop playsinline preload="none"></video>`}
@@ -488,7 +501,20 @@ function openPost(id){const p=Store.posts.find(x=>x.id===id);if(!p)return;track(
  <h2 style="margin-top:10px">${esc(p.title)}</h2><p style="font-size:calc(20px*var(--fz,1));line-height:1.5;color:var(--ink2);margin-top:0">${esc(p.text)}</p>
  <div class="rich">${richHTML(p.body)}</div>
  ${(p.products||[]).length?`<h4>Где купить</h4>${p.products.map(pr=>`<div class="prod"><div><b>${esc(pr.name)}</b>${mpRow(pr,p.id)}</div></div>`).join('')}`:''}
- <div class="tags">${(p.tags||[]).map(t=>`<span class="tag" data-tagq="${esc(t)}">#${esc(t)}</span>`).join('')}</div>`)}
+ <div class="tags">${(p.tags||[]).map(t=>`<span class="tag" data-tagq="${esc(t)}">#${esc(t)}</span>`).join('')}</div>${similarHTML(p)}`)}
+function similarHTML(p){const tg=new Set([...(p.tags||[]),...(p.zones||[])]);const sc=visiblePosts(p.mode).filter(x=>x.id!==p.id).map(x=>({x,s:[...(x.tags||[]),...(x.zones||[])].filter(t=>tg.has(t)).length})).filter(o=>o.s>0).sort((a,b)=>b.s-a.s||b.x.publishAt-a.x.publishAt).slice(0,4).map(o=>o.x);
+ if(!sc.length)return'';return `<h4 style="margin-top:22px">Похожие советы</h4><div class="sim">${sc.map(x=>`<button class="simc" data-open="${x.id}"><img src="${esc(x.slides[0].type==='image'?x.slides[0].src:x.slides[0].poster)}" alt=""><span>${esc(x.title)}</span></button>`).join('')}</div>`}
+async function shareImage(id){const p=Store.posts.find(x=>x.id===id);if(!p)return;const url=location.origin+location.pathname;const txt=`${p.title}\nЕщё советы: ${url}`;ut('Поделиться',{title:p.title});
+ try{toast('Готовлю картинку…');const sl=p.slides[0];const src=sl.type==='image'?(sl.full||sl.src):sl.poster;const blob=await (await fetch(src,{referrerPolicy:'no-referrer'})).blob();const bmp=await createImageBitmap(blob);
+  const W=1080,IH=Math.round(W*bmp.height/bmp.width),H=IH+300;const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);x.drawImage(bmp,0,0,W,IH);
+  const acc=p.mode==='mood'?'#1E9E58':'#D7141A';x.fillStyle=acc;x.fillRect(0,IH,W,12);x.fillStyle='#1d1b1a';x.font='800 54px Inter, sans-serif';const words=p.title.split(' ');let line='',y=IH+100,lines=0;for(const w of words){const t=line?line+' '+w:w;if(x.measureText(t).width>W-120&&line){x.fillText(line,60,y);y+=66;line=w;lines++;if(lines>=2)break}else line=t}if(lines<2)x.fillText(line,60,y);
+  x.fillStyle=acc;x.font='700 40px Inter, sans-serif';x.fillText('Ещё советы: '+url.replace(/^https?:\/\//,'').replace(/\/$/,''),60,H-50);
+  const out=await new Promise(r=>c.toBlob(r,'image/jpeg',.9));const file=new File([out],'sovet.jpg',{type:'image/jpeg'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:txt});return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(out);a.download='sovet.jpg';a.click();copy(txt)}catch(e){if(e&&e.name==='AbortError')return;if(navigator.share)navigator.share({text:txt}).catch(()=>{});else copy(txt)}}
+function onboarding(){let i=0;const S=[['👆','Два раздела','Вверху переключатель: «Здоровье» с советами Спецмази и «Настроение» с Доктором Шустером.'],['🔍','Смотрите ближе','Нажмите на картинку поста, и нужное место приблизится. Листайте картинки пальцем вбок.'],['🩹','Где болит?','В «Здоровье» нажмите на человечка там, где болит, и увидите подходящие советы.'],['🎁','Скидки и избранное','Играйте в «Скидки» и получайте промокоды. Сердечко ♥ сохраняет пост в «Избранное».']];
+ const draw=()=>{const s=S[i];sheet(`<div class="onb"><div class="onbi">${s[0]}</div><h2>${s[1]}</h2><p>${s[2]}</p><div class="onbd">${S.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('')}</div><button class="btn wide" data-act="onbnext">${i<S.length-1?'Дальше':'Понятно, начать!'}</button>${i<S.length-1?'<button class="muted" data-act="close" style="margin-top:12px;text-decoration:underline">Пропустить</button>':''}</div>`,()=>{st().onb=1;saveState()})};
+ window._onbNext=()=>{if(i<S.length-1){i++;draw()}else closeSheet()};draw()}
 function sheet(html,onClose){closeSheet();const d=document.createElement('div');d.className='sheet';d.id='sheet';d.innerHTML=`<div class="in"><button class="close" data-act="close">✕</button>${html}</div>`;
  d.addEventListener('click',e=>{if(e.target===d)closeSheet()});d.querySelector('.in').insertAdjacentHTML('afterbegin','<div class="grab"></div>');bindSwipeClose(d);document.body.appendChild(d);bindSliders(d);d.querySelectorAll('.slider video').forEach(v=>v.play().catch(()=>{}));d._onClose=onClose;d.querySelector('.in').scrollTop=0}
 function bindSwipeClose(d){const box=d.querySelector('.in');let y0=null,x0=0,dy=0,lock=null;
@@ -532,7 +558,7 @@ function openBell(){const ns=notifications();
 async function askPush(){try{if(!('Notification'in window))throw 0;const r=await Notification.requestPermission();if(r==='granted'){st().push=true;saveState();toast('Уведомления включены');try{new Notification('Готово',{body:'Будем сообщать о новых постах и скидках'})}catch(e){}}else toast('Разрешите уведомления в настройках браузера')}catch(e){toast('Установите приложение на экран телефона, чтобы получать уведомления')}}
 
 // ================= coupons =================
-function addCoupon(percent,code,src){const c={id:uid(),percent,code,src,mode:mode(),exp:now()+(Store.config.couponDays||7)*DAY,used:false};st().coupons.unshift(c);saveState();return c}
+function addCoupon(percent,code,src){ut('Скидка получена',{percent,src});const c={id:uid(),percent,code,src,mode:mode(),exp:now()+(Store.config.couponDays||7)*DAY,used:false};st().coupons.unshift(c);saveState();return c}
 function couponHTML(c){const exp=c.exp<now();return `<div class="coupon ${c.used||exp?'used':''}"><div class="pc">${c.percent}%</div><div class="ci"><div class="row between"><span class="code">${esc(c.code)}</span>${c.used||exp?'':`<button class="btn sm" data-copyc="${c.id}">Копировать</button>`}</div>
  <div class="muted" style="margin-top:6px">${c.used?'Использован':exp?'Срок истёк':'До '+new Date(c.exp).toLocaleDateString('ru')} · ${({game:'за игру',wheel:'бонус дня',ref:'за друга'})[c.src]||''}</div>
  ${c.used||exp?'':`<button class="muted" data-usec="${c.id}" style="margin-top:4px;text-decoration:underline">Отметить использованным</button>`}</div></div>`}
@@ -555,7 +581,7 @@ function newBoard(){const b=[];for(let i=0;i<GN*GN;i++){let v;do{v=Math.floor(Ma
 function findMatches(b){const m=new Set();for(let r=0;r<GN;r++)for(let c=0;c<GN;c++){const i=r*GN+c;if(b[i]<0)continue;
  if(c<=GN-3&&b[i]===b[i+1]&&b[i]===b[i+2]){let k=c;while(k<GN&&b[r*GN+k]===b[i]){m.add(r*GN+k);k++}}
  if(r<=GN-3&&b[i]===b[i+GN]&&b[i]===b[i+2*GN]){let k=r;while(k<GN&&b[k*GN+c]===b[i]){m.add(k*GN+c);k++}}}return m}
-function startGame(){const s=st();if(s.games.left<=0)return;s.games.left--;s.games.played=(s.games.played||0)+1;saveState();App.game={b:newBoard(),score:0,moves:20,sel:-1,busy:false,mode:mode()};render()}
+function startGame(){const s=st();if(s.games.left<=0)return;s.games.left--;s.games.played=(s.games.played||0)+1;saveState();ut('Игра начата');App.game={b:newBoard(),score:0,moves:20,sel:-1,busy:false,mode:mode()};render()}
 function bindBoard(){const bd=$('#board');if(!bd)return;let sx=0,sy=0,si=-1;
  bd.addEventListener('pointerdown',e=>{const c=e.target.closest('.cell');if(!c)return;si=+c.dataset.c;sx=e.clientX;sy=e.clientY});
  bd.addEventListener('pointerup',e=>{const g=App.game;if(!g||g.busy||si<0)return;const dx=e.clientX-sx,dy=e.clientY-sy;
@@ -617,7 +643,8 @@ function adminPosts(){const q=(App.aq||'').toLowerCase();const ps=Store.posts.fi
  <p class="muted">Посты и карусели берутся сами из папки «Клиенты/Спецмазь/Реклама 2026/Посты» на Диске: папка «Спецмазь» идёт в «Здоровье», «Шустер» в «Настроение». Папки со словом «карусель» становятся каруселями, остальные картинки отдельными постами.</p>
  <div class="row" style="margin-bottom:10px"><input id="aq" placeholder="Найти пост" value="${esc(App.aq||'')}"><button class="btn sm ghost" data-act="reload">⟳</button></div>
  ${ps.map(p=>{const sch=p.publishAt>now();const zc=p.slides.reduce((a,s)=>a+(s.zones||[]).length,0);return `<div class="prod"><img src="${esc(p.slides[0].type==='image'?p.slides[0].src:p.slides[0].poster)}" loading="lazy" style="width:44px;height:58px;object-fit:cover;border-radius:8px"><div style="flex:1;min-width:0"><b>${esc(p.title)}</b><div class="muted">${esc(p.group)} · ${p.kind==='carousel'?p.slides.length+' карт.':'пост'}${zc?' · '+zc+' зон':''}${p.hidden?' · скрыт':''}${sch?' · ⏰':''}</div></div><button class="btn sm ghost" data-editp="${p.id}">Изменить</button></div>`}).join('')}`}
-function adminStats(){const S=[{views:st().views,clicks:st().clicks,favs:st().favs,games:st().games.played||0,won:st().coupons.length,copied:st().coupons.filter(c=>c.copied).length,used:st().coupons.filter(c=>c.used).length,ref:st().ref.used?1:0}];
+function adminStats(){return `<div class="box"><b style="font-size:20px">📊 Статистика по всем покупателям</b><p class="muted">Посещения, открытые посты, переходы на маркетплейсы, игры и скидки собираются в Umami (фильтр по сайту shuster.pomoshnik.ai, раздел «События»).</p><a class="btn wide" href="https://cloud.umami.is/analytics/eu/websites/cb0ec999-076a-4bd0-ad61-49313a08c950" target="_blank" rel="noopener" style="text-decoration:none">Открыть Umami</a></div>`+adminStatsLocal()}
+function adminStatsLocal(){const S=[{views:st().views,clicks:st().clicks,favs:st().favs,games:st().games.played||0,won:st().coupons.length,copied:st().coupons.filter(c=>c.copied).length,used:st().coupons.filter(c=>c.used).length,ref:st().ref.used?1:0}];
  const sum=k=>S.reduce((a,x)=>a+(x[k]||0),0);const views={},clicks={},favs={};
  S.forEach(x=>{Object.entries(x.views||{}).forEach(([k,v])=>views[k]=(views[k]||0)+v);Object.entries(x.clicks||{}).forEach(([k,o])=>{clicks[k]=clicks[k]||{};Object.entries(o).forEach(([m,v])=>clicks[k][m]=(clicks[k][m]||0)+v)});(x.favs||[]).forEach(k=>favs[k]=(favs[k]||0)+1)});
  const totalClicks=Object.values(clicks).reduce((a,o)=>a+Object.values(o).reduce((b,v)=>b+v,0),0);
@@ -693,7 +720,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
  else if(d.copyc){const c=st().coupons.find(x=>x.id===d.copyc);if(c){c.copied=true;saveState();copy(c.code)}}
  else if(d.usec){const c=st().coupons.find(x=>x.id===d.usec);if(c){c.used=true;saveState();render()}}
  else if(d.topic){const a=st().topics;const i=a.indexOf(d.topic);if(i>=0)a.splice(i,1);else a.push(d.topic);saveState();render()}
- else if(d.share){const p=Store.posts.find(x=>x.id===d.share);const txt=`${p.title}: ${p.text}\nКод на скидку: ${refCode()}\n${location.href.split('#')[0]}`;if(navigator.share)navigator.share({text:txt}).catch(()=>copy(txt));else copy(txt)}
+ else if(d.share){shareImage(d.share);return;const p=Store.posts.find(x=>x.id===d.share);const txt=`${p.title}: ${p.text}\nКод на скидку: ${refCode()}\n${location.href.split('#')[0]}`;if(navigator.share)navigator.share({text:txt}).catch(()=>copy(txt));else copy(txt)}
  else if(d.atab){App.adminTab=d.atab;render()}
  else if(d.editp){openEditor(d.editp)}
  else if(d.es!==undefined){syncEditorFields();App.edit._s=+d.es;drawEditor()}
@@ -704,6 +731,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
  else if(d.act){const a=d.act;const e=App.edit;
   if(a==='close'){App.edit=null;closeSheet()}
   else if(a==='bell')openBell();
+  else if(a==='onbnext')window._onbNext&&window._onbNext();
   else if(a==='tcmore'){App[t.dataset.k]=!App[t.dataset.k];render()}
   else if(a==='tts')speakPost(t.dataset.id,t);
   else if(a==='top'){scrollTo({top:0,behavior:'smooth'})}
@@ -741,7 +769,7 @@ window.addEventListener('hashchange',()=>{Store.isAdmin=location.hash==='#admin'
 // ================= boot =================
 (async()=>{Store.state=Object.assign(defState(),LS.get('sm_state',{}));applyTheme();try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{applyTheme();render()})}catch(e){}document.body.classList.toggle('mood',Store.state.mode==='mood');render();
  App.prevVisit=st().lastVisit||0;st().lastVisit=Date.now();saveState();
- await initStore();setMode(st().mode||'health');setTimeout(()=>{const b=document.querySelector('[data-act=bell]');if(b&&b.querySelector('b'))b.classList.add('ring')},600);
+ await initStore();setMode(st().mode||'health');if(!st().onb)setTimeout(onboarding,700);setTimeout(()=>{const b=document.querySelector('[data-act=bell]');if(b&&b.querySelector('b'))b.classList.add('ring')},600);
  const tb=document.createElement('button');tb.className='totop';tb.dataset.act='top';tb.setAttribute('aria-label','Наверх');tb.textContent='↑';document.body.appendChild(tb);addEventListener('scroll',()=>tb.classList.toggle('show',scrollY>900),{passive:true});
  if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}})();
 </script>
