@@ -16,16 +16,16 @@ html,body{margin:0;font-size:19px;background:var(--bg);color:var(--ink);font-fam
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 input,textarea,select{font:inherit;font-size:19px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
 textarea{min-height:90px;resize:vertical}
-#app{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:104px;position:relative}
-header{position:sticky;top:0;z-index:20;background:var(--bg);padding:12px 16px 10px;transition:background .3s}
+#app{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:80px;position:relative}
+header{position:sticky;top:0;z-index:20;background:var(--bg);padding:8px 14px 6px;transition:background .3s}
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:26px;letter-spacing:-.3px}
-.logo .mark{width:46px;height:46px;border-radius:10px;background:var(--acc);display:grid;place-items:center;color:#fff;font-size:26px;overflow:hidden}
+.logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:21px;letter-spacing:-.3px}
+.logo .mark{width:34px;height:34px;border-radius:9px;background:var(--acc);display:grid;place-items:center;color:#fff;font-size:19px;overflow:hidden}
 .logo .mark img{width:100%;height:100%;object-fit:cover}
-.bell{position:relative;width:52px;height:52px;border-radius:12px;background:#fff;display:grid;place-items:center;font-size:26px}
+.bell{position:relative;width:40px;height:40px;border-radius:11px;background:#fff;display:grid;place-items:center;font-size:20px}
 .bell b{position:absolute;top:-4px;right:-4px;background:var(--acc);color:#fff;font-size:14px;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
-.switch{display:grid;grid-template-columns:1fr 1fr;background:#fff;border-radius:16px;padding:4px;margin-top:10px;position:relative}
-.switch button{padding:15px 0;border-radius:12px;font-weight:800;font-size:20px;z-index:1;transition:color .25s;color:var(--mut)}
+.switch{display:grid;grid-template-columns:1fr 1fr;background:#fff;border-radius:16px;padding:3px;margin-top:7px;position:relative}
+.switch button{padding:9px 0;border-radius:12px;font-weight:800;font-size:17px;z-index:1;transition:color .25s;color:var(--mut)}
 .switch .pill{position:absolute;top:4px;bottom:4px;width:calc(50% - 4px);left:4px;border-radius:12px;background:#d7141a;transition:left .3s,background .3s}
 body.mood .switch .pill{left:50%;background:#1f6fd6}
 body:not(.mood) .switch .h,body.mood .switch .m{color:#fff}
@@ -73,8 +73,8 @@ main{padding:4px 16px}
 /* nav */
 nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 nav .in{display:flex;width:100%;max-width:480px}
-nav button{flex:1;padding:10px 0 12px;font-size:14px;font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
-nav button span{font-size:29px;filter:grayscale(1);opacity:.6}
+nav button{flex:1;padding:5px 0 6px;font-size:12px;font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button span{font-size:22px;filter:grayscale(1);opacity:.6}
 nav button.on{color:var(--acc)}
 nav button.on span{filter:none;opacity:1}
 h2{font-size:29px;margin:8px 0 12px;letter-spacing:-.3px}
@@ -96,7 +96,7 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 /* sheet */
 .sheet{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
 .sheet .in{background:var(--bg);width:100%;max-width:480px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:16px 16px 30px;animation:up .25s}
-.sheet .close{position:sticky;top:0;float:right;width:36px;height:36px;border-radius:50%;background:#fff;font-size:23px;z-index:2}
+.sheet .close{position:sticky;top:0;display:flex;align-items:center;justify-content:center;margin:-4px 0 10px auto;width:44px;height:44px;border-radius:50%;background:#fff;font-size:22px;z-index:4;box-shadow:0 2px 8px rgba(0,0,0,.12)}
 @keyframes up{from{transform:translateY(40px);opacity:.5}}
 @keyframes fade{from{opacity:0}}
 .rich h1,.rich h2{font-size:26px;margin:18px 0 8px}
@@ -118,9 +118,25 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .sv .go{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:3}
 .sv .tapL,.sv .tapR{position:absolute;top:0;bottom:0;width:35%;z-index:1}.sv .tapL{left:0}.sv .tapR{right:0}
 /* body map */
-.bodymap{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:center}
-.bodymap svg .z{fill:var(--soft);stroke:var(--acc);stroke-width:2;cursor:pointer;transition:fill .2s}
-.bodymap svg .z:hover,.bodymap svg .z.on{fill:var(--acc)}
+
+
+.bm{text-align:center}
+.bm svg{width:100%;max-width:330px;height:auto;display:block;margin:0 auto;overflow:visible}
+.bm .z{cursor:pointer}
+.bm .z>*{transition:fill .2s}
+.bm .z:hover>*{filter:brightness(1.07)}
+.bm .z.on>*{fill:#FF4B4B!important;animation:ouch .7s ease-in-out infinite alternate}
+@keyframes ouch{from{fill:#FF4B4B}to{fill:#FF9A8A}}
+.bm .guy.hurt{animation:shake .45s ease-in-out 2;transform-origin:150px 500px}
+@keyframes shake{25%{transform:rotate(-2.5deg)}75%{transform:rotate(2.5deg)}}
+.bm .pain{animation:blink .5s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+.bubble{display:inline-block;position:relative;background:#fff;border:2.5px solid #1d1b1a;border-radius:18px;padding:10px 16px;font-weight:800;font-size:19px;margin:4px 0 2px;max-width:92%}
+.bubble::after{content:'';position:absolute;left:50%;bottom:-11px;margin-left:-9px;border:9px solid transparent;border-top-color:#1d1b1a;border-bottom:0}
+.bmseg{display:inline-flex;background:var(--bg);border-radius:14px;padding:3px;margin:8px 0}
+.bmseg button{padding:9px 16px;border-radius:11px;font-weight:700;font-size:16px;color:var(--mut)}
+.bmseg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.bm .chips{justify-content:center;margin-top:12px}
 /* game */
 .board{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:#fff;padding:8px;border-radius:20px;touch-action:none;user-select:none}
 .cell{aspect-ratio:1;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:34px;transition:transform .15s,opacity .2s}
@@ -190,7 +206,9 @@ const today=()=>new Date().toISOString().slice(0,10);
 function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2400)}
 async function copy(t){try{await navigator.clipboard.writeText(t);toast('Скопировано')}catch(e){toast('Код: '+t)}}
 const MP={wb:'WB',ozon:'Ozon',ym:'Я.Маркет'};
-const BODY={neck:'Шея',shoulders:'Плечи',back:'Спина',lower:'Поясница',arms:'Руки и локти',knees:'Колени',feet:'Стопы'};
+const BODY={head:'Голова',neck:'Шея',shoulders:'Плечи',chest:'Грудь, дыхание',belly:'Живот',back:'Спина',lower:'Поясница',arms:'Руки и локти',hands:'Кисти, пальцы',hips:'Бёдра, таз',knees:'Колени',feet:'Стопы'};
+const BODY_BACK=['back','lower'];
+const BODY_FUN={head:'Ой, голова трещит!',neck:'Шею не повернуть!',shoulders:'Плечи, будто мешки таскал!',chest:'Кхе-кхе, дышать тяжко!',belly:'Живот бурчит, как трактор!',back:'Спину заклинило!',lower:'Поясница стреляет!',arms:'Локти скрипят, как дверь!',hands:'Пальцы не слушаются!',hips:'Бёдра ноют после дачи!',knees:'Колени хрустят, как сухарики!',feet:'Ноги гудят!'};
 const MODES={health:{t:'Здоровье',brand:'Спецмазь',em:'🛡️'},mood:{t:'Настроение',brand:'Доктор Шустер',em:'🐼'}};
 const TILES={health:['🧴','❤️','💪','🌿','⭐','🛡️'],mood:['🍬','🍭','🍫','🍩','🧁','🍪']};
 
@@ -318,17 +336,35 @@ function viewFeed(){const m=mode();const ps=visiblePosts(m);const stories=ps.fil
  if(App.bodyZone)h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:20px">Про «${BODY[App.bodyZone]}»</b><button class="btn sm ghost" data-act="clearzone">Все посты</button></div>`;
  h+=list.length?list.slice(0,App.feedN||12).map(p=>cardHTML(p)).join('')+(list.length>(App.feedN||12)?`<button class="btn ghost wide" data-act="more" style="margin-bottom:16px">Показать ещё</button>`:''):(Store.loading?'<div class="empty">Загружаю посты с Диска…</div>':Store.err?`<div class="empty">${esc(Store.err)}</div>`:`<div class="empty">Пока нет постов${App.bodyZone?' про эту зону':''}</div>`);
  return h}
-function bodyMapHTML(){const z=App.bodyZone;const Z=(k,el)=>el.replace('<','<').replace(/^<(\w+)/,`<$1 class="z ${z===k?'on':''}" data-zone="${k}"`);
- return `<div class="box"><div class="bodymap"><svg viewBox="0 0 150 300" width="130" height="260">
- <circle cx="75" cy="30" r="22" fill="#eee"/>${Z('neck','<rect x="64" y="52" width="22" height="16" rx="6"/>')}
- ${Z('shoulders','<path d="M30 72 Q75 60 120 72 L120 92 L30 92 Z"/>')}
- ${Z('back','<rect x="45" y="94" width="60" height="50" rx="8"/>')}${Z('lower','<rect x="45" y="146" width="60" height="30" rx="8"/>')}
- ${Z('arms','<path d="M14 94 h26 v90 h-18 z M110 94 h26 l-8 90 h-18 z"/>')}
- <rect x="48" y="178" width="22" height="50" rx="8" fill="#eee"/><rect x="80" y="178" width="22" height="50" rx="8" fill="#eee"/>
- ${Z('knees','<path d="M47 230 h24 v22 h-24 z M79 230 h24 v22 h-24 z"/>')}<rect x="49" y="254" width="20" height="26" rx="6" fill="#eee"/><rect x="81" y="254" width="20" height="26" rx="6" fill="#eee"/>
- ${Z('feet','<path d="M42 282 h30 v12 h-30 z M78 282 h30 v12 h-30 z"/>')}</svg>
- <div><b style="font-size:22px">Где беспокоит?</b><p class="muted" style="margin:6px 0 10px">Нажмите на зону, покажем советы и подходящее средство.</p>
- <div class="chips">${Object.entries(BODY).map(([k,v])=>`<button class="chip ${z===k?'on':''}" data-zone="${k}">${v}</button>`).join('')}</div></div></div>
+function bodyMapHTML(){const z=App.bodyZone;const back=App.bodyView==='back'||(!App.bodyView&&BODY_BACK.includes(z));const hurt=!!z;
+ const SK='#F6C9A6',SK2='#E9AE86',TOP='#D7141A',SH='#2F4F8F',BOOT='#3B2A20',HELM='#4F8A2F';
+ const Z=(k,inner)=>`<g class="z ${z===k?'on':''}" data-zone="${k}">${inner}</g>`;
+ const mir=(d)=>d; // helper placeholder
+ const arm=(sgn)=>{const X=x=>sgn>0?x:300-x;return `<path d="M${X(80)} 182 L${X(104)} 192 L${X(92)} 262 L${X(66)} 256 Z" fill="${SK}"/><circle cx="${X(78)}" cy="259" r="14" fill="${SK2}"/><path d="M${X(65)} 258 L${X(91)} 263 L${X(86)} 322 L${X(60)} 318 Z" fill="${SK}"/>`};
+ const face=hurt?`<path d="M126 92 l14 6 l-14 6" stroke="#2a1a10" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M174 92 l-14 6 l14 6" stroke="#2a1a10" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="150" cy="128" rx="11" ry="9" fill="#7a1f1f"/><path d="M122 112 q28 -12 56 0 q-6 10 -28 6 q-22 4 -28 -6z" fill="#5a3a24"/><path class="pain" d="M200 66 l8 -6 l2 9 l9 -5" stroke="#FF4B4B" stroke-width="3" fill="none"/><path class="pain" d="M100 68 l-8 -6 l-2 9 l-9 -5" stroke="#FF4B4B" stroke-width="3" fill="none"/>`
+  :`<circle cx="134" cy="98" r="5.5" fill="#2a1a10"/><circle cx="166" cy="98" r="5.5" fill="#2a1a10"/><circle cx="136" cy="96" r="1.8" fill="#fff"/><circle cx="168" cy="96" r="1.8" fill="#fff"/><path d="M122 112 q28 -12 56 0 q-6 10 -28 6 q-22 4 -28 -6z" fill="#5a3a24"/><path d="M136 126 q14 10 28 0" stroke="#7a1f1f" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+ const legs=[0,1].map(i=>{const X=x=>i?300-x:x;return `<rect x="${Math.min(X(112),X(146))}" y="352" width="34" height="50" rx="10" fill="${SK}"/><rect x="${Math.min(X(114),X(144))}" y="428" width="30" height="52" rx="10" fill="${SK}"/>`}).join('');
+ const knees=[0,1].map(i=>`<circle cx="${i?172:128}" cy="414" r="21" fill="${SK2}"/>`).join('');
+ const feet=[0,1].map(i=>`<ellipse cx="${i?178:122}" cy="494" rx="28" ry="15" fill="${BOOT}"/>`).join('');
+ const hands=[0,1].map(i=>`<circle cx="${i?227:73}" cy="334" r="17" fill="${SK}"/><path d="M${i?236:64} 344 l${i?4:-4} 8 M${i?228:72} 349 l0 9 M${i?220:80} 346 l${i?-3:3} 8" stroke="${SK2}" stroke-width="4" stroke-linecap="round"/>`).join('');
+ let svg=`<svg viewBox="0 0 300 520" role="img" aria-label="Персонаж: нажмите, где болит"><g class="guy ${hurt?'hurt':''}">
+ <ellipse cx="150" cy="510" rx="95" ry="8" fill="rgba(0,0,0,.08)"/>
+ ${legs}${Z('knees',knees)}${Z('feet',feet)}
+ ${Z('hips',`<path d="M100 296 h100 v56 q-25 6 -48 0 l-2 -14 l-2 14 q-23 6 -48 0z" fill="${SH}"/>`)}
+ ${Z('arms',arm(1)+arm(-1))}${Z('hands',hands)}`;
+ if(!back){svg+=`${Z('chest',`<path d="M100 166 Q150 150 200 166 L204 240 L96 240 Z" fill="${TOP}"/><rect x="143" y="190" width="14" height="34" fill="#fff"/><rect x="133" y="200" width="34" height="14" fill="#fff"/>`)}
+  ${Z('belly',`<ellipse cx="150" cy="266" rx="60" ry="40" fill="${TOP}"/><ellipse cx="150" cy="286" rx="34" ry="18" fill="${SK}"/><circle cx="150" cy="288" r="3" fill="${SK2}"/>`)}`}
+ else{svg+=`${Z('back',`<path d="M100 166 Q150 150 200 166 L204 240 L96 240 Z" fill="${TOP}"/><path d="M150 172 v62" stroke="rgba(0,0,0,.18)" stroke-width="3"/>`)}
+  ${Z('lower',`<path d="M96 240 h108 l-4 58 h-100z" fill="#B8121A"/><path d="M118 262 q32 14 64 0" stroke="rgba(255,255,255,.35)" stroke-width="3" fill="none"/>`)}`}
+ svg+=`${Z('shoulders',`<circle cx="96" cy="176" r="22" fill="${TOP}"/><circle cx="204" cy="176" r="22" fill="${TOP}"/>`)}
+ ${Z('neck',`<rect x="136" y="134" width="28" height="30" rx="9" fill="${SK2}"/>`)}
+ ${Z('head',`<circle cx="150" cy="100" r="46" fill="${SK}"/><ellipse cx="103" cy="104" rx="8" ry="12" fill="${SK2}"/><ellipse cx="197" cy="104" rx="8" ry="12" fill="${SK2}"/>`+(back?`<path d="M106 104 q44 34 88 0 v14 q-44 26 -88 0z" fill="#6b3f22"/>`:''))}
+ ${back?'':`<g pointer-events="none">${face}</g>`}
+ <g pointer-events="none"><path d="M100 80 A50 50 0 0 1 200 80 L206 86 L94 86 Z" fill="${HELM}"/><rect x="92" y="78" width="116" height="11" rx="5.5" fill="#3f7225"/>${back?'':'<circle cx="150" cy="58" r="10" fill="#D7141A"/><rect x="146" y="50" width="8" height="16" fill="#fff"/><rect x="142" y="54" width="16" height="8" fill="#fff"/>'}</g>
+ </g></svg>`;
+ return `<div class="box bm"><div class="row between" style="flex-wrap:wrap"><b style="font-size:21px">Где болит?</b><div class="bmseg"><button class="${back?'':'on'}" data-act="bmfront">Спереди</button><button class="${back?'on':''}" data-act="bmback">Сзади</button></div></div>
+ <div class="bubble">${z?esc(BODY_FUN[z]||BODY[z]):'Нажмите, где болит!'}</div>${svg}
+ <div class="chips">${Object.entries(BODY).map(([k,v])=>`<button class="chip ${z===k?'on':''}" data-zone="${k}">${v}</button>`).join('')}</div>
  ${z?recoHTML(z):''}</div>`}
 function recoHTML(z){const p=visiblePosts('health').find(p=>(p.zones||[]).includes(z)&&(p.products||[]).length);if(!p)return'';const pr=p.products[0];
  return `<div class="prod" style="margin:12px 0 0;background:var(--soft)"><div><b>Подойдёт: ${esc(pr.name)}</b>${mpRow(pr,p.id)}</div></div>`}
@@ -545,7 +581,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
  else if(d.fav){const f=st().favs;const i=f.indexOf(d.fav);if(i>=0)f.splice(i,1);else{f.push(d.fav);toast('В избранном')}saveState();document.querySelectorAll(`[data-fav="${d.fav}"]`).forEach(b=>{b.classList.toggle('on',i<0);b.textContent=i<0?'♥':'♡'});if(App.tab==='favs'&&!$('#sheet'))render()}
  else if(d.open){openPost(d.open)}
  else if(d.story){openStory(d.story)}
- else if(d.zone){App.bodyZone=App.bodyZone===d.zone?'':d.zone;render()}
+ else if(d.zone){App.bodyZone=App.bodyZone===d.zone?'':d.zone;if(BODY_BACK.includes(App.bodyZone))App.bodyView='back';else if(App.bodyZone&&!['head','neck','shoulders','arms','hands','hips','knees','feet'].includes(App.bodyZone))App.bodyView='front';render()}
  else if(d.tagq){ev.preventDefault();closeSheet();App.tab='search';App.q=d.tagq;render();scrollTo(0,0)}
  else if(d.rem){const r=st().holRem;const i=r.indexOf(d.rem);if(i>=0)r.splice(i,1);else{r.push(d.rem);toast('Напомним за 3 дня')}saveState();if($('#sheet'))$('#sheet').querySelectorAll(`[data-rem="${d.rem}"]`).forEach(b=>{b.textContent=i<0?'🔔 Напомню':'Напомнить';b.classList.toggle('ghost',i>=0)});render()}
  else if(d.qall!==undefined){App.qAll=d.qall==='1';render()}
@@ -565,6 +601,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
   if(a==='close'){App.edit=null;closeSheet()}
   else if(a==='bell')openBell();
   else if(a==='clearzone'){App.bodyZone='';render()}
+  else if(a==='bmfront'||a==='bmback'){App.bodyView=a==='bmback'?'back':'front';render()}
   else if(a==='bodymap'){sheet(bodyMapHTML())}
   else if(a==='cal'){sheet(`<h2>Календарь праздников</h2>${upcomingHolidays().map(holRow).join('')||'<div class="empty">Скоро добавим</div>'}`)}
   else if(a==='pushperm')askPush();
