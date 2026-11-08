@@ -12,44 +12,44 @@
 :root{--nav:rgba(255,255,255,.96);--card:#fff;--ink2:#3a3532;--acc:#d7141a;--acc2:#b0101a;--soft:#fff0ee;--bg:#f6f4f2;--card:#fff;--ink:#1d1b1a;--mut:#8a8580;--line:#ece7e3}
 body.mood{--acc:#1E9E58;--acc2:#157A43;--soft:#E3F5EA;--bg:#f2f5fa}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;font-size:19px;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;transition:background .3s}
+html,body{margin:0;font-size:calc(19px*var(--fz,1));background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;transition:background .3s}
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
-input,textarea,select{font:inherit;font-size:19px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+input,textarea,select{font:inherit;font-size:calc(19px*var(--fz,1));width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
 textarea{min-height:90px;resize:vertical}
 #app{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:80px;position:relative}
 header{position:sticky;top:0;z-index:20;background:var(--bg);padding:8px 14px 6px;transition:background .3s}
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:21px;letter-spacing:-.3px}
-.logo .mark{width:34px;height:34px;border-radius:9px;background:var(--acc);display:grid;place-items:center;color:#fff;font-size:19px;overflow:hidden}
+.logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:calc(21px*var(--fz,1));letter-spacing:-.3px}
+.logo .mark{width:34px;height:34px;border-radius:9px;background:var(--acc);display:grid;place-items:center;color:#fff;font-size:calc(19px*var(--fz,1));overflow:hidden}
 .logo .mark img{width:100%;height:100%;object-fit:cover}
-.bell{position:relative;width:40px;height:40px;border-radius:11px;background:var(--card);display:grid;place-items:center;font-size:20px}
-.bell b{position:absolute;top:-4px;right:-4px;background:var(--acc);color:#fff;font-size:14px;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+.bell{position:relative;width:40px;height:40px;border-radius:11px;background:var(--card);display:grid;place-items:center;font-size:calc(20px*var(--fz,1))}
+.bell b{position:absolute;top:-4px;right:-4px;background:var(--acc);color:#fff;font-size:calc(14px*var(--fz,1));min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
 .switch{display:grid;grid-template-columns:1fr 1fr;background:var(--card);border-radius:16px;padding:3px;margin-top:7px;position:relative}
-.switch button{padding:9px 0;border-radius:12px;font-weight:800;font-size:17px;z-index:1;transition:color .25s;color:var(--mut)}
+.switch button{padding:9px 0;border-radius:12px;font-weight:800;font-size:calc(17px*var(--fz,1));z-index:1;transition:color .25s;color:var(--mut)}
 .switch .pill{position:absolute;top:4px;bottom:4px;width:calc(50% - 4px);left:4px;border-radius:12px;background:#d7141a;transition:left .3s,background .3s}
 body.mood .switch .pill{left:50%;background:#1E9E58}
 body:not(.mood) .switch .h,body.mood .switch .m{color:#fff}
 main{padding:4px 16px}
 .stories{display:flex;gap:12px;overflow-x:auto;padding:6px 2px 12px;scrollbar-width:none}
 .stories::-webkit-scrollbar{display:none}
-.story{flex:0 0 auto;width:84px;text-align:center;font-size:14px;font-weight:600;color:var(--mut)}
+.story{flex:0 0 auto;width:84px;text-align:center;font-size:calc(14px*var(--fz,1));font-weight:600;color:var(--mut)}
 .story .ring{width:78px;height:78px;border-radius:50%;padding:3px;background:conic-gradient(var(--acc),#ffb000,var(--acc));margin:0 auto 4px}
 .story.seen .ring{background:#d6d1cc}
 .story .ring>*{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid var(--bg);display:block;background:var(--card)}
 .story span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card{background:var(--card);border-radius:22px;overflow:hidden;margin-bottom:16px;box-shadow:0 1px 0 rgba(0,0,0,.03)}
 .card .cb{padding:12px 16px 14px}
-.card h3{margin:0 0 4px;font-size:23px;letter-spacing:-.2px}
-.card p{margin:0;color:#4b4642;font-size:18px;line-height:1.45}
+.card h3{margin:0 0 4px;font-size:calc(23px*var(--fz,1));letter-spacing:-.2px}
+.card p{margin:0;color:#4b4642;font-size:calc(18px*var(--fz,1));line-height:1.45}
 .row{display:flex;align-items:center;gap:8px}
 .between{justify-content:space-between}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.tag{font-size:16px;font-weight:600;padding:4px 10px;border-radius:20px;background:var(--soft);color:var(--acc2)}
-.mp{display:flex;gap:12px;margin-top:10px;font-size:16px;color:var(--mut);align-items:center;flex-wrap:wrap}
+.tag{font-size:calc(16px*var(--fz,1));font-weight:600;padding:4px 10px;border-radius:20px;background:var(--soft);color:var(--acc2)}
+.mp{display:flex;gap:12px;margin-top:10px;font-size:calc(16px*var(--fz,1));color:var(--mut);align-items:center;flex-wrap:wrap}
 .mp a{color:var(--mut);text-decoration:none;border-bottom:1px dotted #c5beb8}
-.ic{width:50px;height:50px;border-radius:12px;display:grid;place-items:center;font-size:25px;background:var(--soft)}
+.ic{width:50px;height:50px;border-radius:12px;display:grid;place-items:center;font-size:calc(25px*var(--fz,1));background:var(--soft)}
 .fav.on{color:var(--acc)}
-.badge{font-size:14px;font-weight:700;padding:3px 8px;border-radius:8px;background:var(--card)4d6;color:#8a5a00}
+.badge{font-size:calc(14px*var(--fz,1));font-weight:700;padding:3px 8px;border-radius:8px;background:var(--card)4d6;color:#8a5a00}
 /* slider */
 .slider{position:relative;aspect-ratio:3/4;background:#eee;overflow:hidden}
 .track{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;touch-action:pan-x pan-y}
@@ -58,49 +58,49 @@ main{padding:4px 16px}
 .slide{flex:0 0 100%;height:100%;scroll-snap-align:center;position:relative;overflow:hidden}
 .media{position:absolute;inset:0;transform-origin:0 0;transition:transform .55s cubic-bezier(.2,.8,.2,1)}
 .media video,.media img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
-.hint{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 0 0 0 rgba(255,255,255,.8);animation:pulse 1.8s infinite;pointer-events:none;display:grid;place-items:center;font-size:14px;color:var(--acc);font-weight:900}
+.hint{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 0 0 0 rgba(255,255,255,.8);animation:pulse 1.8s infinite;pointer-events:none;display:grid;place-items:center;font-size:calc(14px*var(--fz,1));color:var(--acc);font-weight:900}
 .slider.zoomed .hint{opacity:0}
 @keyframes pulse{70%{box-shadow:0 0 0 14px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
 .dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px;pointer-events:none}
 .dots i{width:7px;height:7px;border-radius:4px;background:rgba(255,255,255,.55);transition:width .2s}
 .dots i.on{width:18px;background:var(--card)}
-.arrow{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.85);font-size:23px;display:none}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.85);font-size:calc(23px*var(--fz,1));display:none}
 @media(hover:hover){.slider:hover .arrow{display:grid;place-items:center}}
 .slider.zoomed .arrow{display:none!important}
 .arrow.l{left:8px}.arrow.r{right:8px}
-.zlabel{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.6);color:#fff;font-size:16px;font-weight:700;padding:5px 10px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none}
+.zlabel{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.6);color:#fff;font-size:calc(16px*var(--fz,1));font-weight:700;padding:5px 10px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none}
 .slider.zoomed .zlabel{opacity:1}
 /* nav */
 nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;background:var(--nav);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 nav .in{display:flex;width:100%;max-width:480px}
-nav button{flex:1;padding:5px 0 6px;font-size:12px;font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
-nav button span{font-size:22px;filter:grayscale(1);opacity:.6}
+nav button{flex:1;padding:5px 0 6px;font-size:calc(12px*var(--fz,1));font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button span{font-size:calc(22px*var(--fz,1));filter:grayscale(1);opacity:.6}
 nav button.on{color:var(--acc)}
 nav button.on span{filter:none;opacity:1}
-h2{font-size:29px;margin:8px 0 12px;letter-spacing:-.3px}
-h4{margin:16px 0 8px;font-size:20px}
+h2{font-size:calc(29px*var(--fz,1));margin:8px 0 12px;letter-spacing:-.3px}
+h4{margin:16px 0 8px;font-size:calc(20px*var(--fz,1))}
 .box{background:var(--card);border-radius:20px;padding:16px;margin-bottom:14px}
 .btn{background:var(--acc);color:#fff;font-weight:800;padding:16px 22px;border-radius:14px;text-align:center;display:inline-block}
 .btn.ghost{background:var(--soft);color:var(--acc2)}
-.btn.sm{padding:12px 16px;font-size:17px;border-radius:11px}
+.btn.sm{padding:12px 16px;font-size:calc(17px*var(--fz,1));border-radius:11px}
 .btn:disabled{opacity:.45}
 .wide{width:100%;display:block}
-.muted{color:var(--mut);font-size:17px}
+.muted{color:var(--mut);font-size:calc(17px*var(--fz,1))}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:12px 18px;border-radius:20px;background:var(--card);font-size:17px;font-weight:700;border:1.5px solid var(--line)}
+.chip{padding:12px 18px;border-radius:20px;background:var(--card);font-size:calc(17px*var(--fz,1));font-weight:700;border:1.5px solid var(--line)}
 .chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .search{position:relative}
 .search input{padding-left:48px;border-radius:18px;border:0;height:60px}
-.search::before{content:'🔍';position:absolute;left:13px;top:13px;font-size:22px}
+.search::before{content:'🔍';position:absolute;left:13px;top:13px;font-size:calc(22px*var(--fz,1))}
 mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 /* sheet */
 .sheet{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
 .sheet .in{background:var(--bg);width:100%;max-width:480px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:16px 16px 30px;animation:up .25s}
-.sheet .close{position:sticky;top:0;display:flex;align-items:center;justify-content:center;margin:-4px 0 10px auto;width:44px;height:44px;border-radius:50%;background:var(--card);font-size:22px;z-index:4;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.sheet .close{position:sticky;top:0;display:flex;align-items:center;justify-content:center;margin:-4px 0 10px auto;width:44px;height:44px;border-radius:50%;background:var(--card);font-size:calc(22px*var(--fz,1));z-index:4;box-shadow:0 2px 8px rgba(0,0,0,.12)}
 @keyframes up{from{transform:translateY(40px);opacity:.5}}
 @keyframes fade{from{opacity:0}}
-.rich h1,.rich h2{font-size:26px;margin:18px 0 8px}
-.rich p{color:var(--ink2);font-size:20px;line-height:1.6;margin:0 0 10px}
+.rich h1,.rich h2{font-size:calc(26px*var(--fz,1));margin:18px 0 8px}
+.rich p{color:var(--ink2);font-size:calc(20px*var(--fz,1));line-height:1.6;margin:0 0 10px}
 .rich ul{padding-left:20px;margin:0 0 10px}.rich li{margin-bottom:6px;line-height:1.5}
 .rich .tipb{background:var(--soft);border-left:4px solid var(--acc);border-radius:12px;padding:12px 14px;margin:12px 0;font-weight:600}
 .prod{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border-radius:16px;padding:12px 14px;margin-bottom:8px}
@@ -113,14 +113,14 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .sv .bars{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:4px;z-index:2}
 .sv .bars i{flex:1;height:3px;background:rgba(255,255,255,.35);border-radius:2px;overflow:hidden}
 .sv .bars i b{display:block;height:100%;width:0;background:var(--card)}
-.sv .x{position:absolute;top:22px;right:12px;color:#fff;font-size:34px;z-index:3}
+.sv .x{position:absolute;top:22px;right:12px;color:#fff;font-size:calc(34px*var(--fz,1));z-index:3}
 .sv .ttl{position:absolute;top:24px;left:14px;color:#fff;font-weight:800;z-index:2;text-shadow:0 1px 4px #0008}
 .sv .go{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:3}
 .sv .tapL,.sv .tapR{position:absolute;top:0;bottom:0;width:35%;z-index:1}.sv .tapL{left:0}.sv .tapR{right:0}
 /* body map */
 
 
-.bm{text-align:center}.bm .bubble{font-size:17px;padding:8px 14px}
+.bm{text-align:center}.bm .bubble{font-size:calc(17px*var(--fz,1));padding:8px 14px}
 
 .bm .z{cursor:pointer}
 .bm .z>*{transition:fill .2s}
@@ -131,69 +131,69 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 @keyframes shake{25%{transform:rotate(-2.5deg)}75%{transform:rotate(2.5deg)}}
 .bm .pain{animation:blink .5s steps(2) infinite}
 @keyframes blink{50%{opacity:.25}}
-.bubble{display:inline-block;position:relative;background:var(--card);border:2.5px solid #1d1b1a;border-radius:18px;padding:10px 16px;font-weight:800;font-size:19px;margin:4px 0 2px;max-width:92%}
+.bubble{display:inline-block;position:relative;background:var(--card);border:2.5px solid #1d1b1a;border-radius:18px;padding:10px 16px;font-weight:800;font-size:calc(19px*var(--fz,1));margin:4px 0 2px;max-width:92%}
 .bubble::after{content:'';position:absolute;left:50%;bottom:-11px;margin-left:-9px;border:9px solid transparent;border-top-color:#1d1b1a;border-bottom:0}
 .bmseg{display:inline-flex;background:var(--bg);border-radius:14px;padding:3px;margin:8px 0}
-.bmseg button{padding:9px 16px;border-radius:11px;font-weight:700;font-size:16px;color:var(--mut)}
+.bmseg button{padding:9px 16px;border-radius:11px;font-weight:700;font-size:calc(16px*var(--fz,1));color:var(--mut)}
 .bmseg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .bmgrid{display:grid;grid-template-columns:48% 1fr;gap:10px;align-items:center;margin-top:6px}
 .bmfig svg{width:100%;height:auto;display:block;overflow:visible}
 .bmlist{display:flex;flex-direction:column;gap:6px}
-.bmlist button{text-align:left;padding:9px 12px;border-radius:12px;background:var(--bg);font-size:16px;font-weight:700;line-height:1.15}
+.bmlist button{text-align:left;padding:9px 12px;border-radius:12px;background:var(--bg);font-size:calc(16px*var(--fz,1));font-weight:700;line-height:1.15}
 .bmlist button.on{background:var(--acc);color:#fff}
 /* game */
 .board{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:var(--card);padding:8px;border-radius:20px;touch-action:none;user-select:none}
-.cell{aspect-ratio:1;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:34px;transition:transform .15s,opacity .2s}
+.cell{aspect-ratio:1;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:calc(34px*var(--fz,1));transition:transform .15s,opacity .2s}
 .cell.sel{transform:scale(.86);box-shadow:0 0 0 3px var(--acc) inset}
 .cell.pop{transform:scale(0);opacity:0}
 .gstat{display:flex;gap:10px;margin-bottom:10px}
 .gstat div{flex:1;background:var(--card);border-radius:14px;padding:10px;text-align:center}
-.gstat b{display:block;font-size:29px}
+.gstat b{display:block;font-size:calc(29px*var(--fz,1))}
 .prog{height:10px;border-radius:5px;background:var(--card);overflow:hidden;margin:8px 0 4px;position:relative}
 .prog i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
 /* coupons */
 .coupon{display:flex;background:var(--card);border-radius:18px;overflow:hidden;margin-bottom:10px}
-.coupon .pc{background:var(--acc);color:#fff;font-weight:900;font-size:31px;width:86px;display:grid;place-items:center;border-right:3px dashed var(--bg)}
+.coupon .pc{background:var(--acc);color:#fff;font-weight:900;font-size:calc(31px*var(--fz,1));width:86px;display:grid;place-items:center;border-right:3px dashed var(--bg)}
 .coupon .ci{padding:12px;flex:1}
 .coupon.used{opacity:.45}
 .code{font-family:ui-monospace,monospace;font-weight:800;background:var(--soft);padding:4px 8px;border-radius:8px}
 /* wheel */
 .wheelw{position:relative;width:260px;height:260px;margin:10px auto}
 .wheel{width:100%;height:100%;border-radius:50%;transition:transform 4s cubic-bezier(.15,.85,.1,1);border:6px solid #fff;box-shadow:0 4px 18px rgba(0,0,0,.12)}
-.wheelw::after{content:'▼';position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:36px;color:var(--ink)}
+.wheelw::after{content:'▼';position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:calc(36px*var(--fz,1));color:var(--ink)}
 .streak{display:flex;gap:6px;justify-content:center;margin:6px 0}
-.streak i{width:30px;height:30px;border-radius:9px;background:var(--card);display:grid;place-items:center;font-style:normal;font-size:16px;font-weight:800;color:var(--mut)}
+.streak i{width:30px;height:30px;border-radius:9px;background:var(--card);display:grid;place-items:center;font-style:normal;font-size:calc(16px*var(--fz,1));font-weight:800;color:var(--mut)}
 .streak i.on{background:var(--acc);color:#fff}
 /* holidays */
 .hol{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;padding:12px;margin-bottom:8px}
-.hol .d{width:52px;text-align:center;font-weight:900;font-size:26px;color:var(--acc);line-height:1}
-.hol .d small{display:block;font-size:14px;color:var(--mut);font-weight:700}
-.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#1d1b1a;color:#fff;padding:12px 18px;border-radius:14px;font-weight:600;font-size:18px;z-index:90;animation:up .2s;max-width:90%}
+.hol .d{width:52px;text-align:center;font-weight:900;font-size:calc(26px*var(--fz,1));color:var(--acc);line-height:1}
+.hol .d small{display:block;font-size:calc(14px*var(--fz,1));color:var(--mut);font-weight:700}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#1d1b1a;color:#fff;padding:12px 18px;border-radius:14px;font-weight:600;font-size:calc(18px*var(--fz,1));z-index:90;animation:up .2s;max-width:90%}
 .empty{text-align:center;color:var(--mut);padding:30px 10px}
 .social{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.social a{background:var(--card);border-radius:14px;padding:12px 4px;text-align:center;text-decoration:none;color:var(--ink);font-size:16px;font-weight:700}
-.social a span{display:block;font-size:29px;margin-bottom:2px}
+.social a{background:var(--card);border-radius:14px;padding:12px 4px;text-align:center;text-decoration:none;color:var(--ink);font-size:calc(16px*var(--fz,1));font-weight:700}
+.social a span{display:block;font-size:calc(29px*var(--fz,1));margin-bottom:2px}
 /* editor */
 .zed{position:relative;aspect-ratio:3/4;background:#ddd;border-radius:16px;overflow:hidden;touch-action:none;user-select:none}
 .zed video,.zed img{width:100%;height:100%;object-fit:cover;pointer-events:none}
 .zed .zr{position:absolute;border:2.5px solid #fff;background:rgba(215,20,26,.25);box-shadow:0 0 0 1px rgba(0,0,0,.3);border-radius:6px}
-.zed .zr span{position:absolute;left:4px;top:3px;font-size:14px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000}
+.zed .zr span{position:absolute;left:4px;top:3px;font-size:calc(14px*var(--fz,1));font-weight:800;color:#fff;text-shadow:0 1px 2px #000}
 .thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
 .thumbs .t{flex:0 0 64px;height:85px;border-radius:10px;overflow:hidden;border:3px solid transparent;position:relative;background:#ddd}
 .thumbs .t.on{border-color:var(--acc)}
 .thumbs .t video,.thumbs .t img{width:100%;height:100%;object-fit:cover}
 .field{margin-bottom:12px}
-.field label{display:block;font-size:16px;font-weight:700;color:var(--mut);margin-bottom:5px}
+.field label{display:block;font-size:calc(16px*var(--fz,1));font-weight:700;color:var(--mut);margin-bottom:5px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-table{width:100%;border-collapse:collapse;font-size:17px}
+table{width:100%;border-collapse:collapse;font-size:calc(17px*var(--fz,1))}
 td,th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
-th{color:var(--mut);font-weight:700;font-size:16px}
+th{color:var(--mut);font-weight:700;font-size:calc(16px*var(--fz,1))}
 td.n,th.n{text-align:right}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .kpis div{background:var(--card);border-radius:16px;padding:12px}
-.kpis b{display:block;font-size:31px}
+.kpis b{display:block;font-size:calc(31px*var(--fz,1))}
 .seg{display:flex;background:var(--card);border-radius:12px;padding:3px;margin-bottom:12px}
-.seg button{flex:1;padding:8px 0;border-radius:10px;font-weight:700;font-size:17px;color:var(--mut)}
+.seg button{flex:1;padding:8px 0;border-radius:10px;font-weight:700;font-size:calc(17px*var(--fz,1));color:var(--mut)}
 .seg button.on{background:var(--acc);color:#fff}
 
 body{--bg:#FBE6E3}
@@ -218,35 +218,59 @@ nav button.on svg{transform:scale(1.1)}
 .fav svg path{fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
 .fav.on{color:#E8323A}.fav.on svg path{fill:#E8323A;stroke:#E8323A}
 .hol{display:grid!important;grid-template-columns:56px 1fr auto;align-items:center;gap:10px}
-.hol>div:nth-child(2){min-width:0}.hol b{font-size:18px;display:block;line-height:1.2}
-.hol .muted{font-size:15px}
-.hol .btn{white-space:nowrap;padding:10px 12px;font-size:15px}
+.hol>div:nth-child(2){min-width:0}.hol b{font-size:calc(18px*var(--fz,1));display:block;line-height:1.2}
+.hol .muted{font-size:calc(15px*var(--fz,1))}
+.hol .btn{white-space:nowrap;padding:10px 12px;font-size:calc(15px*var(--fz,1))}
 .holhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .social a{display:flex;flex-direction:column;align-items:center;gap:6px}
 .social svg{width:40px;height:40px;display:block}
 .social a.off{opacity:.55}
 .inst{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border-radius:18px;padding:12px 14px;margin:0 0 14px}
-.inst b{font-size:17px}
-.inst .x{color:var(--mut);font-size:20px;width:36px;height:36px}
+.inst b{font-size:calc(17px*var(--fz,1))}
+.inst .x{color:var(--mut);font-size:calc(20px*var(--fz,1));width:36px;height:36px}
 .sheet .in{transition:transform .25s;touch-action:pan-y}
 .sheet .grab{width:48px;height:5px;border-radius:3px;background:var(--line);margin:-6px auto 6px}
 .bmgrid{grid-template-columns:54% 1fr!important;align-items:stretch!important}
 .bmfig{position:relative;min-height:380px}
 .bmfig svg{position:absolute;inset:0;width:100%!important;height:100%!important}
 .bmlist{gap:5px!important}
-.bmlist button{padding:8px 10px!important;font-size:15px!important;color:var(--ink)}
+.bmlist button{padding:8px 10px!important;font-size:calc(15px*var(--fz,1))!important;color:var(--ink)}
 .card{position:relative}
-.newb{position:absolute;top:12px;left:12px;z-index:3;background:#FFD54A;color:#3A2A00;font-weight:800;font-size:14px;padding:5px 10px;border-radius:10px}
-.totop{position:fixed;right:16px;bottom:96px;width:52px;height:52px;border-radius:50%;background:var(--acc);color:#fff;font-size:24px;font-weight:900;box-shadow:0 4px 14px rgba(0,0,0,.2);z-index:25;opacity:0;pointer-events:none;transition:opacity .25s}
+.newb{position:absolute;top:12px;left:12px;z-index:3;background:#FFD54A;color:#3A2A00;font-weight:800;font-size:calc(14px*var(--fz,1));padding:5px 10px;border-radius:10px}
+.totop{position:fixed;right:10px;bottom:74px;width:46px;height:46px;border-radius:50%;background:var(--acc);color:#fff;font-size:calc(24px*var(--fz,1));font-weight:900;box-shadow:0 4px 14px rgba(0,0,0,.2);z-index:25;opacity:0;pointer-events:none;transition:opacity .25s}
 .totop.show{opacity:1;pointer-events:auto}
 .flyh{position:fixed;width:28px;height:28px;z-index:95;pointer-events:none}
 .flyh svg{width:28px;height:28px}
 @keyframes beat{0%{transform:scale(1)}20%{transform:scale(1.55) rotate(-8deg)}40%{transform:scale(.9)}60%{transform:scale(1.3) rotate(6deg)}80%{transform:scale(.95)}100%{transform:scale(1)}}
 nav svg.beat{animation:beat .8s ease}
-.social a{font-size:12.5px!important;min-width:0;padding:12px 0!important;white-space:nowrap;letter-spacing:-.2px;line-height:1.2}
+.social a{font-size:calc(12.5px*var(--fz,1))!important;min-width:0;padding:12px 0!important;white-space:nowrap;letter-spacing:-.2px;line-height:1.2}
 .social svg{width:44px!important;height:44px!important}
 .switch .pill{transition:left .4s cubic-bezier(.3,1.3,.5,1),background .4s!important}
 html,body{transition:background .45s}
+.box,.prod,.hol,.coupon,.card:not(.pre){animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+.card.pre{opacity:0}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+button,.chip,.btn,.story,a{transition:transform .15s ease,background .25s,color .25s,box-shadow .25s}
+button:active,.chip:active,.btn:active,.story:active{transform:scale(.94)}
+nav button:active svg{transform:scale(.85)}
+main.tabin{animation:tabin .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes tabin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.bell.ring svg{animation:ringb 1.2s ease 1}
+@keyframes ringb{0%,100%{transform:rotate(0)}15%{transform:rotate(18deg)}30%{transform:rotate(-16deg)}45%{transform:rotate(12deg)}60%{transform:rotate(-8deg)}75%{transform:rotate(4deg)}}
+.bell b{animation:popb .5s cubic-bezier(.3,1.8,.5,1)}
+@keyframes popb{from{transform:scale(0)}to{transform:scale(1)}}
+.story .ring{transition:transform .25s}
+.story:hover .ring{transform:scale(1.06) rotate(-4deg)}
+.chip.on,.bmlist button.on{animation:pop .35s cubic-bezier(.3,1.8,.5,1)}
+@keyframes pop{0%{transform:scale(.85)}100%{transform:scale(1)}}
+.fav.on svg{animation:pop .4s cubic-bezier(.3,1.8,.5,1)}
+.totop.show{animation:popb .35s cubic-bezier(.3,1.8,.5,1)}
+.empty{animation:rise .5s both}
+.skel{height:420px;border-radius:22px;margin-bottom:16px;background:linear-gradient(90deg,var(--card) 25%,var(--soft) 50%,var(--card) 75%);background-size:300% 100%;animation:shim 1.3s linear infinite}
+@keyframes shim{from{background-position:100% 0}to{background-position:-200% 0}}
+.cell{transition:transform .18s,opacity .2s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+nav button{font-size:12px!important}.switch button{font-size:17px!important}.logo{font-size:21px!important}.seg button{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -338,9 +362,9 @@ let DEFERRED=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDef
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone;
 function isDark(){const t=(Store.state&&Store.state.theme)||'auto';return t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches)}
 function applyTheme(){document.body.classList.toggle('dark',isDark());applyFS()}
-function applyFS(){const z=[1,1.12,1.25][(Store.state&&Store.state.fs)||0]||1;document.body.style.zoom=z}
+function applyFS(){const z=[1,1.12,1.25][(Store.state&&Store.state.fs)||0]||1;document.body.style.zoom='';document.documentElement.style.setProperty('--fz',z)}
 async function doInstall(){if(DEFERRED){DEFERRED.prompt();try{await DEFERRED.userChoice}catch(e){}DEFERRED=null;return}
- const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);sheet(`<h2>Установить приложение</h2>${ios?'<p class="muted" style="font-size:19px">1. Нажмите кнопку «Поделиться» внизу Safari (квадрат со стрелкой).<br><br>2. Выберите «На экран Домой».<br><br>3. Нажмите «Добавить».</p>':'<p class="muted" style="font-size:19px">1. Нажмите меню браузера ⋮ в правом верхнем углу.<br><br>2. Выберите «Установить приложение» или «Добавить на главный экран».<br><br>3. Подтвердите.</p>'}`)}
+ const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);sheet(`<h2>Установить приложение</h2>${ios?'<p class="muted" style="font-size:calc(19px*var(--fz,1))">1. Нажмите кнопку «Поделиться» внизу Safari (квадрат со стрелкой).<br><br>2. Выберите «На экран Домой».<br><br>3. Нажмите «Добавить».</p>':'<p class="muted" style="font-size:calc(19px*var(--fz,1))">1. Нажмите меню браузера ⋮ в правом верхнем углу.<br><br>2. Выберите «Установить приложение» или «Добавить на главный экран».<br><br>3. Подтвердите.</p>'}`)}
 // ================= app state =================
 const App={tab:'feed',q:'',qAll:false,bodyZone:'',game:null,adminTab:'posts',edit:null};
 const st=()=>Store.state;
@@ -395,12 +419,12 @@ function cardHTML(p,hl){const f=st().favs.includes(p.id);const isNew=App.prevVis
 function mpRow(pr,pid){const l=Object.keys(MP).filter(k=>pr[k]);if(!l.length)return'';return `<div class="mp">Купить: ${l.map(k=>`<a href="${esc(pr[k])}" target="_blank" rel="noopener" data-mp="${k}" data-pid="${pid}">${MP[k]}</a>`).join(' · ')}</div>`}
 function highlight(s,q){const t=esc(s);if(!q)return t;const words=q.trim().split(/\s+/).filter(w=>w.length>1).map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));if(!words.length)return t;return t.replace(new RegExp('('+words.join('|')+')','gi'),'<mark>$1</mark>')}
 function viewFeed(){const m=mode();const ps=visiblePosts(m);const stories=ps.filter(p=>p.story&&(p.slides||[]).length);
- let h='';if(!isStandalone()&&!st().instHide)h+=`<div class="inst"><div><b>📲 Установите приложение</b><div class="muted" style="font-size:14px">Значок на экране телефона</div></div><div class="row"><button class="btn sm" data-act="install">Установить</button><button class="x" data-act="insthide" aria-label="Скрыть">✕</button></div></div>`;
+ let h='';if(!isStandalone()&&!st().instHide)h+=`<div class="inst"><div><b>📲 Установите приложение</b><div class="muted" style="font-size:calc(14px*var(--fz,1))">Значок на экране телефона</div></div><div class="row"><button class="btn sm" data-act="install">Установить</button><button class="x" data-act="insthide" aria-label="Скрыть">✕</button></div></div>`;
  if(stories.length)h+=`<div class="stories">${stories.map(p=>`<div class="story ${st().seenStories.includes(p.id)?'seen':''}" data-story="${p.id}"><div class="ring"><img src="${esc(p.slides[0].type==='image'?p.slides[0].src:p.slides[0].poster)}"></div><span>${esc(p.title)}</span></div>`).join('')}</div>`;
  if(m==='health')h+=bodyMapHTML();else h+=holidaysHTML(true);
  let list=ps;if(m==='health'&&App.bodyZone)list=ps.filter(p=>(p.zones||[]).includes(App.bodyZone));
- if(App.bodyZone)h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:20px">Про «${BODY[App.bodyZone]}»</b><button class="btn sm ghost" data-act="clearzone">Все посты</button></div>`;
- h+=list.length?list.slice(0,App.feedN||12).map(p=>cardHTML(p)).join('')+(list.length>(App.feedN||12)?`<button class="btn ghost wide" data-act="more" style="margin-bottom:16px">Показать ещё</button>`:''):(Store.loading?'<div class="empty">Загружаю посты с Диска…</div>':Store.err?`<div class="empty">${esc(Store.err)}</div>`:`<div class="empty">Пока нет постов${App.bodyZone?' про эту зону':''}</div>`);
+ if(App.bodyZone)h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">Про «${BODY[App.bodyZone]}»</b><button class="btn sm ghost" data-act="clearzone">Все посты</button></div>`;
+ h+=list.length?list.slice(0,App.feedN||12).map(p=>cardHTML(p)).join('')+(list.length>(App.feedN||12)?`<button class="btn ghost wide" data-act="more" style="margin-bottom:16px">Показать ещё</button>`:''):(Store.loading?'<div class="skel"></div><div class="skel"></div>':Store.err?`<div class="empty">${esc(Store.err)}</div>`:`<div class="empty">Пока нет постов${App.bodyZone?' про эту зону':''}</div>`);
  return h}
 function bodyMapHTML(){const z=App.bodyZone;const back=App.bodyView==='back'||(!App.bodyView&&BODY_BACK.includes(z));const hurt=!!z;
  const SK='#F3C7A5',SK2='#E3A985',SH='#D7141A',SH2='#B50F17',TR='#2F4A7A',TR2='#3B5C95',BOOT='#4A3426',HAIR='#C9CED6';
@@ -429,7 +453,7 @@ function bodyMapHTML(){const z=App.bodyZone;const back=App.bodyView==='back'||(!
  ${Z('head',`<ellipse cx="69" cy="60" rx="6" ry="9" fill="${SK2}"/><ellipse cx="131" cy="60" rx="6" ry="9" fill="${SK2}"/><ellipse cx="100" cy="58" rx="30" ry="33" fill="${SK}"/>`+(back?`<path d="M70 52 Q72 24 100 23 Q128 24 130 52 Q132 78 118 88 Q100 94 82 88 Q68 78 70 52Z" fill="${HAIR}"/>`:`<path d="M70 50 Q72 22 100 22 Q128 22 130 50 Q124 34 112 33 Q100 40 88 33 Q76 34 70 50Z" fill="${HAIR}"/>`))}
  ${back?'':`<g pointer-events="none">${hurt?faceH:faceN}</g>`}
  </g></svg>`;
- return `<div class="box bm"><div class="row between" style="flex-wrap:wrap;margin-bottom:4px"><b style="font-size:21px">Где болит?</b><div class="bmseg"><button class="${back?'':'on'}" data-act="bmfront">Спереди</button><button class="${back?'on':''}" data-act="bmback">Сзади</button></div></div>
+ return `<div class="box bm"><div class="row between" style="flex-wrap:wrap;margin-bottom:4px"><b style="font-size:calc(21px*var(--fz,1))">Где болит?</b><div class="bmseg"><button class="${back?'':'on'}" data-act="bmfront">Спереди</button><button class="${back?'on':''}" data-act="bmback">Сзади</button></div></div>
  <div class="bubble">${z?esc(BODY_FUN[z]||BODY[z]):'Нажмите, где болит!'}</div>
  <div class="bmgrid"><div class="bmfig">${svg}</div><div class="bmlist">${Object.entries(BODY).filter(([k])=>back?!['chest','belly'].includes(k):!BODY_BACK.includes(k)).map(([k,v])=>`<button class="${z===k?'on':''}" data-zone="${k}">${v}</button>`).join('')}</div></div>
  ${z?recoHTML(z):''}</div>`}
@@ -437,7 +461,7 @@ function recoHTML(z){const p=visiblePosts('health').find(p=>(p.zones||[]).includ
  return `<div class="prod" style="margin:12px 0 0;background:var(--soft)"><div><b>Подойдёт: ${esc(pr.name)}</b>${mpRow(pr,p.id)}</div></div>`}
 function upcomingHolidays(){const t=today();return (Store.config.holidays||[]).filter(h=>h.date>=t).sort((a,b)=>a.date.localeCompare(b.date))}
 function holidaysHTML(short){const hs=upcomingHolidays().slice(0,short?2:20);if(!hs.length)return'';
- return `<div class="box"><div class="holhead"><b style="font-size:21px">🎉 Скоро праздник</b>${short?`<button class="btn sm ghost" data-act="cal">Календарь</button>`:''}</div><div style="margin-top:10px">${hs.map(holRow).join('')}</div></div>`}
+ return `<div class="box"><div class="holhead"><b style="font-size:calc(21px*var(--fz,1))">🎉 Скоро праздник</b>${short?`<button class="btn sm ghost" data-act="cal">Календарь</button>`:''}</div><div style="margin-top:10px">${hs.map(holRow).join('')}</div></div>`}
 function holRow(h){const d=new Date(h.date+'T00:00');const days=Math.ceil((d-new Date(today()+'T00:00'))/DAY);const on=st().holRem.includes(h.date);
  return `<div class="hol" style="background:var(--bg)"><div class="d">${d.getDate()}<small>${d.toLocaleString('ru',{month:'short'})}</small></div><div style="flex:1"><b>${esc(h.title)}</b><div class="muted">${days===0?'Сегодня':'через '+days+' дн.'}${h.tag?` · <a href="#" data-tagq="${esc(h.tag)}" style="color:var(--acc)">идеи подарков</a>`:''}</div></div><button class="btn sm ${on?'':'ghost'}" data-rem="${h.date}">${on?'🔔 Напомню':'Напомнить'}</button></div>`}
 function viewSearch(){const q=App.q.trim().toLowerCase();const src=visiblePosts(App.qAll?null:mode());
@@ -449,7 +473,7 @@ function viewSearch(){const q=App.q.trim().toLowerCase();const src=visiblePosts(
  <div id="sres">${q?(res.length?`<p class="muted">Найдено: ${res.length}</p>`+res.map(p=>cardHTML(p,App.q)).join(''):'<div class="empty">Ничего не нашлось. Попробуйте другое слово.</div>'):''}</div>`}
 function topTags(src){const c={};src.forEach(p=>(p.tags||[]).forEach(t=>{if(t&&t!=='здоровье')c[t]=(c[t]||0)+1}));return Object.entries(c).sort((a,b)=>b[1]-a[1]).map(x=>x[0])}
 function tagCloud(src,kind){const all=topTags(src);const key='tc_'+kind;const open=App[key];const N=10;const list=open?all:all.slice(0,N);const on=t=>kind==='topic'&&st().topics.includes(t);
- return `<div style="margin-bottom:14px"><b style="font-size:17px;display:block;margin:4px 0 10px">${kind==='topic'?'':'Популярные темы'}</b><div class="chips">${list.map(t=>`<button class="chip ${on(t)?'on':''}" data-${kind==='topic'?'topic':'tagq'}="${esc(t)}">#${esc(t)}</button>`).join('')}${all.length>N?`<button class="chip" data-act="tcmore" data-k="${key}" style="border-style:dashed">${open?'Свернуть ▴':'Все темы ('+all.length+') ▾'}</button>`:''}</div></div>`}
+ return `<div style="margin-bottom:14px"><b style="font-size:calc(17px*var(--fz,1));display:block;margin:4px 0 10px">${kind==='topic'?'':'Популярные темы'}</b><div class="chips">${list.map(t=>`<button class="chip ${on(t)?'on':''}" data-${kind==='topic'?'topic':'tagq'}="${esc(t)}">#${esc(t)}</button>`).join('')}${all.length>N?`<button class="chip" data-act="tcmore" data-k="${key}" style="border-style:dashed">${open?'Свернуть ▴':'Все темы ('+all.length+') ▾'}</button>`:''}</div></div>`}
 function viewFavs(){const ps=Store.posts.filter(p=>st().favs.includes(p.id));return `<h2>Избранное</h2>`+(ps.length?ps.map(p=>cardHTML(p)).join(''):'<div class="empty">Нажмите ♡ на посте, и он появится здесь</div>')}
 
 // ================= post page (rich content) =================
@@ -461,7 +485,7 @@ function openPost(id){const p=Store.posts.find(x=>x.id===id);if(!p)return;track(
  const f=st().favs.includes(id);
  sheet(`${sliderHTML(p).replace('class="slider"','class="slider" style="border-radius:20px"')}
  <div class="row between" style="margin-top:14px"><span class="tag">${MODES[p.mode].t}</span><div class="row"><button class="ic" data-share="${id}">↗</button><button class="ic fav ${f?'on':''}" data-fav="${id}">${IC.heart}</button></div></div>
- <h2 style="margin-top:10px">${esc(p.title)}</h2><p style="font-size:20px;line-height:1.5;color:var(--ink2);margin-top:0">${esc(p.text)}</p>
+ <h2 style="margin-top:10px">${esc(p.title)}</h2><p style="font-size:calc(20px*var(--fz,1));line-height:1.5;color:var(--ink2);margin-top:0">${esc(p.text)}</p>
  <div class="rich">${richHTML(p.body)}</div>
  ${(p.products||[]).length?`<h4>Где купить</h4>${p.products.map(pr=>`<div class="prod"><div><b>${esc(pr.name)}</b>${mpRow(pr,p.id)}</div></div>`).join('')}`:''}
  <div class="tags">${(p.tags||[]).map(t=>`<span class="tag" data-tagq="${esc(t)}">#${esc(t)}</span>`).join('')}</div>`)}
@@ -475,7 +499,7 @@ function speakPost(id,btn){try{const ss=speechSynthesis;if(ss.speaking){ss.cance
 function flyHeart(from){const nb=document.querySelector('nav [data-tab=favs]');if(!nb)return;const a=from.getBoundingClientRect(),b=nb.querySelector('svg').getBoundingClientRect();
  const h=document.createElement('div');h.className='flyh';h.innerHTML=IC.favs;h.style.left=(a.left+a.width/2-14)+'px';h.style.top=(a.top+a.height/2-14)+'px';document.body.appendChild(h);
  const dx=b.left+b.width/2-(a.left+a.width/2),dy=b.top+b.height/2-(a.top+a.height/2);
- h.animate([{transform:'translate(0,0) scale(1.2)',opacity:1},{transform:`translate(${dx*.5}px,${dy*.5-80}px) scale(1.4)`,opacity:1,offset:.5},{transform:`translate(${dx}px,${dy}px) scale(.6)`,opacity:.9}],{duration:700,easing:'cubic-bezier(.4,0,.2,1)'}).onfinish=()=>{h.remove();const sv=nb.querySelector('svg');sv.classList.remove('beat');void sv.offsetWidth;sv.classList.add('beat')}}
+ h.animate([{transform:'translate(0,0) scale(1.2)',opacity:1},{transform:`translate(${dx*.5}px,${dy*.5-80}px) scale(1.4)`,opacity:1,offset:.5},{transform:`translate(${dx}px,${dy}px) scale(.6)`,opacity:.9}],{duration:700,easing:'cubic-bezier(.4,0,.2,1)'}).onfinish=()=>{h.remove();const sv=nb.querySelector('svg');sv.animate([{transform:'scale(1)'},{transform:'scale(1.6) rotate(-10deg)',offset:.2},{transform:'scale(.85)',offset:.4},{transform:'scale(1.3) rotate(8deg)',offset:.6},{transform:'scale(.95)',offset:.8},{transform:'scale(1)'}],{duration:800,easing:'ease-out'})}}
 function closeSheet(){try{speechSynthesis.cancel()}catch(e){}const s=$('#sheet');if(s){s._onClose&&s._onClose();s.remove()}}
 
 // ================= stories =================
@@ -501,7 +525,7 @@ function notifications(){const s=st();const out=[];const m=mode();
  if(s.wheel.date!==t)out.push({ic:'🎡',t:'Ежедневный бонус ждёт',tab:'game'});
  return out}
 function openBell(){const ns=notifications();
- sheet(`<h2>Уведомления</h2>${ns.length?ns.map((n,i)=>`<div class="prod" data-ni="${i}" style="cursor:pointer"><div class="row"><span style="font-size:22px">${n.ic}</span><b style="font-size:14px">${esc(n.t)}</b></div><span>›</span></div>`).join(''):'<div class="empty">Пока ничего нового</div>'}
+ sheet(`<h2>Уведомления</h2>${ns.length?ns.map((n,i)=>`<div class="prod" data-ni="${i}" style="cursor:pointer"><div class="row"><span style="font-size:calc(22px*var(--fz,1))">${n.ic}</span><b style="font-size:calc(14px*var(--fz,1))">${esc(n.t)}</b></div><span>›</span></div>`).join(''):'<div class="empty">Пока ничего нового</div>'}
  <button class="btn ghost wide" data-act="pushperm" style="margin-top:10px">Получать уведомления на телефон</button>
  <p class="muted" style="text-align:center">Темы уведомлений настраиваются в профиле</p>`,()=>{st().lastSeen=now();saveState();render()});
  $('#sheet').addEventListener('click',e=>{const el=e.target.closest('[data-ni]');if(!el)return;const n=ns[+el.dataset.ni];closeSheet();if(n.post)openPost(n.post);else if(n.tab){App.tab=n.tab;render()}else if(n.tag){App.tab='search';App.q=n.tag;render()}})}
@@ -518,7 +542,7 @@ const GN=7;
 function viewGame(){const s=st();const t=today();if(s.games.date!==t){s.games.date=t;s.games.left=Store.config.gamesPerDay||3;saveState()}
  const g=App.game;const cps=Store.config.coupons||[];const max=cps.length?cps[cps.length-1].min:1000;
  let h=wheelBox();
- if(!g){h+=`<div class="box" style="text-align:center"><div style="font-size:54px">${TILES[mode()].slice(0,3).join('')}</div><h2 style="margin:6px 0">Три в ряд за скидку</h2>
+ if(!g){h+=`<div class="box" style="text-align:center"><div style="font-size:calc(54px*var(--fz,1))">${TILES[mode()].slice(0,3).join('')}</div><h2 style="margin:6px 0">Три в ряд за скидку</h2>
   <p class="muted">Собирайте по 3 и больше одинаковых. 20 ходов. Набрали очки, получили промокод на маркетплейс.</p>
   <div style="text-align:left;margin:12px 0">${cps.map(c=>`<div class="row between" style="padding:6px 0;border-bottom:1px solid var(--line)"><span>от ${c.min} очков</span><b>скидка ${c.percent}%</b></div>`).join('')}</div>
   <button class="btn wide" data-act="startgame" ${s.games.left>0?'':'disabled'}>${s.games.left>0?`Играть (осталось ${s.games.left})`:'Попытки закончились до завтра'}</button>
@@ -547,18 +571,18 @@ async function trySwap(a,b){const g=App.game;g.busy=true;[g.b[a],g.b[b]]=[g.b[b]
   drawBoard();await sleep(200);combo++;m=findMatches(g.b)}
  render();g.busy=false;if(g.moves<=0)endGame()}
 function endGame(){const g=App.game;App.game=null;const s=st();s.games.best=Math.max(s.games.best||0,g.score);const won=[...(Store.config.coupons||[])].reverse().find(c=>g.score>=c.min);let c=null;if(won)c=addCoupon(won.percent,won.code,'game');saveState();render();
- sheet(`<div style="text-align:center"><div style="font-size:60px">${won?'🎉':'🙂'}</div><h2>${g.score} очков</h2>${won?`<p>Ваша скидка <b>${won.percent}%</b> на маркетплейсе</p>${couponHTML(c)}`:`<p class="muted">Чуть-чуть не хватило до скидки. Попробуйте ещё раз!</p>`}<button class="btn wide" data-act="close">Отлично</button></div>`)}
+ sheet(`<div style="text-align:center"><div style="font-size:calc(60px*var(--fz,1))">${won?'🎉':'🙂'}</div><h2>${g.score} очков</h2>${won?`<p>Ваша скидка <b>${won.percent}%</b> на маркетплейсе</p>${couponHTML(c)}`:`<p class="muted">Чуть-чуть не хватило до скидки. Попробуйте ещё раз!</p>`}<button class="btn wide" data-act="close">Отлично</button></div>`)}
 
 // ================= daily wheel =================
 const PRIZES=[{t:'+1 игра',g:1},{t:'5%',p:5},{t:'+2 игры',g:2},{t:'+1 игра',g:1},{t:'7%',p:7},{t:'+3 игры',g:3},{t:'5%',p:5},{t:'10%',p:10}];
 const PRW=[18,14,14,18,10,8,14,4];
 function wheelBox(){const s=st();const t=today();const done=s.wheel.date===t;const yest=new Date(Date.now()-DAY).toISOString().slice(0,10);const streak=done?s.wheel.streak:(s.wheel.date===yest?s.wheel.streak:0);
- return `<div class="box"><div class="row between"><div><b style="font-size:22px">🎡 Бонус дня</b><div class="muted">${done?'Сегодня: '+esc(s.wheel.last)+'. Приходите завтра!':'Крутите колесо раз в день'}</div></div><button class="btn sm" data-act="wheel" ${done?'disabled':''}>Крутить</button></div>
+ return `<div class="box"><div class="row between"><div><b style="font-size:calc(22px*var(--fz,1))">🎡 Бонус дня</b><div class="muted">${done?'Сегодня: '+esc(s.wheel.last)+'. Приходите завтра!':'Крутите колесо раз в день'}</div></div><button class="btn sm" data-act="wheel" ${done?'disabled':''}>Крутить</button></div>
  <div class="streak">${[1,2,3,4,5,6,7].map(i=>`<i class="${i<=streak?'on':''}">${i===7?'🎁':i}</i>`).join('')}</div><p class="muted" style="text-align:center;margin:0">7 дней подряд: скидка 10% в подарок</p></div>`}
 function openWheel(){const cols=['#d7141a','#ffb000','#1f6fd6','#2fa84f','#ff6fa5','#7a4cc2','#ff8a00','#1d1b1a'];const seg=360/PRIZES.length;
  const grad=PRIZES.map((_,i)=>`${cols[i]} ${i*seg}deg ${(i+1)*seg}deg`).join(',');
- sheet(`<h2 style="text-align:center">Бонус дня</h2><div class="wheelw"><div class="wheel" id="wheel" style="background:conic-gradient(${grad})">${PRIZES.map((p,i)=>`<div style="position:absolute;left:50%;top:50%;transform:rotate(${i*seg+seg/2}deg) translateY(-92px) translateX(-50%);color:#fff;font-weight:900;font-size:15px;transform-origin:0 0;white-space:nowrap">${p.t}</div>`).join('')}</div></div>
- <button class="btn wide" id="spin">Крутить!</button><p id="wres" style="text-align:center;font-weight:800;font-size:18px"></p>`);
+ sheet(`<h2 style="text-align:center">Бонус дня</h2><div class="wheelw"><div class="wheel" id="wheel" style="background:conic-gradient(${grad})">${PRIZES.map((p,i)=>`<div style="position:absolute;left:50%;top:50%;transform:rotate(${i*seg+seg/2}deg) translateY(-92px) translateX(-50%);color:#fff;font-weight:900;font-size:calc(15px*var(--fz,1));transform-origin:0 0;white-space:nowrap">${p.t}</div>`).join('')}</div></div>
+ <button class="btn wide" id="spin">Крутить!</button><p id="wres" style="text-align:center;font-weight:800;font-size:calc(18px*var(--fz,1))"></p>`);
  $('#spin').onclick=()=>{const s=st();const t=today();if(s.wheel.date===t)return;$('#spin').disabled=true;
   let r=Math.random()*100,k=0;for(;k<PRW.length;k++){if(r<PRW[k])break;r-=PRW[k]}k=Math.min(k,PRIZES.length-1);
   const rot=360*6+(360-(k*seg+seg/2));$('#wheel').style.transform=`rotate(${rot}deg)`;
@@ -572,16 +596,16 @@ function refCode(){const s=st();if(!s.ref.code){s.ref.code=('DRUG'+(Store.uid||u
 function viewMe(){const s=st();const m=mode();const cfg=Store.config;const active=s.coupons.filter(c=>!c.used&&c.exp>now());const allTags=[...new Set(visiblePosts(null).flatMap(p=>p.tags||[]))];
  const soc=(cfg[m]||{}).social||{};const SOC=[['vk','ВКонтакте'],['tg','Telegram'],['ok','Одноклассники']].concat(soc.yt?[['yt','YouTube']]:[]);
  return `<h2>Профиль</h2>
- <div class="box"><b style="font-size:22px">🔠 Размер текста</b><div class="seg" style="margin:12px 0 0">${['Обычный','Крупный','Очень крупный'].map((n,i)=>`<button class="${(s.fs||0)===i?'on':''}" data-act="fs${i}" style="font-size:${16+i*2}px">${n}</button>`).join('')}</div></div>
- <div class="box"><div class="row between"><b style="font-size:22px">🎟️ Мои скидки</b><span class="muted">${active.length} активн.</span></div><div style="margin-top:10px">${s.coupons.length?s.coupons.slice(0,30).map(couponHTML).join(''):'<p class="muted">Скидки из игры и бонуса дня будут здесь. Код вводится при оформлении заказа на маркетплейсе.</p>'}</div></div>
- <div class="box"><b style="font-size:22px">👫 Пригласи друга</b><p class="muted">Поделитесь приложением с вашим кодом. Друг получит скидку ${cfg.referralPercent||10}%, и вы тоже.</p>
-  <div class="row between" style="margin:10px 0"><span class="code" style="font-size:18px">${refCode()}</span><button class="btn sm" data-act="share">Поделиться</button></div>
+ <div class="box"><b style="font-size:calc(22px*var(--fz,1))">🔠 Размер текста</b><div class="seg" style="margin:12px 0 0">${['Обычный','Крупный','Очень крупный'].map((n,i)=>`<button class="${(s.fs||0)===i?'on':''}" data-act="fs${i}" style="font-size:${16+i*2}px">${n}</button>`).join('')}</div></div>
+ <div class="box"><div class="row between"><b style="font-size:calc(22px*var(--fz,1))">🎟️ Мои скидки</b><span class="muted">${active.length} активн.</span></div><div style="margin-top:10px">${s.coupons.length?s.coupons.slice(0,30).map(couponHTML).join(''):'<p class="muted">Скидки из игры и бонуса дня будут здесь. Код вводится при оформлении заказа на маркетплейсе.</p>'}</div></div>
+ <div class="box"><b style="font-size:calc(22px*var(--fz,1))">👫 Пригласи друга</b><p class="muted">Поделитесь приложением с вашим кодом. Друг получит скидку ${cfg.referralPercent||10}%, и вы тоже.</p>
+  <div class="row between" style="margin:10px 0"><span class="code" style="font-size:calc(18px*var(--fz,1))">${refCode()}</span><button class="btn sm" data-act="share">Поделиться</button></div>
   ${s.ref.used?'<p class="muted">Код друга уже применён ✓</p>':`<div class="row"><input id="refin" placeholder="Код друга"><button class="btn sm" data-act="applyref">ОК</button></div>`}</div>
  ${m==='mood'?holidaysHTML(false):''}
- <div class="box"><b style="font-size:22px">🔔 Уведомления</b><p class="muted">О каких темах сообщать (если ничего не выбрать, то обо всех):</p>${tagCloud(visiblePosts(null),'topic')}
+ <div class="box"><b style="font-size:calc(22px*var(--fz,1))">🔔 Уведомления</b><p class="muted">О каких темах сообщать (если ничего не выбрать, то обо всех):</p>${tagCloud(visiblePosts(null),'topic')}
   <button class="btn ghost wide" data-act="pushperm" style="margin-top:12px">Получать на телефон</button></div>
- <div class="box"><b style="font-size:22px">Мы в соцсетях</b><div class="social" style="margin-top:12px;grid-template-columns:repeat(${SOC.length},minmax(0,1fr))">${SOC.map(x=>soc[x[0]]?`<a href="${esc(soc[x[0]])}" target="_blank" rel="noopener">${SOCIC[x[0]]}${x[1]}</a>`:`<a href="#" class="off" data-act="nosoc">${SOCIC[x[0]]}${x[1]}</a>`).join('')}</div></div>
- <div class="box"><b style="font-size:22px">📲 Приложение на телефон</b><p class="muted">Значок появится на экране, как у обычного приложения.</p><button class="btn wide" data-act="install">Установить приложение</button></div>`}
+ <div class="box"><b style="font-size:calc(22px*var(--fz,1))">Мы в соцсетях</b><div class="social" style="margin-top:12px;grid-template-columns:repeat(${SOC.length},minmax(0,1fr))">${SOC.map(x=>soc[x[0]]?`<a href="${esc(soc[x[0]])}" target="_blank" rel="noopener">${SOCIC[x[0]]}${x[1]}</a>`:`<a href="#" class="off" data-act="nosoc">${SOCIC[x[0]]}${x[1]}</a>`).join('')}</div></div>
+ <div class="box"><b style="font-size:calc(22px*var(--fz,1))">📲 Приложение на телефон</b><p class="muted">Значок появится на экране, как у обычного приложения.</p><button class="btn wide" data-act="install">Установить приложение</button></div>`}
 function shareApp(){const t=`Полезные советы и скидки Спецмазь и Доктор Шустер. Мой код на скидку: ${refCode()}\n${location.href.split('#')[0]}`;
  if(navigator.share){navigator.share({text:t}).catch(()=>copy(t))}else copy(t)}
 
@@ -626,7 +650,7 @@ function drawEditor(){const e=App.edit;const s=e.slides[e._s];
  <div class="field"><label>Заголовок</label><input data-e="title" value="${esc(e.title)}"></div>
  <div class="field"><label>Коротко (видно в ленте)</label><textarea data-e="text" style="min-height:60px">${esc(e.text)}</textarea></div>
  <h4>Зоны приближения</h4>
- ${e.slides.length>1?`<div class="thumbs">${e.slides.map((x,i)=>`<div class="t ${i===e._s?'on':''}" data-es="${i}">${mediaHTML(x,false)}${(x.zones||[]).length?`<b style="position:absolute;right:3px;bottom:3px;background:var(--acc);color:#fff;font-size:10px;padding:1px 5px;border-radius:6px">${x.zones.length}</b>`:''}</div>`).join('')}</div>`:''}
+ ${e.slides.length>1?`<div class="thumbs">${e.slides.map((x,i)=>`<div class="t ${i===e._s?'on':''}" data-es="${i}">${mediaHTML(x,false)}${(x.zones||[]).length?`<b style="position:absolute;right:3px;bottom:3px;background:var(--acc);color:#fff;font-size:calc(10px*var(--fz,1));padding:1px 5px;border-radius:6px">${x.zones.length}</b>`:''}</div>`).join('')}</div>`:''}
  <p class="muted">Проведите пальцем или мышкой по картинке, чтобы отметить зону. В приложении нажатие на зону плавно приблизит её.</p>
  <div class="zed" id="zed">${s.type==='image'?`<img src="${esc(s.src)}">`:`<video src="${esc(s.src)}" muted loop autoplay playsinline></video>`}${(s.zones||[]).map((z,i)=>`<div class="zr" style="left:${z.x*100}%;top:${z.y*100}%;width:${z.w*100}%;height:${z.h*100}%"><span>${i+1}</span></div>`).join('')}</div>
  <div style="margin-top:8px">${(s.zones||[]).map((z,i)=>`<div class="row" style="margin-bottom:6px"><b style="width:20px">${i+1}</b><input data-zl="${i}" value="${esc(z.label||'')}" placeholder="Подпись зоны"><button class="btn sm ghost" data-zdel="${i}">✕</button></div>`).join('')}</div>
@@ -656,7 +680,7 @@ async function doSavePost(){syncEditorFields();const e=App.edit;if(!Store.token)
 
 // ================= events =================
 document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-tab],[data-mode],[data-act],[data-fav],[data-open],[data-story],[data-zone],[data-tagq],[data-rem],[data-qall],[data-mp],[data-copyc],[data-usec],[data-topic],[data-share],[data-atab],[data-editp],[data-es],[data-zdel],[data-emode],[data-ebz],[data-prdel]');if(!t)return;const d=t.dataset;
- if(d.tab){App.tab=d.tab;closeSheet();render();scrollTo(0,0)}
+ if(d.tab){App.tab=d.tab;closeSheet();render();scrollTo(0,0);const mn=document.querySelector('main');if(mn){mn.classList.remove('tabin');void mn.offsetWidth;mn.classList.add('tabin')}}
  else if(d.mode){if(d.mode!==mode())setMode(d.mode)}
  else if(d.fav){const f=st().favs;const i=f.indexOf(d.fav);if(i>=0)f.splice(i,1);else{f.push(d.fav);flyHeart(t)}saveState();document.querySelectorAll(`[data-fav="${d.fav}"]`).forEach(b=>{b.classList.toggle('on',i<0)});if(App.tab==='favs'&&!$('#sheet'))render()}
  else if(d.open){openPost(d.open)}
@@ -706,8 +730,10 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
   else if(a==='savecfg')doSaveCfg();
  }});
 let qT=null;
+function revealCards(){if(!window.IntersectionObserver)return;const io=window._rio||(window._rio=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.remove('pre');en.target.classList.add('vis');window._rio.unobserve(en.target)}}),{rootMargin:'0px 0px -40px 0px'}));
+ document.querySelectorAll('#app .feedcard').forEach((c,i)=>{if(i<2)return;const r=c.getBoundingClientRect();if(r.top>innerHeight){c.classList.add('pre');io.observe(c)}})}
 function afterRender(){const aq=$('#aq');if(aq)aq.oninput=()=>{App.aq=aq.value;clearTimeout(qT);qT=setTimeout(()=>{const pos=aq.selectionStart;render();const n=$('#aq');n.focus();n.setSelectionRange(pos,pos)},300)};const q=$('#q');if(q){q.oninput=()=>{App.q=q.value;clearTimeout(qT);qT=setTimeout(()=>{const pos=q.selectionStart;render();const n=$('#q');n.focus();n.setSelectionRange(pos,pos)},250)};}
- bindBoard();
+ bindBoard();revealCards();
  // autoplay only visible videos
  if(window.IntersectionObserver){const io=new IntersectionObserver(es=>es.forEach(en=>{const v=en.target;if(en.isIntersecting)v.play().catch(()=>{});else v.pause()}),{threshold:.25});document.querySelectorAll('#app .slider video').forEach(v=>io.observe(v))}}
 window.addEventListener('hashchange',()=>{Store.isAdmin=location.hash==='#admin'||!!Store.token;render()});
@@ -715,7 +741,7 @@ window.addEventListener('hashchange',()=>{Store.isAdmin=location.hash==='#admin'
 // ================= boot =================
 (async()=>{Store.state=Object.assign(defState(),LS.get('sm_state',{}));applyTheme();try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{applyTheme();render()})}catch(e){}document.body.classList.toggle('mood',Store.state.mode==='mood');render();
  App.prevVisit=st().lastVisit||0;st().lastVisit=Date.now();saveState();
- await initStore();setMode(st().mode||'health');
+ await initStore();setMode(st().mode||'health');setTimeout(()=>{const b=document.querySelector('[data-act=bell]');if(b&&b.querySelector('b'))b.classList.add('ring')},600);
  const tb=document.createElement('button');tb.className='totop';tb.dataset.act='top';tb.setAttribute('aria-label','Наверх');tb.textContent='↑';document.body.appendChild(tb);addEventListener('scroll',()=>tb.classList.toggle('show',scrollY>900),{passive:true});
  if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}})();
 </script>
