@@ -71,6 +71,10 @@ main{padding:4px 16px}
 .arrow.l{left:8px}.arrow.r{right:8px}
 .zlabel{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.6);color:#fff;font-size:calc(16px*var(--fz,1));font-weight:700;padding:5px 10px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none}
 .slider.zoomed .zlabel{opacity:1}
+.zbtn{position:absolute;top:50%;width:38px;height:38px;margin-top:-19px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;font-size:calc(24px*var(--fz,1));font-weight:700;line-height:1;display:none;place-items:center;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.25);animation:zbin .3s ease}
+.zbtn.l{left:8px}.zbtn.r{right:8px}
+.slider.zoomed.hasz .zbtn{display:grid}
+@keyframes zbin{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
 /* nav */
 nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;background:var(--nav);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 nav .in{display:flex;width:100%;max-width:480px}
@@ -390,7 +394,7 @@ function track(kind,id,extra){const P=Store.posts.find(x=>x.id===id);if(kind==='
 // ================= media + zoom slider =================
 function mediaHTML(sl,auto=true){if(!auto&&sl.type==='video'&&sl.poster)return `<img src="${esc(sl.poster)}" alt="" loading="lazy">`;return sl.type==='image'?`<img src="${esc(sl.src)}" alt="" loading="lazy">`:`<video src="${esc(sl.src)}" poster="${esc(sl.poster||'')}" muted loop playsinline preload="none"></video>`}
 function sliderHTML(p){const sl=p.slides||[];return `<div class="slider" data-post="${p.id}"><div class="track">${sl.map((s,i)=>`<div class="slide" data-i="${i}"><div class="media">${mediaHTML(s)}</div>${(s.zones||[]).map((z,j)=>`<div class="hint" style="left:${(z.x+z.w)*100-3}%;top:${z.y*100+3}%">+</div>`).join('')}</div>`).join('')}</div>
- ${sl.length>1?`<button class="arrow l">‹</button><button class="arrow r">›</button><div class="dots">${sl.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}<div class="zlabel"></div></div>`}
+ ${sl.length>1?`<button class="arrow l">‹</button><button class="arrow r">›</button><div class="dots">${sl.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}<div class="zlabel"></div><button class="zbtn l" aria-label="Предыдущая зона">‹</button><button class="zbtn r" aria-label="Следующая зона">›</button></div>`}
 function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._b)return;el._b=1;const p=Store.posts.find(x=>x.id===el.dataset.post);if(!p)return;
  const tr=el.querySelector('.track');let cur=0,zoom=null,drag=null,downX=0,downY=0,downT=0,moved=0;
  const dots=[...el.querySelectorAll('.dots i')];
@@ -400,10 +404,14 @@ function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._
  const lab=el.querySelector('.zlabel');
  function setT(anim){zoom.m.style.transition=anim?'':'none';zoom.m.style.transform=`translate(${zoom.tx}px,${zoom.ty}px) scale(${zoom.s})`}
  function clampT(){zoom.tx=Math.min(0,Math.max(zoom.W-zoom.W*zoom.s,zoom.tx));zoom.ty=Math.min(0,Math.max(zoom.H-zoom.H*zoom.s,zoom.ty))}
- function unzoom(){if(!zoom)return;zoom.m.style.transition='';zoom.m.style.transform='';zoom=null;el.classList.remove('zoomed')}
+ function unzoom(){if(!zoom)return;zoom.m.style.transition='';zoom.m.style.transform='';zoom=null;el.classList.remove('zoomed','hasz')}
  function zoomAt(slideEl,cx,cy,s,text){const m=slideEl.querySelector('.media');const W=slideEl.clientWidth,H=slideEl.clientHeight;
   const im=m.querySelector('img');const sl=p.slides[+slideEl.dataset.i];if(im&&sl.full&&im.src!==sl.full){const hi=new Image();hi.onload=()=>{im.src=sl.full};hi.src=sl.full}
-  zoom={m,W,H,s,tx:W*(0.5-cx*s),ty:H*(0.5-cy*s)};clampT();setT(true);el.classList.add('zoomed');lab.textContent=text}
+  zoom={m,W,H,s,tx:W*(0.5-cx*s),ty:H*(0.5-cy*s),slideEl,zi:null};clampT();setT(true);el.classList.add('zoomed');lab.textContent=text}
+ function zoneList(slideEl){const v=slideEl.querySelector('video');return (p.slides[+slideEl.dataset.i].zones||[]).filter(z=>zoneOn(z,v))}
+ function zoomZone(slideEl,z,list){const i=list.indexOf(z);zoomAt(slideEl,z.x+z.w/2,z.y+z.h/2,Math.max(1,Math.min(8,1/z.w,1/z.h)),'🔍 '+(z.label||'Ближе')+(list.length>1?' · '+(i+1)+'/'+list.length:''));zoom.zi=i;el.classList.toggle('hasz',list.length>1)}
+ function navZone(d){if(!zoom)return;const list=zoneList(zoom.slideEl);if(!list.length)return;const n=list.length;const i=zoom.zi==null?(d>0?0:n-1):(zoom.zi+d+n)%n;zoomZone(zoom.slideEl,list[i],list)}
+ el.querySelector('.zbtn.l').addEventListener('click',e=>{e.stopPropagation();navZone(-1)});el.querySelector('.zbtn.r').addEventListener('click',e=>{e.stopPropagation();navZone(1)});
  const zoneOn=(z,v)=>{const t=v?v.currentTime:0;return (z.t1==null||t>=z.t1)&&(z.t2==null||t<=z.t2)};
  tr.addEventListener('pointerdown',e=>{downX=e.clientX;downY=e.clientY;downT=Date.now();moved=0;if(zoom){drag={tx:zoom.tx,ty:zoom.ty};try{tr.setPointerCapture(e.pointerId)}catch(_){}}});
  tr.addEventListener('pointermove',e=>{const dx=e.clientX-downX,dy=e.clientY-downY;moved=Math.max(moved,Math.hypot(dx,dy));if(zoom&&drag){zoom.tx=drag.tx+dx;zoom.ty=drag.ty+dy;clampT();setT(false)}});
@@ -412,9 +420,9 @@ function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._
   const slideEl=e.target.closest('.slide');if(!slideEl)return;const sl=p.slides[+slideEl.dataset.i];const r=slideEl.getBoundingClientRect();
   const nx=(e.clientX-r.left)/r.width,ny=(e.clientY-r.top)/r.height;const v=slideEl.querySelector('video');
   const zs=(sl.zones||[]).filter(z=>zoneOn(z,v)&&nx>=z.x&&nx<=z.x+z.w&&ny>=z.y&&ny<=z.y+z.h).sort((a,b)=>a.w*a.h-b.w*b.h);
-  if(zs.length){const z=zs[0];zoomAt(slideEl,z.x+z.w/2,z.y+z.h/2,Math.max(1,Math.min(8,1/z.w,1/z.h)),'🔍 '+(z.label||'Ближе'))}
+  if(zs.length)zoomZone(slideEl,zs[0],zoneList(slideEl))
   else if(el.closest('.feedcard'))openPost(p.id);
-  else zoomAt(slideEl,nx,ny,2.5,'🔍 Двигайте пальцем')});
+  else{zoomAt(slideEl,nx,ny,2.5,'🔍 Двигайте пальцем');el.classList.toggle('hasz',zoneList(slideEl).length>0)}});
  tr.addEventListener('pointercancel',()=>{drag=null});
  })}
 
