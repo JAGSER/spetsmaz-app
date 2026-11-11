@@ -392,23 +392,30 @@ function mediaHTML(sl,auto=true){if(!auto&&sl.type==='video'&&sl.poster)return `
 function sliderHTML(p){const sl=p.slides||[];return `<div class="slider" data-post="${p.id}"><div class="track">${sl.map((s,i)=>`<div class="slide" data-i="${i}"><div class="media">${mediaHTML(s)}</div>${(s.zones||[]).map((z,j)=>`<div class="hint" style="left:${(z.x+z.w)*100-3}%;top:${z.y*100+3}%">+</div>`).join('')}</div>`).join('')}</div>
  ${sl.length>1?`<button class="arrow l">‹</button><button class="arrow r">›</button><div class="dots">${sl.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}<div class="zlabel"></div></div>`}
 function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._b)return;el._b=1;const p=Store.posts.find(x=>x.id===el.dataset.post);if(!p)return;
- const tr=el.querySelector('.track');let cur=0,zoom=null,downX=0,downY=0,downT=0;
+ const tr=el.querySelector('.track');let cur=0,zoom=null,drag=null,downX=0,downY=0,downT=0,moved=0;
  const dots=[...el.querySelectorAll('.dots i')];
  tr.addEventListener('scroll',()=>{const i=Math.round(tr.scrollLeft/tr.clientWidth);if(i!==cur){cur=i;dots.forEach((d,k)=>d.classList.toggle('on',k===i))}},{passive:true});
  const go=d=>{tr.scrollTo({left:(cur+d)*tr.clientWidth,behavior:'smooth'})};
  el.querySelector('.arrow.l')?.addEventListener('click',e=>{e.stopPropagation();go(-1)});el.querySelector('.arrow.r')?.addEventListener('click',e=>{e.stopPropagation();go(1)});
- function unzoom(){if(!zoom)return;zoom.style.transform='';zoom=null;el.classList.remove('zoomed')}
- function zoomTo(slideEl,z){const m=slideEl.querySelector('.media');const W=slideEl.clientWidth,H=slideEl.clientHeight;
-  let s=Math.min(1/z.w,1/z.h)*0.92;s=Math.max(1.4,Math.min(s,4));const cx=z.x+z.w/2,cy=z.y+z.h/2;
-  let tx=W*(0.5-cx*s),ty=H*(0.5-cy*s);tx=Math.min(0,Math.max(W-W*s,tx));ty=Math.min(0,Math.max(H-H*s,ty));
-  const im=m.querySelector('img');const sl=p.slides[+slideEl.dataset.i];if(im&&sl.full&&im.src!==sl.full){const hi=new Image();hi.onload=()=>{im.src=sl.full};hi.src=sl.full}m.style.transform=`translate(${tx}px,${ty}px) scale(${s})`;zoom=m;el.classList.add('zoomed');el.querySelector('.zlabel').textContent='🔍 '+(z.label||'Ближе')}
- tr.addEventListener('pointerdown',e=>{downX=e.clientX;downY=e.clientY;downT=Date.now()});
- tr.addEventListener('pointerup',e=>{if(Math.hypot(e.clientX-downX,e.clientY-downY)>10||Date.now()-downT>600)return;
+ const lab=el.querySelector('.zlabel');
+ function setT(anim){zoom.m.style.transition=anim?'':'none';zoom.m.style.transform=`translate(${zoom.tx}px,${zoom.ty}px) scale(${zoom.s})`}
+ function clampT(){zoom.tx=Math.min(0,Math.max(zoom.W-zoom.W*zoom.s,zoom.tx));zoom.ty=Math.min(0,Math.max(zoom.H-zoom.H*zoom.s,zoom.ty))}
+ function unzoom(){if(!zoom)return;zoom.m.style.transition='';zoom.m.style.transform='';zoom=null;el.classList.remove('zoomed')}
+ function zoomAt(slideEl,cx,cy,s,text){const m=slideEl.querySelector('.media');const W=slideEl.clientWidth,H=slideEl.clientHeight;
+  const im=m.querySelector('img');const sl=p.slides[+slideEl.dataset.i];if(im&&sl.full&&im.src!==sl.full){const hi=new Image();hi.onload=()=>{im.src=sl.full};hi.src=sl.full}
+  zoom={m,W,H,s,tx:W*(0.5-cx*s),ty:H*(0.5-cy*s)};clampT();setT(true);el.classList.add('zoomed');lab.textContent=text}
+ const zoneOn=(z,v)=>{const t=v?v.currentTime:0;return (z.t1==null||t>=z.t1)&&(z.t2==null||t<=z.t2)};
+ tr.addEventListener('pointerdown',e=>{downX=e.clientX;downY=e.clientY;downT=Date.now();moved=0;if(zoom){drag={tx:zoom.tx,ty:zoom.ty};try{tr.setPointerCapture(e.pointerId)}catch(_){}}});
+ tr.addEventListener('pointermove',e=>{const dx=e.clientX-downX,dy=e.clientY-downY;moved=Math.max(moved,Math.hypot(dx,dy));if(zoom&&drag){zoom.tx=drag.tx+dx;zoom.ty=drag.ty+dy;clampT();setT(false)}});
+ tr.addEventListener('pointerup',e=>{const wasDrag=drag;drag=null;if(zoom)zoom.m.style.transition='';if(moved>10||Date.now()-downT>600)return;
   if(zoom){unzoom();return}
   const slideEl=e.target.closest('.slide');if(!slideEl)return;const sl=p.slides[+slideEl.dataset.i];const r=slideEl.getBoundingClientRect();
-  const nx=(e.clientX-r.left)/r.width,ny=(e.clientY-r.top)/r.height;
-  const zs=(sl.zones||[]).filter(z=>nx>=z.x&&nx<=z.x+z.w&&ny>=z.y&&ny<=z.y+z.h).sort((a,b)=>a.w*a.h-b.w*b.h);
-  if(zs.length)zoomTo(slideEl,zs[0]);else if(el.closest('.feedcard'))openPost(p.id)});
+  const nx=(e.clientX-r.left)/r.width,ny=(e.clientY-r.top)/r.height;const v=slideEl.querySelector('video');
+  const zs=(sl.zones||[]).filter(z=>zoneOn(z,v)&&nx>=z.x&&nx<=z.x+z.w&&ny>=z.y&&ny<=z.y+z.h).sort((a,b)=>a.w*a.h-b.w*b.h);
+  if(zs.length){const z=zs[0];zoomAt(slideEl,z.x+z.w/2,z.y+z.h/2,Math.max(1,Math.min(8,1/z.w,1/z.h)),'🔍 '+(z.label||'Ближе'))}
+  else if(el.closest('.feedcard'))openPost(p.id);
+  else zoomAt(slideEl,nx,ny,2.5,'🔍 Двигайте пальцем')});
+ tr.addEventListener('pointercancel',()=>{drag=null});
  })}
 
 // ================= render =================
@@ -518,7 +525,7 @@ function onboarding(){let i=0;const S=[['👆','Два раздела','Ввер
 function sheet(html,onClose){closeSheet();const d=document.createElement('div');d.className='sheet';d.id='sheet';d.innerHTML=`<div class="in"><button class="close" data-act="close">✕</button>${html}</div>`;
  d.addEventListener('click',e=>{if(e.target===d)closeSheet()});d.querySelector('.in').insertAdjacentHTML('afterbegin','<div class="grab"></div>');bindSwipeClose(d);document.body.appendChild(d);bindSliders(d);d.querySelectorAll('.slider video').forEach(v=>v.play().catch(()=>{}));d._onClose=onClose;d.querySelector('.in').scrollTop=0}
 function bindSwipeClose(d){const box=d.querySelector('.in');let y0=null,x0=0,dy=0,lock=null;
- box.addEventListener('touchstart',e=>{if(box.scrollTop>2||e.target.closest('.zed')){y0=null;return}y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0;lock=null;box.style.transition='none'},{passive:true});
+ box.addEventListener('touchstart',e=>{if(box.scrollTop>2||e.target.closest('.zed,.slider.zoomed')){y0=null;return}y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0;lock=null;box.style.transition='none'},{passive:true});
  box.addEventListener('touchmove',e=>{if(y0===null)return;const t=e.touches[0];const ddy=t.clientY-y0,ddx=t.clientX-x0;if(lock===null&&(Math.abs(ddy)>8||Math.abs(ddx)>8))lock=Math.abs(ddy)>Math.abs(ddx)&&ddy>0?'y':'x';if(lock!=='y')return;dy=Math.max(0,ddy);box.style.transform=`translateY(${dy}px)`;if(e.cancelable)e.preventDefault()},{passive:false});
  box.addEventListener('touchend',()=>{if(y0===null)return;box.style.transition='';if(lock==='y'&&dy>110){box.style.transform='translateY(100%)';setTimeout(closeSheet,200)}else box.style.transform='';y0=null})}
 function speakPost(id,btn){try{const ss=speechSynthesis;if(ss.speaking){ss.cancel();btn.textContent='🔊';return}const p=Store.posts.find(x=>x.id===id);const txt=[p.title,p.text,String(p.body||'').replace(/^[#>\-]\s*/gm,'')].filter(Boolean).join('. ');const u=new SpeechSynthesisUtterance(txt);u.lang='ru-RU';u.rate=.95;const v=ss.getVoices().find(v=>/^ru/i.test(v.lang));if(v)u.voice=v;u.onend=()=>{btn.textContent='🔊'};btn.textContent='⏹';ss.speak(u)}catch(e){toast('Озвучка недоступна на этом телефоне')}}
@@ -637,7 +644,7 @@ function shareApp(){const t=`Полезные советы и скидки Сп�
 
 // ================= admin =================
 function viewAdmin(){if(!Store.isAdmin)return'';const at=App.adminTab;
- return `<h2>Админ</h2><div class="seg">${[['posts','Посты'],['stats','Статистика'],['settings','Настройки']].map(t=>`<button class="${at===t[0]?'on':''}" data-atab="${t[0]}">${t[1]}</button>`).join('')}</div>`+({posts:adminPosts,stats:adminStats,settings:adminSettings})[at]()}
+ return `<h2>Админ</h2><a class="btn wide" href="editor.html" style="display:block;text-align:center;margin-bottom:12px;text-decoration:none">🔍 Редактор зон приближения</a><div class="seg">${[['posts','Посты'],['stats','Статистика'],['settings','Настройки']].map(t=>`<button class="${at===t[0]?'on':''}" data-atab="${t[0]}">${t[1]}</button>`).join('')}</div>`+({posts:adminPosts,stats:adminStats,settings:adminSettings})[at]()}
 function adminPosts(){const q=(App.aq||'').toLowerCase();const ps=Store.posts.filter(p=>p.mode===mode()&&(!q||(p.title+' '+p.group).toLowerCase().includes(q))).sort((a,b)=>(b.publishAt||0)-(a.publishAt||0));
  return `${Store.token?'<p class="muted">✓ Вход через Яндекс выполнен, правки сохраняются на Диск.</p>':`<div class="box"><b>Подключите Диск один раз</b><p class="muted">Чтобы зоны, ссылки на маркетплейсы и настройки сохранялись на ваш Диск: откройте страницу Яндекса «Полигон Диска», нажмите «Получить OAuth-токен», скопируйте его и вставьте сюда. Токен хранится только на этом устройстве.</p><a class="btn ghost wide" href="https://yandex.ru/dev/disk/poligon/" target="_blank" rel="noopener" style="margin-bottom:8px;text-decoration:none">Открыть Полигон Диска</a><div class="row"><input id="tokin" placeholder="Вставьте токен"><button class="btn sm" data-act="settoken">ОК</button></div></div>`}
  <p class="muted">Посты и карусели берутся сами из папки «Клиенты/Спецмазь/Реклама 2026/Посты» на Диске: папка «Спецмазь» идёт в «Здоровье», «Шустер» в «Настроение». Папки со словом «карусель» становятся каруселями, остальные картинки отдельными постами.</p>
@@ -679,7 +686,7 @@ function drawEditor(){const e=App.edit;const s=e.slides[e._s];
  <h4>Зоны приближения</h4>
  ${e.slides.length>1?`<div class="thumbs">${e.slides.map((x,i)=>`<div class="t ${i===e._s?'on':''}" data-es="${i}">${mediaHTML(x,false)}${(x.zones||[]).length?`<b style="position:absolute;right:3px;bottom:3px;background:var(--acc);color:#fff;font-size:calc(10px*var(--fz,1));padding:1px 5px;border-radius:6px">${x.zones.length}</b>`:''}</div>`).join('')}</div>`:''}
  <p class="muted">Проведите пальцем или мышкой по картинке, чтобы отметить зону. В приложении нажатие на зону плавно приблизит её.</p>
- <div class="zed" id="zed">${s.type==='image'?`<img src="${esc(s.src)}">`:`<video src="${esc(s.src)}" muted loop autoplay playsinline></video>`}${(s.zones||[]).map((z,i)=>`<div class="zr" style="left:${z.x*100}%;top:${z.y*100}%;width:${z.w*100}%;height:${z.h*100}%"><span>${i+1}</span></div>`).join('')}</div>
+ <a href="editor.html#${e.id}" style="display:inline-block;margin-bottom:8px;font-weight:700;color:var(--acc)">🔍 Открыть в большом редакторе зон</a><div class="zed" id="zed">${s.type==='image'?`<img src="${esc(s.src)}">`:`<video src="${esc(s.src)}" muted loop autoplay playsinline></video>`}${(s.zones||[]).map((z,i)=>`<div class="zr" style="left:${z.x*100}%;top:${z.y*100}%;width:${z.w*100}%;height:${z.h*100}%"><span>${i+1}</span></div>`).join('')}</div>
  <div style="margin-top:8px">${(s.zones||[]).map((z,i)=>`<div class="row" style="margin-bottom:6px"><b style="width:20px">${i+1}</b><input data-zl="${i}" value="${esc(z.label||'')}" placeholder="Подпись зоны"><button class="btn sm ghost" data-zdel="${i}">✕</button></div>`).join('')}</div>
  <h4>Текст поста</h4><div class="field"><label># заголовок, - пункт списка, &gt; совет</label><textarea data-e="body" style="min-height:140px">${esc(e.body)}</textarea></div>
  <div class="field"><label>Теги через запятую (для поиска и уведомлений)</label><input data-e="tags" value="${esc((e.tags||[]).join(', '))}"></div>
