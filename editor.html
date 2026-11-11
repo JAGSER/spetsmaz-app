@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>Редактор зон приближения</title>
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--acc:#D7141A;--bg:#fbf4f1;--card:#fff;--line:#eadbd6;--ink:#1d1b1a;--mut:#776b67;--soft:#fbe9e7}
+body.mood{--acc:#1E9E58;--bg:#f2f8f3;--line:#d6e8dc;--soft:#e6f4ea}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-size:17px;transition:background .3s}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.btn{background:var(--acc);color:#fff;font-weight:700;border-radius:12px;padding:10px 16px;transition:transform .1s,opacity .2s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:default}
+.app{display:grid;grid-template-columns:330px minmax(0,1fr) 360px;height:100vh}
+header{grid-column:1/-1}
+aside,.side{background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.side{border-right:0;border-left:1px solid var(--line);overflow:auto;padding:16px;gap:12px}
+.top{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.top h1{font-size:20px;flex:1}
+.seg{display:flex;background:var(--soft);border-radius:12px;padding:3px;margin:12px 16px 0}
+.seg button{flex:1;padding:8px;border-radius:10px;font-weight:700;color:var(--mut)}
+.seg button.on{background:var(--acc);color:#fff}
+.search{margin:10px 16px;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff}
+.list{overflow:auto;flex:1;padding:0 10px 16px}
+.it{display:flex;gap:10px;align-items:center;padding:8px;border-radius:12px;cursor:pointer;margin-bottom:4px}
+.it:hover{background:var(--soft)}
+.it.on{background:var(--soft);outline:2px solid var(--acc)}
+.it img{width:48px;height:64px;object-fit:cover;border-radius:8px;background:#eee;flex:none}
+.it .t{font-size:15px;font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.it .s{font-size:13px;color:var(--mut);margin-top:2px}
+.zb{background:var(--acc);color:#fff;border-radius:8px;padding:1px 7px;font-size:12px;font-weight:800;margin-left:4px}
+.upl{margin:0 16px 10px;display:block;text-align:center}
+main{display:flex;flex-direction:column;align-items:center;padding:16px;gap:12px;min-height:0;overflow:auto}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;width:100%}
+.ttl{font-weight:800;font-size:19px;text-align:center;max-width:560px}
+.frame{position:relative;aspect-ratio:3/4;height:min(70vh,760px);max-width:100%;background:#ddd;border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12);user-select:none;-webkit-user-select:none;touch-action:none}
+.media{position:absolute;inset:0;transform-origin:0 0;transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.media img,.media video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.ov{position:absolute;inset:0;cursor:crosshair}
+.zr{position:absolute;border:3px solid #fff;background:rgba(215,20,26,.22);box-shadow:0 0 0 1.5px rgba(0,0,0,.45);border-radius:6px;cursor:move}
+body.mood .zr{background:rgba(30,158,88,.22)}
+.zr.sel{border-color:#ffd400;background:rgba(255,212,0,.18)}
+.zr .n{position:absolute;left:5px;top:3px;font-weight:900;color:#fff;text-shadow:0 1px 3px #000;font-size:15px;pointer-events:none;white-space:nowrap}
+.zr .h{position:absolute;width:20px;height:20px;background:#ffd400;border:2px solid #000;border-radius:50%;display:none}
+.zr.sel .h{display:block}
+.h.nw{left:-11px;top:-11px;cursor:nwse-resize}.h.ne{right:-11px;top:-11px;cursor:nesw-resize}.h.sw{left:-11px;bottom:-11px;cursor:nesw-resize}.h.se{right:-11px;bottom:-11px;cursor:nwse-resize}
+.vis{position:absolute;border:2px dashed #ffd400;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,.35);border-radius:4px}
+.hint{position:absolute;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;font-weight:900;color:var(--acc);animation:pulse 1.8s infinite;pointer-events:none}
+.frame.zoomed .hint{opacity:0}
+@keyframes pulse{70%{box-shadow:0 0 0 14px rgba(255,255,255,0)}0%{box-shadow:0 0 0 0 rgba(255,255,255,.8)}}
+.zlabel{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.62);color:#fff;font-weight:700;padding:5px 10px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none}
+.frame.zoomed .zlabel{opacity:1}
+.empty{display:grid;place-items:center;height:100%;color:var(--mut);text-align:center;padding:30px;font-size:18px;line-height:1.5}
+.thumbs{display:flex;gap:6px;overflow-x:auto;max-width:100%;padding:4px}
+.thumbs div{position:relative;width:54px;height:72px;border-radius:8px;overflow:hidden;flex:none;cursor:pointer;opacity:.6;outline:2px solid transparent}
+.thumbs div.on{opacity:1;outline-color:var(--acc)}
+.thumbs img{width:100%;height:100%;object-fit:cover}
+.thumbs b{position:absolute;right:2px;bottom:2px;background:var(--acc);color:#fff;font-size:11px;border-radius:6px;padding:0 5px}
+.vctl{display:flex;align-items:center;gap:10px;width:min(100%,560px)}
+.vctl input{flex:1;accent-color:var(--acc)}
+.vctl .tm{font-variant-numeric:tabular-nums;color:var(--mut);min-width:90px;text-align:right}
+.mode{display:flex;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:3px}
+.mode button{padding:8px 14px;border-radius:9px;font-weight:700;color:var(--mut)}
+.mode button.on{background:var(--ink);color:#fff}
+.help{font-size:15px;color:var(--mut);text-align:center;max-width:560px;line-height:1.45}
+.card{background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.card.sel{border-color:#e0b800;background:#fffbe6}
+.card .row{display:flex;gap:8px;align-items:center}
+.card input[type=text],.card input[type=number],.inp{width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:#fff}
+.card input[type=number]{width:80px}
+.card .num{width:30px;height:30px;border-radius:50%;background:var(--acc);color:#fff;font-weight:900;display:grid;place-items:center;flex:none}
+.small{font-size:14px;color:var(--mut)}
+.mini{padding:6px 10px;border-radius:9px;border:1.5px solid var(--line);background:#fff;font-size:14px;font-weight:600}
+.mini.red{color:#c00}
+h3{font-size:18px}
+.tok{display:flex;flex-direction:column;gap:8px}
+.ok{color:#1E9E58;font-weight:700}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(30px);background:#222;color:#fff;padding:12px 20px;border-radius:14px;font-weight:600;opacity:0;transition:.3s;z-index:99;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.save{position:sticky;bottom:0;background:var(--card);padding-top:8px}
+@media(max-width:1100px){.app{grid-template-columns:280px minmax(0,1fr)}.side{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}.app{height:auto}aside{height:100vh;position:sticky;top:0}}
+@media(max-width:760px){.app{display:block}aside{height:auto;position:static}.list{max-height:40vh}.frame{height:auto;width:100%}}
+</style>
+</head>
+<body>
+<div class="app">
+ <aside>
+  <div class="top"><h1>🔍 Зоны приближения</h1><a class="mini" href="./#admin" style="text-decoration:none">← В приложение</a></div>
+  <div class="seg"><button data-m="health" class="on">Здоровье</button><button data-m="mood">Настроение</button></div>
+  <input class="search" id="q" placeholder="Поиск поста по названию">
+  <label class="btn ghost upl">📤 Загрузить свою картинку или видео<input type="file" id="file" accept="image/*,video/*" hidden></label>
+  <div class="list" id="list"><div class="empty">Загружаю посты с Диска…</div></div>
+ </aside>
+ <main id="main"><div class="empty">Выберите пост слева<br>или загрузите свою картинку или видео.</div></main>
+ <div class="side" id="side"></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const DISK_KEY='https://yadi.sk/d/iDTvVSSsPP7QtA';
+const DISK_PATH='disk:/Клиенты/Спецмазь/Реклама 2026/Посты';
+const YA_CLIENT_ID='__YA_CLIENT_ID__';
+const API='https://cloud-api.yandex.net/v1/disk';
+const enc=encodeURIComponent;const clone=o=>JSON.parse(JSON.stringify(o));
+const DEFAULT_CONFIG={
+ health:{brand:'Спецмазь',logo:'',social:{vk:'https://vk.com/spetzmaz',tg:'',yt:'',ok:''}},
+ mood:{brand:'Доктор Шустер',logo:'',social:{vk:'https://vk.com/dr.shuster',tg:'',yt:'',ok:''}},
+ coupons:[{min:800,percent:5,code:'SKIDKA5'},{min:1600,percent:10,code:'SKIDKA10'},{min:2600,percent:15,code:'SKIDKA15'}],
+ couponDays:7, gamesPerDay:3, referralPercent:10, referralCode:'DRUG10',
+ holidays:[{date:'2026-12-31',title:'Новый год',tag:'подарок'},{date:'2027-02-14',title:'День влюблённых',tag:'подарок'},{date:'2027-02-23',title:'23 Февраля',tag:'подарок'},{date:'2027-03-08',title:'8 Марта',tag:'подарок'}]
+};
+
+// ================= storage: Яндекс.Диск =================
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const Store={base:[],posts:[],meta:{posts:{},config:{}},config:clone(DEFAULT_CONFIG),state:null,isAdmin:false,token:LS.get('sm_token',''),loading:true,err:'',stats:[]};
+function defState(){return{favs:[],coupons:[],seenStories:[],lastSeen:0,topics:[],games:{date:'',left:0,best:0},wheel:{date:'',streak:0,last:''},ref:{code:'',used:false},holRem:[],views:{},clicks:{},mode:'health'}}
+async function pub(path,offset){const r=await fetch(`${API}/public/resources?public_key=${enc(DISK_KEY)}&path=${enc(path)}&limit=200&offset=${offset||0}&preview_size=1080x&preview_crop=false`);if(!r.ok)throw new Error('disk '+r.status);return r.json()}
+async function listAll(path){let items=[],off=0;for(;;){const j=await pub(path,off);const it=(j._embedded&&j._embedded.items)||[];items=items.concat(it);if(it.length<200)break;off+=200}return items}
+const natural=(a,b)=>a.name.localeCompare(b.name,'ru',{numeric:true});
+function hid(s){let h=5381;for(const c of s)h=((h*33)^c.charCodeAt(0))>>>0;return 'y'+h.toString(36)}
+const isVid=f=>f.media_type==='video'||/\.(mp4|webm|mov)$/i.test(f.name);
+const isMedia=f=>f.type==='file'&&(isVid(f)||f.media_type==='image'||/\.(png|jpe?g|webp|gif)$/i.test(f.name));
+function slideOf(f){return isVid(f)?{src:f.file,poster:f.preview||'',type:'video',path:f.path}:{src:f.preview||f.file,full:f.file,type:'image',path:f.path}}
+const MONTHS=/(январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр)/i;
+function cleanFolder(n){let t=n.replace(/^\+/,'').replace(/\s*\((карусель|карсуель)\)/ig,'').replace(/^(Спецмазь|Шустер)\s*/i,'').replace(/(Карусель|Карсуель)\s*/i,'').trim()||n;const m=t.match(/^(20\d\d)\s+(.+)$/);return m?m[2]+' '+m[1]:t}
+function cleanFile(n){return n.replace(/\.[^.]+$/,'').replace(/^\d+[\s._-]*/,'').trim()}
+const isCar=n=>/карус|карсуел/i.test(n||'');
+async function crawl(){const posts=[];
+ async function walk(path,mode,names){const items=await listAll(path);const files=items.filter(isMedia).sort(natural);const dirs=items.filter(x=>x.type==='dir');
+  const name=names[names.length-1],parent=names[names.length-2]||'';const month=names.slice().reverse().find(n=>MONTHS.test(n));
+  const label=cleanFolder(month||name);
+  if(files.length){
+   if(isCar(name)||isCar(parent))posts.push({id:hid(path),mode,kind:'carousel',title:cleanFolder(name),group:label,dpath:path,slides:files.map(slideOf),created:Math.max(...files.map(f=>Date.parse(f.created)||0))});
+   else files.forEach((f,i)=>{const t=cleanFile(f.name);posts.push({id:hid(f.path),mode,kind:'single',title:t||(label+' · пост '+(i+1)),group:label,dpath:f.path,slides:[slideOf(f)],created:Date.parse(f.created)||0})})}
+  await Promise.all(dirs.map(d=>walk(d.path,mode,names.concat(d.name))))}
+ const root=await listAll('/');
+ await Promise.all(root.filter(x=>x.type==='dir').map(d=>walk(d.path,/шуст/i.test(d.name)?'mood':'health',[d.name])));
+ const mf=root.find(x=>x.name==='_app.json');let meta={posts:{},config:{}};
+ if(mf){try{meta=await (await fetch(mf.file+(mf.file.includes('?')?'&':'?')+'nc='+Date.now())).json();meta.posts=meta.posts||{};meta.config=meta.config||{}}catch(e){}}
+ return {posts,meta}}
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=s=>document.querySelector(s);
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2600)}
+const E={posts:[],meta:{posts:{},config:{}},auto:{},m:'health',q:'',cur:null,si:0,zones:{},sel:-1,test:false,dirty:false,token:LS.get('sm_token',''),folders:[]};
+const fmt=t=>{t=Math.max(0,t||0);const m=Math.floor(t/60),s=(t%60).toFixed(1);return m+':'+(s<10?'0':'')+s};
+const r4=v=>Math.round(v*10000)/10000;
+
+async function load(){
+ try{E.auto=await (await fetch('titles.json',{cache:'no-cache'})).json()}catch(e){E.auto={}}
+ try{const r=await crawl();E.posts=r.posts.map(p=>Object.assign(p,{title:(E.auto[p.id]&&E.auto[p.id].title)||p.title}));E.meta=r.meta;
+  const fs=new Set();r.posts.forEach(p=>{if(p.kind==='single'){const d=p.dpath.slice(0,p.dpath.lastIndexOf('/'));if(d)fs.add(d)}});E.folders=[...fs].sort((a,b)=>a.localeCompare(b,'ru'));
+ }catch(e){$('#list').innerHTML='<div class="empty">Не удалось загрузить посты с Диска. Проверьте интернет и обновите страницу.</div>';return}
+ drawList();const h=decodeURIComponent(location.hash.slice(1));if(h){const p=E.posts.find(x=>x.id===h);if(p){setMode(p.mode);openPost(p)}}
+}
+function zc(p){const sz=((E.meta.posts[p.id]||{}).slideZones)||{};return Object.values(sz).reduce((a,z)=>a+z.length,0)}
+function drawList(){const q=E.q.toLowerCase();const ps=E.posts.filter(p=>p.mode===E.m&&(!q||(p.title+' '+p.group).toLowerCase().includes(q))).sort((a,b)=>b.created-a.created);
+ $('#list').innerHTML=ps.length?ps.map(p=>{const s=p.slides[0];const n=zc(p);return `<div class="it ${E.cur&&E.cur.id===p.id?'on':''}" data-id="${p.id}"><img src="${esc(s.type==='image'?s.src:s.poster)}" loading="lazy" alt=""><div><div class="t">${esc(p.title)}</div><div class="s">${s.type==='video'?'🎬 Видео · ':''}${p.kind==='carousel'?'Карусель, '+p.slides.length+' шт · ':''}${esc(p.group)}${n?`<span class="zb">${n}</span>`:''}</div></div></div>`}).join(''):'<div class="empty">Ничего не найдено</div>'}
+function setMode(m){E.m=m;document.body.classList.toggle('mood',m==='mood');document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));drawList()}
+
+function confirmLeave(){return !E.dirty||confirm('Есть несохранённые зоны. Перейти без сохранения?')}
+function openPost(p){if(E.cur&&E.cur!==p&&!confirmLeave())return;E.cur=p;E.si=0;E.sel=-1;E.test=false;E.dirty=false;
+ const sz=p.local?{}:((E.meta.posts[p.id]||{}).slideZones)||{};E.zones={};p.slides.forEach((s,i)=>{E.zones[i]=JSON.parse(JSON.stringify(sz[s.path]||[]))});
+ if(!p.local)history.replaceState(null,'','#'+p.id);drawList();drawMain();drawSide()}
+const Z=()=>E.zones[E.si]||(E.zones[E.si]=[]);
+const slide=()=>E.cur.slides[E.si];
+
+// ---------- main ----------
+function drawMain(){const p=E.cur;const s=slide();
+ $('#main').innerHTML=`<div class="ttl">${esc(p.title)}</div>
+ <div class="mode"><button data-test="0" class="${E.test?'':'on'}">✏️ Рисовать зоны</button><button data-test="1" class="${E.test?'on':''}">👆 Проверить, как в приложении</button></div>
+ <div class="frame" id="fr"><div class="media" id="md">${s.type==='image'?`<img src="${esc(s.src)}" alt="">`:`<video src="${esc(s.src)}" poster="${esc(s.poster||'')}" muted loop playsinline autoplay></video>`}</div>
+  ${E.test?Z().map(z=>`<div class="hint" style="left:${(z.x+z.w)*100-3}%;top:${z.y*100+3}%">+</div>`).join('')+'<div class="zlabel" id="zl"></div>':'<div class="ov" id="ov"></div>'}</div>
+ ${s.type==='video'?`<div class="vctl"><button class="mini" id="vp">⏸</button><input type="range" id="vr" min="0" max="1000" value="0"><span class="tm" id="vt">0:00.0</span></div>`:''}
+ ${p.slides.length>1?`<div class="thumbs">${p.slides.map((x,i)=>`<div class="${i===E.si?'on':''}" data-si="${i}"><img src="${esc(x.type==='image'?x.src:x.poster)}" alt="">${(E.zones[i]||[]).length?`<b>${E.zones[i].length}</b>`:''}</div>`).join('')}</div>`:''}
+ <div class="help">${E.test?'Нажмите на зону: приблизится ровно она. Нажмите мимо зон: обычное приближение в точку, картинку можно двигать пальцем или мышкой. Ещё нажатие: отдалить.':'Проведите пальцем или мышкой по картинке, чтобы нарисовать зону. Зону можно двигать и тянуть за жёлтые углы. Пунктиром показано, что будет видно на экране телефона после нажатия.'}</div>`;
+ const v=$('#md video');if(v)bindVideo(v);
+ if(E.test)bindTest();else{bindDraw();drawZones()}}
+function bindVideo(v){const r=$('#vr'),t=$('#vt'),b=$('#vp');let seeking=false;
+ v.addEventListener('timeupdate',()=>{if(!seeking&&v.duration)r.value=v.currentTime/v.duration*1000;t.textContent=fmt(v.currentTime)+' / '+fmt(v.duration)});
+ r.addEventListener('input',()=>{seeking=true;if(v.duration)v.currentTime=r.value/1000*v.duration;t.textContent=fmt(v.currentTime)});r.addEventListener('change',()=>seeking=false);
+ b.onclick=()=>{if(v.paused){v.play();b.textContent='⏸'}else{v.pause();b.textContent='▶'}}}
+
+function visRect(z){const s=Math.max(1,Math.min(8,1/z.w,1/z.h));const cx=z.x+z.w/2,cy=z.y+z.h/2;let x=cx-0.5/s,y=cy-0.5/s;x=Math.min(1-1/s,Math.max(0,x));y=Math.min(1-1/s,Math.max(0,y));return {x,y,w:1/s,h:1/s,s}}
+function drawZones(){const ov=$('#ov');if(!ov)return;const zs=Z();
+ ov.innerHTML=zs.map((z,i)=>`<div class="zr ${i===E.sel?'sel':''}" data-z="${i}" style="left:${z.x*100}%;top:${z.y*100}%;width:${z.w*100}%;height:${z.h*100}%"><span class="n">${i+1}. ${esc(z.label||'')}</span><i class="h nw" data-h="nw"></i><i class="h ne" data-h="ne"></i><i class="h sw" data-h="sw"></i><i class="h se" data-h="se"></i></div>`).join('')+
+ (E.sel>=0&&zs[E.sel]?(()=>{const v=visRect(zs[E.sel]);return `<div class="vis" style="left:${v.x*100}%;top:${v.y*100}%;width:${v.w*100}%;height:${v.h*100}%"></div>`})():'')}
+function bindDraw(){const ov=$('#ov');let act=null;
+ const pos=e=>{const r=ov.getBoundingClientRect();return {x:Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),y:Math.max(0,Math.min(1,(e.clientY-r.top)/r.height))}};
+ ov.addEventListener('pointerdown',e=>{e.preventDefault();const p=pos(e);const zs=Z();const h=e.target.dataset.h;const zEl=e.target.closest('.zr');
+  if(zEl){const i=+zEl.dataset.z;E.sel=i;act={type:h||'move',i,p0:p,z0:Object.assign({},zs[i])}}else{act={type:'new',p0:p};E.sel=-1}
+  ov.setPointerCapture(e.pointerId);drawZones();drawSide()});
+ ov.addEventListener('pointermove',e=>{if(!act)return;const p=pos(e);const zs=Z();
+  if(act.type==='new'){const z={x:Math.min(p.x,act.p0.x),y:Math.min(p.y,act.p0.y),w:Math.abs(p.x-act.p0.x),h:Math.abs(p.y-act.p0.y)};
+   if(act.i==null){if(z.w<.02&&z.h<.02)return;zs.push(Object.assign(z,{label:'Зона '+(zs.length+1)}));act.i=zs.length-1;E.sel=act.i}else Object.assign(zs[act.i],z)}
+  else{const z0=act.z0,dx=p.x-act.p0.x,dy=p.y-act.p0.y,z=zs[act.i];
+   if(act.type==='move'){z.x=Math.min(1-z0.w,Math.max(0,z0.x+dx));z.y=Math.min(1-z0.h,Math.max(0,z0.y+dy))}
+   else{let x1=z0.x,y1=z0.y,x2=z0.x+z0.w,y2=z0.y+z0.h;if(act.type.includes('w'))x1=Math.min(x2-.03,Math.max(0,x1+dx));if(act.type.includes('e'))x2=Math.max(x1+.03,Math.min(1,x2+dx));if(act.type.includes('n'))y1=Math.min(y2-.03,Math.max(0,y1+dy));if(act.type.includes('s'))y2=Math.max(y1+.03,Math.min(1,y2+dy));Object.assign(z,{x:x1,y:y1,w:x2-x1,h:y2-y1})}}
+  E.dirty=true;drawZones()});
+ const end=()=>{if(!act)return;const zs=Z();if(act.type==='new'&&act.i!=null){const z=zs[act.i];if(z.w<.03||z.h<.03){zs.splice(act.i,1);E.sel=-1}}
+  zs.forEach(z=>{z.x=r4(z.x);z.y=r4(z.y);z.w=r4(z.w);z.h=r4(z.h)});act=null;drawZones();drawSide();drawThumbBadges()};
+ ov.addEventListener('pointerup',end);ov.addEventListener('pointercancel',end)}
+function drawThumbBadges(){document.querySelectorAll('.thumbs [data-si]').forEach(d=>{const n=(E.zones[+d.dataset.si]||[]).length;let b=d.querySelector('b');if(n){if(!b){b=document.createElement('b');d.appendChild(b)}b.textContent=n}else b&&b.remove()})}
+
+// ---------- test: точно как в приложении ----------
+function bindTest(preset){const fr=$('#fr'),m=$('#md'),lab=$('#zl');let zoom=null,drag=null,dX=0,dY=0,dT=0,moved=0;
+ const setT=a=>{m.style.transition=a?'':'none';m.style.transform=`translate(${zoom.tx}px,${zoom.ty}px) scale(${zoom.s})`};
+ const clampT=()=>{zoom.tx=Math.min(0,Math.max(zoom.W-zoom.W*zoom.s,zoom.tx));zoom.ty=Math.min(0,Math.max(zoom.H-zoom.H*zoom.s,zoom.ty))};
+ const unzoom=()=>{if(!zoom)return;m.style.transition='';m.style.transform='';zoom=null;fr.classList.remove('zoomed')};
+ const zoomAt=(cx,cy,s,t)=>{const W=fr.clientWidth,H=fr.clientHeight;zoom={W,H,s,tx:W*(0.5-cx*s),ty:H*(0.5-cy*s)};clampT();setT(true);fr.classList.add('zoomed');lab.textContent=t};
+ const zoneOn=z=>{const v=m.querySelector('video');const t=v?v.currentTime:0;return (z.t1==null||t>=z.t1)&&(z.t2==null||t<=z.t2)};
+ E.zoomZone=z=>{unzoom();setTimeout(()=>zoomAt(z.x+z.w/2,z.y+z.h/2,Math.max(1,Math.min(8,1/z.w,1/z.h)),'🔍 '+(z.label||'Ближе')),zoom?0:30)};
+ fr.addEventListener('pointerdown',e=>{dX=e.clientX;dY=e.clientY;dT=Date.now();moved=0;if(zoom){drag={tx:zoom.tx,ty:zoom.ty};fr.setPointerCapture(e.pointerId)}});
+ fr.addEventListener('pointermove',e=>{const dx=e.clientX-dX,dy=e.clientY-dY;moved=Math.max(moved,Math.hypot(dx,dy));if(zoom&&drag){zoom.tx=drag.tx+dx;zoom.ty=drag.ty+dy;clampT();setT(false)}});
+ fr.addEventListener('pointerup',e=>{drag=null;if(zoom)m.style.transition='';if(moved>10||Date.now()-dT>600)return;if(zoom){unzoom();return}
+  const r=fr.getBoundingClientRect();const nx=(e.clientX-r.left)/r.width,ny=(e.clientY-r.top)/r.height;
+  const zs=Z().filter(z=>zoneOn(z)&&nx>=z.x&&nx<=z.x+z.w&&ny>=z.y&&ny<=z.y+z.h).sort((a,b)=>a.w*a.h-b.w*b.h);
+  if(zs.length){const z=zs[0];zoomAt(z.x+z.w/2,z.y+z.h/2,Math.max(1,Math.min(8,1/z.w,1/z.h)),'🔍 '+(z.label||'Ближе'))}else zoomAt(nx,ny,2.5,'🔍 Двигайте пальцем')});
+ if(preset)E.zoomZone(preset)}
+
+// ---------- side ----------
+function drawSide(){const p=E.cur;if(!p){$('#side').innerHTML='';return}const s=slide();const zs=Z();const vid=s.type==='video';
+ $('#side').innerHTML=`<h3>Зоны${p.slides.length>1?' на картинке '+(E.si+1):''}: ${zs.length}</h3>
+ ${zs.length?'':'<p class="small">Зон нет: в приложении будет обычное приближение в точку нажатия. Нарисуйте зону, если нужно приближать конкретное место.</p>'}
+ ${zs.map((z,i)=>{const v=visRect(z);return `<div class="card ${i===E.sel?'sel':''}" data-card="${i}">
+  <div class="row"><span class="num">${i+1}</span><input type="text" data-lab="${i}" value="${esc(z.label||'')}" placeholder="Подпись, например «Состав»"></div>
+  <div class="small">Увеличение ×${v.s.toFixed(1)}${v.s>=8?' (максимум)':''}</div>
+  ${vid?`<div class="row small">Действует с <input type="number" step="0.1" min="0" data-t1="${i}" value="${z.t1==null?'':z.t1}" placeholder="нач."> по <input type="number" step="0.1" min="0" data-t2="${i}" value="${z.t2==null?'':z.t2}" placeholder="конец"> сек</div>
+   <div class="row"><button class="mini" data-now1="${i}">⏱ Начало = сейчас</button><button class="mini" data-now2="${i}">⏱ Конец = сейчас</button></div><div class="small">Пусто: зона работает всё видео.</div>`:''}
+  <div class="row" style="flex-wrap:wrap"><button class="mini" data-fit="${i}">📱 Ровно под экран</button><button class="mini" data-try="${i}">👁 Показать</button><button class="mini red" data-del="${i}">🗑 Удалить</button></div></div>`}).join('')}
+ ${zs.length>1?'<button class="mini red" data-clear="1">Удалить все зоны на этой картинке</button>':''}
+ <div class="save">${p.local?`<div class="card"><b>Сохранить как новый пост</b><div class="small">Файл загрузится на Диск в выбранную папку, станет постом в приложении вместе с зонами.</div>
+   <select class="inp" id="fold">${E.folders.map(f=>`<option ${(/шуст/i.test(f)?'mood':'health')===E.m?'':''}>${esc(f)}</option>`).join('')}</select>
+   <button class="btn" data-act="upload">📤 Загрузить на Диск с зонами</button></div>`:
+  `<button class="btn" style="width:100%" data-act="save" ${E.dirty?'':'disabled'}>${E.dirty?'💾 Сохранить зоны в приложение':'✓ Всё сохранено'}</button>`}
+ <div class="tok" style="margin-top:12px">${E.token?'<span class="ok">✓ Диск подключён</span>':`<div class="card"><b>Подключите Диск один раз</b><div class="small">Откройте <a href="https://yandex.ru/dev/disk/poligon/" target="_blank" rel="noopener">Полигон Яндекс.Диска</a>, нажмите «Получить OAuth-токен», скопируйте его и вставьте сюда.</div><input class="inp" id="tok" placeholder="Токен"><button class="btn" data-act="tok">Подключить</button></div>`}</div></div>`}
+
+// ---------- save ----------
+async function putFile(path,body,overwrite){const h={Authorization:'OAuth '+E.token};
+ const u=await fetch(`${API}/resources/upload?path=${enc(DISK_PATH+path)}&overwrite=${overwrite}`,{headers:h});if(u.status===401){E.token='';LS.set('sm_token','');throw {code:'notoken'}}if(u.status===409)throw {code:'exists'};if(!u.ok)throw {code:'up'+u.status};
+ const {href}=await u.json();const r=await fetch(href,{method:'PUT',body});if(r.status>=300)throw {code:'put'+r.status}}
+async function freshMeta(){const root=await listAll('/');const mf=root.find(x=>x.name==='_app.json');let meta={posts:{},config:{}};
+ if(mf){meta=await (await fetch(mf.file+(mf.file.includes('?')?'&':'?')+'nc='+Date.now())).json();meta.posts=meta.posts||{};meta.config=meta.config||{}}return meta}
+function clean(zs){return zs.map(z=>{const o={x:z.x,y:z.y,w:z.w,h:z.h,label:(z.label||'').trim()};if(z.t1!=null&&z.t1!=='')o.t1=+z.t1;if(z.t2!=null&&z.t2!=='')o.t2=+z.t2;return o})}
+async function saveMeta2(id,pairs){const meta=await freshMeta();const P=meta.posts[id]=meta.posts[id]||{};P.slideZones=P.slideZones||{};
+ pairs.forEach(([path,zs])=>{if(zs.length)P.slideZones[path]=clean(zs);else delete P.slideZones[path]});
+ await putFile('/_app.json',new Blob([JSON.stringify(meta)],{type:'application/json'}),true);E.meta=meta;
+ const c=LS.get('sm_cache',null);if(c){c.meta=meta;LS.set('sm_cache',c)}}
+async function doSave(){if(!E.token){toast('Сначала подключите Диск, внизу справа');return}const p=E.cur;toast('Сохраняю…');
+ try{await saveMeta2(p.id,p.slides.map((s,i)=>[s.path,E.zones[i]||[]]));E.dirty=false;drawSide();drawList();toast('Сохранено. В приложении уже работает')}
+ catch(e){toast(e&&e.code==='notoken'?'Токен не подошёл, подключите Диск заново':'Не удалось сохранить, попробуйте ещё раз');drawSide()}}
+async function doUpload(){if(!E.token){toast('Сначала подключите Диск, внизу справа');return}const p=E.cur,f=p.slides[0].file;const folder=$('#fold').value;
+ const name=f.name.replace(/[\\/:*?"<>|]/g,'_');const path=folder+'/'+name;toast('Загружаю файл на Диск…');
+ try{await putFile(path,f,false);await saveMeta2(hid(path),[[path,E.zones[0]||[]]]);LS.set('sm_cache',null);E.dirty=false;toast('Готово, пост появится в приложении');setTimeout(()=>location.reload(),1500)}
+ catch(e){toast(e&&e.code==='exists'?'Файл с таким именем уже есть в этой папке, переименуйте':e&&e.code==='notoken'?'Токен не подошёл, подключите Диск заново':'Не удалось загрузить')}}
+
+// ---------- events ----------
+document.addEventListener('click',async e=>{const t=e.target.closest('[data-m],[data-id],[data-test],[data-si],[data-del],[data-try],[data-fit],[data-now1],[data-now2],[data-clear],[data-act],[data-card]');if(!t)return;const d=t.dataset;
+ if(d.m){setMode(d.m)}
+ else if(d.id){const p=E.posts.find(x=>x.id===d.id);if(p)openPost(p)}
+ else if(d.test!==undefined){E.test=d.test==='1';drawMain()}
+ else if(d.si!==undefined){E.si=+d.si;E.sel=-1;drawMain();drawSide()}
+ else if(d.del!==undefined){Z().splice(+d.del,1);E.sel=-1;E.dirty=true;refresh()}
+ else if(d.clear){if(confirm('Удалить все зоны на этой картинке?')){E.zones[E.si]=[];E.sel=-1;E.dirty=true;refresh()}}
+ else if(d.try!==undefined){const z=Z()[+d.try];E.sel=+d.try;if(!E.test){E.test=true;drawMain()}drawSide();E.zoomZone(z)}
+ else if(d.fit!==undefined){const z=Z()[+d.fit];const v=visRect(z);Object.assign(z,{x:r4(v.x),y:r4(v.y),w:r4(v.w),h:r4(v.h)});E.sel=+d.fit;E.dirty=true;refresh()}
+ else if(d.now1!==undefined||d.now2!==undefined){const v=$('#md video');if(!v)return;const i=+(d.now1??d.now2);Z()[i][d.now1!==undefined?'t1':'t2']=+v.currentTime.toFixed(1);E.dirty=true;drawSide()}
+ else if(d.act==='save')doSave();
+ else if(d.act==='upload')doUpload();
+ else if(d.act==='tok'){const v=($('#tok').value||'').trim();if(!v){toast('Вставьте токен');return}const r=await fetch(API+'/',{headers:{Authorization:'OAuth '+v}});if(r.ok){E.token=v;LS.set('sm_token',v);toast('Диск подключён');drawSide()}else toast('Токен не подошёл')}
+ else if(d.card!==undefined&&!e.target.closest('input,button')){E.sel=+d.card;if(!E.test)drawZones();drawSide()}});
+function refresh(){if(E.test)drawMain();else drawZones();drawSide();drawThumbBadges()}
+document.addEventListener('input',e=>{const d=e.target.dataset;if(d.lab!==undefined){Z()[+d.lab].label=e.target.value;E.dirty=true;if(!E.test){const n=document.querySelector(`.zr[data-z="${d.lab}"] .n`);if(n)n.textContent=(+d.lab+1)+'. '+e.target.value}markDirty()}
+ else if(d.t1!==undefined||d.t2!==undefined){const i=+(d.t1??d.t2);const v=e.target.value;Z()[i][d.t1!==undefined?'t1':'t2']=v===''?null:+v;E.dirty=true;markDirty()}
+ else if(e.target.id==='q'){E.q=e.target.value;drawList()}});
+function markDirty(){const b=document.querySelector('[data-act="save"]');if(b){b.disabled=false;b.textContent='💾 Сохранить зоны в приложение'}}
+document.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&E.sel>=0&&!E.test&&!e.target.closest('input')){Z().splice(E.sel,1);E.sel=-1;E.dirty=true;refresh()}});
+$('#file').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const vid=/^video/.test(f.type);const url=URL.createObjectURL(f);
+ openPost({id:'local',local:true,mode:E.m,title:f.name,slides:[{type:vid?'video':'image',src:url,poster:'',path:null,file:f}]});e.target.value=''});
+addEventListener('beforeunload',e=>{if(E.dirty){e.preventDefault();e.returnValue=''}});
+load();
+</script>
+</body>
+</html>
