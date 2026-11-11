@@ -57,6 +57,9 @@ body.mood .zr{background:rgba(30,158,88,.22)}
 @keyframes pulse{70%{box-shadow:0 0 0 14px rgba(255,255,255,0)}0%{box-shadow:0 0 0 0 rgba(255,255,255,.8)}}
 .zlabel{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.62);color:#fff;font-weight:700;padding:5px 10px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none}
 .frame.zoomed .zlabel{opacity:1}
+.zbtn{position:absolute;top:50%;width:42px;height:42px;margin-top:-21px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;font-size:26px;font-weight:700;display:none;place-items:center;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.zbtn.l{left:10px}.zbtn.r{right:10px}
+.frame.zoomed.hasz .zbtn{display:grid}
 .empty{display:grid;place-items:center;height:100%;color:var(--mut);text-align:center;padding:30px;font-size:18px;line-height:1.5}
 .thumbs{display:flex;gap:6px;overflow-x:auto;max-width:100%;padding:4px}
 .thumbs div{position:relative;width:54px;height:72px;border-radius:8px;overflow:hidden;flex:none;cursor:pointer;opacity:.6;outline:2px solid transparent}
@@ -175,7 +178,7 @@ function drawMain(){const p=E.cur;const s=slide();
  $('#main').innerHTML=`<div class="ttl">${esc(p.title)}</div>
  <div class="mode"><button data-test="0" class="${E.test?'':'on'}">✏️ Рисовать зоны</button><button data-test="1" class="${E.test?'on':''}">👆 Проверить, как в приложении</button></div>
  <div class="frame" id="fr"><div class="media" id="md">${s.type==='image'?`<img src="${esc(s.src)}" alt="">`:`<video src="${esc(s.src)}" poster="${esc(s.poster||'')}" muted loop playsinline autoplay></video>`}</div>
-  ${E.test?Z().map(z=>`<div class="hint" style="left:${(z.x+z.w)*100-3}%;top:${z.y*100+3}%">+</div>`).join('')+'<div class="zlabel" id="zl"></div>':'<div class="ov" id="ov"></div>'}</div>
+  ${E.test?Z().map(z=>`<div class="hint" style="left:${(z.x+z.w)*100-3}%;top:${z.y*100+3}%">+</div>`).join('')+'<div class="zlabel" id="zl"></div><button class="zbtn l" id="zbl">‹</button><button class="zbtn r" id="zbr">›</button>':'<div class="ov" id="ov"></div>'}</div>
  ${s.type==='video'?`<div class="vctl"><button class="mini" id="vp">⏸</button><input type="range" id="vr" min="0" max="1000" value="0"><span class="tm" id="vt">0:00.0</span></div>`:''}
  ${p.slides.length>1?`<div class="thumbs">${p.slides.map((x,i)=>`<div class="${i===E.si?'on':''}" data-si="${i}"><img src="${esc(x.type==='image'?x.src:x.poster)}" alt="">${(E.zones[i]||[]).length?`<b>${E.zones[i].length}</b>`:''}</div>`).join('')}</div>`:''}
  <div class="help">${E.test?'Нажмите на зону: приблизится ровно она. Нажмите мимо зон: обычное приближение в точку, картинку можно двигать пальцем или мышкой. Ещё нажатие: отдалить.':'Проведите пальцем или мышкой по картинке, чтобы нарисовать зону. Зону можно двигать и тянуть за жёлтые углы. Пунктиром показано, что будет видно на экране телефона после нажатия.'}</div>`;
@@ -211,16 +214,20 @@ function drawThumbBadges(){document.querySelectorAll('.thumbs [data-si]').forEac
 function bindTest(preset){const fr=$('#fr'),m=$('#md'),lab=$('#zl');let zoom=null,drag=null,dX=0,dY=0,dT=0,moved=0;
  const setT=a=>{m.style.transition=a?'':'none';m.style.transform=`translate(${zoom.tx}px,${zoom.ty}px) scale(${zoom.s})`};
  const clampT=()=>{zoom.tx=Math.min(0,Math.max(zoom.W-zoom.W*zoom.s,zoom.tx));zoom.ty=Math.min(0,Math.max(zoom.H-zoom.H*zoom.s,zoom.ty))};
- const unzoom=()=>{if(!zoom)return;m.style.transition='';m.style.transform='';zoom=null;fr.classList.remove('zoomed')};
+ const unzoom=()=>{if(!zoom)return;m.style.transition='';m.style.transform='';zoom=null;fr.classList.remove('zoomed','hasz')};
  const zoomAt=(cx,cy,s,t)=>{const W=fr.clientWidth,H=fr.clientHeight;zoom={W,H,s,tx:W*(0.5-cx*s),ty:H*(0.5-cy*s)};clampT();setT(true);fr.classList.add('zoomed');lab.textContent=t};
  const zoneOn=z=>{const v=m.querySelector('video');const t=v?v.currentTime:0;return (z.t1==null||t>=z.t1)&&(z.t2==null||t<=z.t2)};
- E.zoomZone=z=>{unzoom();setTimeout(()=>zoomAt(z.x+z.w/2,z.y+z.h/2,Math.max(1,Math.min(8,1/z.w,1/z.h)),'🔍 '+(z.label||'Ближе')),zoom?0:30)};
+ const list=()=>Z().filter(zoneOn);
+ const zoomZone=z=>{const L=list();const i=L.indexOf(z);zoomAt(z.x+z.w/2,z.y+z.h/2,Math.max(1,Math.min(8,1/z.w,1/z.h)),'🔍 '+(z.label||'Ближе')+(L.length>1?' · '+(i+1)+'/'+L.length:''));zoom.zi=i;fr.classList.toggle('hasz',L.length>1)};
+ const nav=d=>{if(!zoom)return;const L=list();if(!L.length)return;const n=L.length;zoomZone(L[zoom.zi==null?(d>0?0:n-1):(zoom.zi+d+n)%n])};
+ [['#zbl',-1],['#zbr',1]].forEach(([q,d])=>{const b=$(q);['pointerdown','pointerup'].forEach(ev=>b.addEventListener(ev,e=>e.stopPropagation()));b.addEventListener('click',e=>{e.stopPropagation();nav(d)})});
+ E.zoomZone=z=>{unzoom();setTimeout(()=>zoomZone(z),30)};
  fr.addEventListener('pointerdown',e=>{dX=e.clientX;dY=e.clientY;dT=Date.now();moved=0;if(zoom){drag={tx:zoom.tx,ty:zoom.ty};fr.setPointerCapture(e.pointerId)}});
  fr.addEventListener('pointermove',e=>{const dx=e.clientX-dX,dy=e.clientY-dY;moved=Math.max(moved,Math.hypot(dx,dy));if(zoom&&drag){zoom.tx=drag.tx+dx;zoom.ty=drag.ty+dy;clampT();setT(false)}});
  fr.addEventListener('pointerup',e=>{drag=null;if(zoom)m.style.transition='';if(moved>10||Date.now()-dT>600)return;if(zoom){unzoom();return}
   const r=fr.getBoundingClientRect();const nx=(e.clientX-r.left)/r.width,ny=(e.clientY-r.top)/r.height;
   const zs=Z().filter(z=>zoneOn(z)&&nx>=z.x&&nx<=z.x+z.w&&ny>=z.y&&ny<=z.y+z.h).sort((a,b)=>a.w*a.h-b.w*b.h);
-  if(zs.length){const z=zs[0];zoomAt(z.x+z.w/2,z.y+z.h/2,Math.max(1,Math.min(8,1/z.w,1/z.h)),'🔍 '+(z.label||'Ближе'))}else zoomAt(nx,ny,2.5,'🔍 Двигайте пальцем')});
+  if(zs.length)zoomZone(zs[0]);else{zoomAt(nx,ny,2.5,'🔍 Двигайте пальцем');fr.classList.toggle('hasz',list().length>0)}});
  if(preset)E.zoomZone(preset)}
 
 // ---------- side ----------
