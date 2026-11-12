@@ -356,13 +356,14 @@ async function crawl(){const posts=[];
 function applyMeta(){const M=Store.meta;Store.config=Object.assign(clone(DEFAULT_CONFIG),M.config||{});
  const byMode={health:[],mood:[]};
  const AU=Store.auto||{};Store.posts=Store.base.map(b=>{const m=M.posts[b.id]||{};const au=AU[b.id]||{};const p=Object.assign({},b,{title:au.title||b.title,text:au.desc||'',body:'',tags:au.tags||[],zones:au.zones||[],products:[],publishAt:b.created},m);
-  p.slides=b.slides.map(s=>Object.assign({},s,{zones:(m.slideZones||{})[s.path]||[]}));if(p.story===undefined)byMode[p.mode].push(p);return p});
+  p.slides=b.slides.map(s=>Object.assign({},s,{zones:((m.slideZones||{})[s.path]!==undefined?m.slideZones[s.path]:(Store.autoZ||{})[s.path])||[]}));if(p.story===undefined)byMode[p.mode].push(p);return p});
  Object.values(byMode).forEach(a=>a.sort((x,y)=>y.publishAt-x.publishAt).forEach((p,i)=>p.story=i<8));}
 async function initStore(){
  Store.state=Object.assign(defState(),LS.get('sm_state',{}));
  const h=new URLSearchParams(location.hash.slice(1));if(h.get('access_token')){Store.token=h.get('access_token');LS.set('sm_token',Store.token);history.replaceState(null,'',location.pathname+'#admin');App.tab='admin'}
  Store.isAdmin=location.hash==='#admin'||!!Store.token;
  try{Store.auto=await (await fetch('titles.json',{cache:'no-cache'})).json()}catch(e){Store.auto={}}
+ try{Store.autoZ=await (await fetch('zones.json',{cache:'no-cache'})).json()}catch(e){Store.autoZ={}}
  const cache=LS.get('sm_cache',null);if(cache&&Date.now()-cache.t<20*60e3){Store.base=cache.posts;Store.meta=cache.meta;applyMeta();Store.loading=false;render()}
  try{const r=await crawl();Store.base=r.posts;Store.meta=r.meta;LS.set('sm_cache',{t:Date.now(),posts:r.posts,meta:r.meta});applyMeta();Store.err=''}catch(e){if(!Store.base.length)Store.err='Не удалось загрузить посты. Проверьте интернет.'}
  Store.loading=false;
@@ -718,7 +719,7 @@ function bindEditor(){const e=App.edit;const host=$('#zkmini');if(!host||!window
  ZoneKit.mount(host,{media:s,zones:s.zones||[],onChange:zs=>{s.zones=zs;const t=document.querySelector(`#sheet [data-es="${e._s}"]`);if(t){let b=t.querySelector('b');if(zs.length){if(!b){b=document.createElement('b');b.style.cssText='position:absolute;right:3px;bottom:3px;background:var(--acc);color:#fff;font-size:11px;padding:1px 5px;border-radius:6px';t.appendChild(b)}b.textContent=zs.length}else b&&b.remove()}}})}
 async function doSavePost(){syncEditorFields();const e=App.edit;if(!Store.token){toast('Сначала подключите Диск в разделе «Админ»');return}
  const prev=clone(Store.meta.posts[e.id]||{});
- Store.meta.posts[e.id]={title:e.title,text:e.text,body:e.body,tags:e.tags,zones:e.mode==='health'?e.zones:[],products:e.products.filter(x=>x.name||x.wb||x.ozon||x.ym),publishAt:e.publishAt,story:!!e.story,hidden:!!e.hidden,slideZones:Object.fromEntries(e.slides.filter(s=>(s.zones||[]).length).map(s=>[s.path,s.zones]))};
+ Store.meta.posts[e.id]={title:e.title,text:e.text,body:e.body,tags:e.tags,zones:e.mode==='health'?e.zones:[],products:e.products.filter(x=>x.name||x.wb||x.ozon||x.ym),publishAt:e.publishAt,story:!!e.story,hidden:!!e.hidden,slideZones:Object.fromEntries(e.slides.map(s=>[s.path,s.zones||[]]))};
  toast('Сохраняю…');try{await saveMeta();applyMeta();App.edit=null;closeSheet();toast('Сохранено на Диск');render()}catch(err){Store.meta.posts[e.id]=prev;toast(err&&err.code==='notoken'?'Подключите Диск заново в разделе «Админ»':'Не удалось сохранить на Диск')}}
 
 // ================= events =================
