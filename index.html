@@ -426,7 +426,7 @@ function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._
  const zoneOn=(z,v)=>{const t=v?v.currentTime:0;return (z.t1==null||t>=z.t1)&&(z.t2==null||t<=z.t2)};
  tr.addEventListener('pointerdown',e=>{downX=e.clientX;downY=e.clientY;downT=Date.now();moved=0;if(zoom){drag={tx:zoom.tx,ty:zoom.ty};try{tr.setPointerCapture(e.pointerId)}catch(_){}}});
  tr.addEventListener('pointermove',e=>{const dx=e.clientX-downX,dy=e.clientY-downY;moved=Math.max(moved,Math.hypot(dx,dy));if(zoom&&drag){zoom.tx=drag.tx+dx;zoom.ty=drag.ty+dy;clampT();setT(false)}});
- tr.addEventListener('pointerup',e=>{const wasDrag=drag;drag=null;if(zoom)zoom.m.style.transition='';if(moved>10||Date.now()-downT>600)return;
+ tr.addEventListener('pointerup',e=>{const wasDrag=drag;drag=null;if(zoom)zoom.m.style.transition='';const sdx=e.clientX-downX,sdy=e.clientY-downY;if(zoom&&Math.abs(sdx)>40&&Math.abs(sdx)>1.5*Math.abs(sdy)&&Date.now()-downT<450&&zoneList(zoom.slideEl).length){navZone(sdx<0?1:-1);return}if(moved>10||Date.now()-downT>600)return;
   if(el.closest('.feedcard')){openPost(p.id);return}
   if(zoom){unzoom();return}
   const slideEl=e.target.closest('.slide');if(!slideEl)return;const sl=p.slides[+slideEl.dataset.i];const r=slideEl.getBoundingClientRect();
