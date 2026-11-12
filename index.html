@@ -242,10 +242,10 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .m3bar em{position:absolute;top:22px;left:50%;transform:translateX(-50%);font-style:normal;font-size:11px;font-weight:800;white-space:nowrap;color:#005bff}
 .m3next{text-align:center;margin:0 0 6px;font-size:14px}
 .m3stage{position:relative;perspective:1000px;perspective-origin:50% 20%;padding:8px 0 22px;width:var(--gw);margin:0 auto}
-.m3board{position:relative;width:100%;aspect-ratio:1;border-radius:24px;transform:rotateX(12deg);transform-style:preserve-3d;transition:transform .35s ease-out;overflow:hidden;touch-action:none;
+.m3board{position:relative;width:100%;aspect-ratio:1;border-radius:24px;transform:rotateX(12deg);transition:transform .35s ease-out;overflow:hidden;touch-action:none;
  background:radial-gradient(circle at 30% 15%,rgba(255,255,255,.55),transparent 55%),linear-gradient(160deg,color-mix(in srgb,var(--acc) 35%,#fff),color-mix(in srgb,var(--acc) 70%,#000 5%));
  box-shadow:0 10px 0 color-mix(in srgb,var(--acc) 55%,#000),0 26px 40px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.6)}
-.m3c{position:absolute;padding:3px}.m3c i{display:block;width:100%;height:100%;border-radius:12px;background:rgba(255,255,255,.42);box-shadow:inset 0 3px 6px rgba(0,0,0,.12),inset 0 -2px 0 rgba(255,255,255,.5)}
+.m3c{position:absolute;padding:3px;pointer-events:none}.m3c i{display:block;width:100%;height:100%;border-radius:12px;background:rgba(255,255,255,.42);box-shadow:inset 0 3px 6px rgba(0,0,0,.12),inset 0 -2px 0 rgba(255,255,255,.5)}
 .m3t{position:absolute;left:0;top:0;will-change:transform;z-index:2}
 .m3t .in{position:absolute;inset:0;display:grid;place-items:center;animation:m3bob 3s ease-in-out infinite;transition:transform .15s}
 .m3t img{position:relative;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 5px 3px rgba(0,0,0,.35));pointer-events:none}.m3t img.bt{transform:scale(1.1)}.m3t img.mr{transform:scale(.9)}
@@ -253,7 +253,7 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 @keyframes m3bob{50%{transform:translateY(-2px) rotate(1.5deg)}}
 .m3t.lift .in,.m3t.sel .in{transform:scale(1.18) translateY(-4px);animation:none}
 .m3t.sel .in{filter:drop-shadow(0 0 8px #fff) drop-shadow(0 0 14px var(--c,#fff))}
-.m3t.hint .in{animation:m3hint .9s ease-in-out infinite}@keyframes m3hint{0%,100%{transform:scale(1)}50%{transform:scale(1.2) rotate(-8deg);filter:brightness(1.4)}}
+.m3t.m3hn .in{animation:m3hint 1s ease-in-out infinite}@keyframes m3hint{0%,100%{transform:translate(0,0) scale(1);filter:brightness(1)}50%{transform:translate(var(--hx,0),var(--hy,0)) scale(1.12);filter:brightness(1.35) drop-shadow(0 0 8px #fff)}}
 .m3t .sp-h::after,.m3t .sp-v::after{content:'';position:absolute;border-radius:6px;background:linear-gradient(90deg,transparent,#fff,transparent);box-shadow:0 0 10px #fff,0 0 18px var(--c);animation:m3glint 1.2s linear infinite;mix-blend-mode:screen}
 .m3t .sp-h::after{left:-6%;right:-6%;top:42%;height:16%}
 .m3t .sp-v::after{top:-6%;bottom:-6%;left:42%;width:16%;background:linear-gradient(180deg,transparent,#fff,transparent)}
@@ -267,19 +267,25 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .m3beam{position:absolute;left:0;top:0;right:0;bottom:0;z-index:6;pointer-events:none;border-radius:20px;background:linear-gradient(var(--d,90deg),transparent,#fff 30%,var(--c) 50%,#fff 70%,transparent);box-shadow:0 0 20px #fff,0 0 40px #ffe08a}
 .m3beam.h{bottom:auto}.m3beam.v{right:auto;--d:180deg}
 .m3say{position:absolute;left:50%;top:45%;z-index:20;pointer-events:none;white-space:nowrap;font-weight:900;font-size:40px;letter-spacing:1px;color:#fff;
- text-shadow:0 1px 0 #ff9f1a,0 2px 0 #ff8c1a,0 3px 0 #f57a12,0 4px 0 #e8650c,0 5px 0 #d4520a,0 6px 0 #c04208,0 8px 14px rgba(0,0,0,.45);-webkit-text-stroke:1.5px #c04208}
+ text-shadow:-2px -2px 0 #c04208,2px -2px 0 #c04208,-2px 2px 0 #c04208,2px 2px 0 #c04208,0 -2px 0 #c04208,0 2px 0 #c04208,-2px 0 0 #c04208,2px 0 0 #c04208,0 4px 0 #d4520a,0 6px 0 #c04208,0 8px 0 #a83806,0 12px 16px rgba(0,0,0,.45)}
 .m3say.big{font-size:46px}
-.m3pts{position:absolute;z-index:19;pointer-events:none;font-weight:900;font-size:26px;color:#fff;text-shadow:0 2px 0 #2b7de9,0 3px 0 #1d5fc0,0 5px 10px rgba(0,0,0,.4);-webkit-text-stroke:1px #1d5fc0}
+.m3pts{position:absolute;z-index:19;pointer-events:none;font-weight:900;font-size:26px;color:#fff;text-shadow:-2px -2px 0 #1d5fc0,2px -2px 0 #1d5fc0,-2px 2px 0 #1d5fc0,2px 2px 0 #1d5fc0,0 -2px 0 #1d5fc0,0 2px 0 #1d5fc0,-2px 0 0 #1d5fc0,2px 0 0 #1d5fc0,0 4px 0 #1d5fc0,0 7px 10px rgba(0,0,0,.4);}
 .m3fly{position:fixed;left:0;top:0;z-index:9998;pointer-events:none;object-fit:contain;filter:drop-shadow(0 6px 6px rgba(0,0,0,.35))}
 .m3fx{position:fixed;inset:0;width:100vw;height:100vh;z-index:9997;pointer-events:none}
 .m3tip{text-align:center;font-size:13px;margin:0}
+.m3tools{display:flex;justify-content:flex-end;gap:8px;margin-bottom:6px}
+.m3tools button{width:44px;height:44px;border-radius:14px;background:var(--card);font-size:22px;box-shadow:0 3px 0 rgba(0,0,0,.1)}
+.m3.fs{position:fixed;inset:0;z-index:9000;background:var(--bg);overflow:auto;padding:max(10px,env(safe-area-inset-top)) 12px 12px;display:flex;flex-direction:column;justify-content:center}
+.m3.fs .m3stage{width:min(100%,calc(100dvh - 300px),640px)}
+.m3.fs .m3tip{display:none}
+.m3fly{z-index:9999}
 .m3hero{position:relative;height:150px;perspective:600px;margin:4px 0 6px}
 .m3hero img{position:absolute;top:10px;width:110px;height:130px;object-fit:contain;filter:drop-shadow(0 10px 8px rgba(0,0,0,.3));animation:m3float 3.4s ease-in-out infinite}
 .m3hero img:nth-child(1){left:calc(50% - 150px);transform:rotateY(25deg);animation-delay:-1s}
 .m3hero img:nth-child(2){left:calc(50% - 55px);top:0;z-index:2;width:120px;height:145px}
 .m3hero img:nth-child(3){left:calc(50% + 40px);animation-delay:-2s}
 @keyframes m3float{50%{translate:0 -10px;rotate:4deg}}
-.m3h1{margin:4px 0;font-size:30px;font-weight:900;color:#fff;text-shadow:0 1px 0 var(--acc),0 2px 0 var(--acc),0 3px 0 var(--acc),0 4px 0 color-mix(in srgb,var(--acc) 80%,#000),0 6px 12px rgba(0,0,0,.3);-webkit-text-stroke:1px color-mix(in srgb,var(--acc) 70%,#000)}
+.m3h1{margin:4px 0;font-size:30px;font-weight:900;color:#fff;text-shadow:-2px -2px 0 var(--acc),2px -2px 0 var(--acc),-2px 2px 0 var(--acc),2px 2px 0 var(--acc),0 1px 0 var(--acc),0 2px 0 var(--acc),0 3px 0 var(--acc),0 4px 0 color-mix(in srgb,var(--acc) 80%,#000),0 6px 12px rgba(0,0,0,.3)}
 .m3goals0{display:flex;justify-content:center;gap:10px;margin:10px 0}
 .m3goals0 div{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:14px;padding:6px 10px;font-weight:800}
 .m3goals0 img{width:40px;height:40px;object-fit:contain}
@@ -437,7 +443,7 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 <body>
 <div id="app"></div>
 <script src="zonekit.js"></script>
-<script src="game.js?v=1"></script>
+<script src="game.js?v=2"></script>
 <script>
 "use strict";
 // ================= helpers =================
