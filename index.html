@@ -293,6 +293,7 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 </head>
 <body>
 <div id="app"></div>
+<script src="zonekit.js"></script>
 <script>
 "use strict";
 // ================= helpers =================
@@ -395,7 +396,7 @@ function track(kind,id,extra){const P=Store.posts.find(x=>x.id===id);if(kind==='
 
 // ================= media + zoom slider =================
 function mediaHTML(sl,auto=true){if(!auto&&sl.type==='video'&&sl.poster)return `<img src="${esc(sl.poster)}" alt="" loading="lazy">`;return sl.type==='image'?`<img src="${esc(sl.src)}" alt="" loading="lazy">`:`<video src="${esc(sl.src)}" poster="${esc(sl.poster||'')}" muted loop playsinline preload="none"></video>`}
-function sliderHTML(p){const sl=p.slides||[];return `<div class="slider" data-post="${p.id}"><div class="track">${sl.map((s,i)=>`<div class="slide" data-i="${i}"><div class="media">${mediaHTML(s)}</div>${(s.zones||[]).map((z,j)=>`<div class="hint" style="left:${(z.x+z.w)*100-3}%;top:${z.y*100+3}%">+</div>`).join('')}</div>`).join('')}</div>
+function sliderHTML(p){const sl=p.slides||[];return `<div class="slider" data-post="${p.id}"><div class="track">${sl.map((s,i)=>`<div class="slide" data-i="${i}"><div class="media">${mediaHTML(s)}</div>${(s.zones||[]).map((z,j)=>`<div class="hint" style="left:${ZoneKit.hintPos(z).x*100}%;top:${ZoneKit.hintPos(z).y*100}%">+</div>`).join('')}</div>`).join('')}</div>
  ${sl.length>1?`<button class="arrow l">‹</button><button class="arrow r">›</button><div class="dots">${sl.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}<div class="zlabel"></div><button class="zbtn l" aria-label="Предыдущая зона">‹</button><button class="zbtn r" aria-label="Следующая зона">›</button></div>`}
 function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._b)return;el._b=1;const p=Store.posts.find(x=>x.id===el.dataset.post);if(!p)return;
  const tr=el.querySelector('.track');let cur=0,zoom=null,drag=null,downX=0,downY=0,downT=0,moved=0;
@@ -422,7 +423,7 @@ function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._
   if(zoom){unzoom();return}
   const slideEl=e.target.closest('.slide');if(!slideEl)return;const sl=p.slides[+slideEl.dataset.i];const r=slideEl.getBoundingClientRect();
   const nx=(e.clientX-r.left)/r.width,ny=(e.clientY-r.top)/r.height;const v=slideEl.querySelector('video');
-  const zs=(sl.zones||[]).filter(z=>zoneOn(z,v)&&nx>=z.x&&nx<=z.x+z.w&&ny>=z.y&&ny<=z.y+z.h).sort((a,b)=>a.w*a.h-b.w*b.h);
+  const near=(sl.zones||[]).filter(z=>zoneOn(z,v)).map(z=>{const h=ZoneKit.hintPos(z);return [z,Math.hypot((h.x-nx)*r.width,(h.y-ny)*r.height)]}).filter(a=>a[1]<28).sort((a,b)=>a[1]-b[1]).map(a=>a[0]);const zs=near.length?near:(sl.zones||[]).filter(z=>zoneOn(z,v)&&nx>=z.x&&nx<=z.x+z.w&&ny>=z.y&&ny<=z.y+z.h).sort((a,b)=>a.w*a.h-b.w*b.h);
   if(zs.length)zoomZone(slideEl,zs[0],zoneList(slideEl))
   else if(el.closest('.feedcard'))openPost(p.id);
   else{zoomAt(slideEl,nx,ny,2.5,'🔍 Двигайте пальцем');el.classList.toggle('hasz',zoneList(slideEl).length>0)}});
@@ -536,7 +537,7 @@ function onboarding(){let i=0;const S=[['👆','Два раздела','Ввер
 function sheet(html,onClose){closeSheet();const d=document.createElement('div');d.className='sheet';d.id='sheet';d.innerHTML=`<div class="in"><button class="close" data-act="close">✕</button>${html}</div>`;
  d.addEventListener('click',e=>{if(e.target===d)closeSheet()});d.querySelector('.in').insertAdjacentHTML('afterbegin','<div class="grab"></div>');bindSwipeClose(d);document.body.appendChild(d);bindSliders(d);d.querySelectorAll('.slider video').forEach(v=>v.play().catch(()=>{}));d._onClose=onClose;d.querySelector('.in').scrollTop=0}
 function bindSwipeClose(d){const box=d.querySelector('.in');let y0=null,x0=0,dy=0,lock=null;
- box.addEventListener('touchstart',e=>{if(box.scrollTop>2||e.target.closest('.zed,.slider.zoomed')){y0=null;return}y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0;lock=null;box.style.transition='none'},{passive:true});
+ box.addEventListener('touchstart',e=>{if(box.scrollTop>2||e.target.closest('.zed,.zk,.slider.zoomed')){y0=null;return}y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0;lock=null;box.style.transition='none'},{passive:true});
  box.addEventListener('touchmove',e=>{if(y0===null)return;const t=e.touches[0];const ddy=t.clientY-y0,ddx=t.clientX-x0;if(lock===null&&(Math.abs(ddy)>6||Math.abs(ddx)>6))lock=Math.abs(ddy)>Math.abs(ddx)&&ddy>0?'y':'x';if(lock!=='y')return;dy=Math.max(0,ddy);box.style.transform=`translateY(${dy}px)`;if(e.cancelable)e.preventDefault()},{passive:false});
  box.addEventListener('touchend',()=>{if(y0===null)return;box.style.transition='';if(lock==='y'&&dy>55){box.style.transform='translateY(100%)';setTimeout(closeSheet,200)}else box.style.transform='';y0=null})}
 function speakPost(id,btn){try{const ss=speechSynthesis;if(ss.speaking){ss.cancel();btn.textContent='🔊';return}const p=Store.posts.find(x=>x.id===id);const txt=[p.title,p.text,String(p.body||'').replace(/^[#>\-]\s*/gm,'')].filter(Boolean).join('. ');const u=new SpeechSynthesisUtterance(txt);u.lang='ru-RU';u.rate=.95;const v=ss.getVoices().find(v=>/^ru/i.test(v.lang));if(v)u.voice=v;u.onend=()=>{btn.textContent='🔊'};btn.textContent='⏹';ss.speak(u)}catch(e){toast('Озвучка недоступна на этом телефоне')}}
@@ -696,9 +697,8 @@ function drawEditor(){const e=App.edit;const s=e.slides[e._s];
  <div class="field"><label>Коротко (видно в ленте)</label><textarea data-e="text" style="min-height:60px">${esc(e.text)}</textarea></div>
  <h4>Зоны приближения</h4>
  ${e.slides.length>1?`<div class="thumbs">${e.slides.map((x,i)=>`<div class="t ${i===e._s?'on':''}" data-es="${i}">${mediaHTML(x,false)}${(x.zones||[]).length?`<b style="position:absolute;right:3px;bottom:3px;background:var(--acc);color:#fff;font-size:calc(10px*var(--fz,1));padding:1px 5px;border-radius:6px">${x.zones.length}</b>`:''}</div>`).join('')}</div>`:''}
- <p class="muted">Проведите пальцем или мышкой по картинке, чтобы отметить зону. В приложении нажатие на зону плавно приблизит её.</p>
- <a href="editor.html#${e.id}" style="display:inline-block;margin-bottom:8px;font-weight:700;color:var(--acc)">🔍 Открыть в большом редакторе зон</a><div class="zed" id="zed">${s.type==='image'?`<img src="${esc(s.src)}">`:`<video src="${esc(s.src)}" muted loop autoplay playsinline></video>`}${(s.zones||[]).map((z,i)=>`<div class="zr" style="left:${z.x*100}%;top:${z.y*100}%;width:${z.w*100}%;height:${z.h*100}%"><span>${i+1}</span></div>`).join('')}</div>
- <div style="margin-top:8px">${(s.zones||[]).map((z,i)=>`<div class="row" style="margin-bottom:6px"><b style="width:20px">${i+1}</b><input data-zl="${i}" value="${esc(z.label||'')}" placeholder="Подпись зоны"><button class="btn sm ghost" data-zdel="${i}">✕</button></div>`).join('')}</div>
+ <div id="zkmini"></div>
+ <a href="editor.html#${e.id}" style="display:inline-block;margin:8px 0;font-weight:700;color:var(--acc)">🖥 Открыть в большом редакторе</a>
  <h4>Текст поста</h4><div class="field"><label># заголовок, - пункт списка, &gt; совет</label><textarea data-e="body" style="min-height:140px">${esc(e.body)}</textarea></div>
  <div class="field"><label>Теги через запятую (для поиска и уведомлений)</label><input data-e="tags" value="${esc((e.tags||[]).join(', '))}"></div>
  ${e.mode==='health'?`<div class="field"><label>Зоны тела (для карты)</label><div class="chips">${Object.entries(BODY).map(([k,v])=>`<button class="chip ${(e.zones||[]).includes(k)?'on':''}" data-ebz="${k}">${v}</button>`).join('')}</div></div>`:''}
@@ -714,10 +714,8 @@ function drawEditor(){const e=App.edit;const s=e.slides[e._s];
 function syncEditorFields(){const e=App.edit;if(!e)return;document.querySelectorAll('#sheet [data-e]').forEach(i=>{const k=i.dataset.e;if(k==='tags')e.tags=i.value.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);else if(k==='publishAt')e.publishAt=i.value?new Date(i.value).getTime():now();else if(k==='story'||k==='hidden')e[k]=i.checked;else e[k]=i.value});
  document.querySelectorAll('#sheet [data-pr]').forEach(i=>{const [n,k]=i.dataset.pr.split('.');e.products[+n][k]=i.value.trim()});
  const s=e.slides[e._s];if(s)document.querySelectorAll('#sheet [data-zl]').forEach(i=>{s.zones[+i.dataset.zl].label=i.value})}
-function bindEditor(){const e=App.edit;const z=$('#zed');if(!z)return;let st0=null,box=null;
- z.addEventListener('pointerdown',ev=>{const r=z.getBoundingClientRect();st0={x:(ev.clientX-r.left)/r.width,y:(ev.clientY-r.top)/r.height};box=document.createElement('div');box.className='zr';z.appendChild(box);z.setPointerCapture(ev.pointerId)});
- z.addEventListener('pointermove',ev=>{if(!st0)return;const r=z.getBoundingClientRect();const x=Math.max(0,Math.min(1,(ev.clientX-r.left)/r.width)),y=Math.max(0,Math.min(1,(ev.clientY-r.top)/r.height));Object.assign(box.style,{left:Math.min(x,st0.x)*100+'%',top:Math.min(y,st0.y)*100+'%',width:Math.abs(x-st0.x)*100+'%',height:Math.abs(y-st0.y)*100+'%'});box._r={x:Math.min(x,st0.x),y:Math.min(y,st0.y),w:Math.abs(x-st0.x),h:Math.abs(y-st0.y)}});
- z.addEventListener('pointerup',()=>{if(!st0)return;st0=null;const r=box&&box._r;if(r&&r.w>.04&&r.h>.04){syncEditorFields();const s=e.slides[e._s];s.zones=s.zones||[];s.zones.push({x:+r.x.toFixed(4),y:+r.y.toFixed(4),w:+r.w.toFixed(4),h:+r.h.toFixed(4),label:'Зона '+(s.zones.length+1)});drawEditor()}else box&&box.remove()})}
+function bindEditor(){const e=App.edit;const host=$('#zkmini');if(!host||!window.ZoneKit)return;const s=e.slides[e._s];
+ ZoneKit.mount(host,{media:s,zones:s.zones||[],onChange:zs=>{s.zones=zs;const t=document.querySelector(`#sheet [data-es="${e._s}"]`);if(t){let b=t.querySelector('b');if(zs.length){if(!b){b=document.createElement('b');b.style.cssText='position:absolute;right:3px;bottom:3px;background:var(--acc);color:#fff;font-size:11px;padding:1px 5px;border-radius:6px';t.appendChild(b)}b.textContent=zs.length}else b&&b.remove()}}})}
 async function doSavePost(){syncEditorFields();const e=App.edit;if(!Store.token){toast('Сначала подключите Диск в разделе «Админ»');return}
  const prev=clone(Store.meta.posts[e.id]||{});
  Store.meta.posts[e.id]={title:e.title,text:e.text,body:e.body,tags:e.tags,zones:e.mode==='health'?e.zones:[],products:e.products.filter(x=>x.name||x.wb||x.ozon||x.ym),publishAt:e.publishAt,story:!!e.story,hidden:!!e.hidden,slideZones:Object.fromEntries(e.slides.filter(s=>(s.zones||[]).length).map(s=>[s.path,s.zones]))};
