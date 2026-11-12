@@ -365,8 +365,11 @@ body.m3on main{padding-top:8px}
 .prog i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
 /* coupons */
 .coupon{display:flex;background:var(--card);border-radius:18px;overflow:hidden;margin-bottom:10px}
-.coupon .pc{background:var(--acc);color:#fff;font-weight:900;font-size:calc(31px*var(--fz,1));width:86px;display:grid;place-items:center;border-right:3px dashed var(--bg)}
-.coupon .ci{padding:12px;flex:1}
+.coupon .pc{background:var(--acc);color:#fff;font-weight:900;font-size:calc(26px*var(--fz,1));min-width:80px;padding:0 8px;flex:0 0 auto;display:grid;place-items:center;border-right:3px dashed var(--bg);white-space:nowrap}
+.coupon .ci{padding:12px;flex:1;min-width:0}
+.coupon .ci .row{flex-wrap:wrap;gap:8px}
+.coupon .ci .code{min-width:0;overflow-wrap:anywhere}
+.coupon .ci button{white-space:normal;text-align:left;max-width:100%}
 .coupon.used{opacity:.45}
 .code{font-family:ui-monospace,monospace;font-weight:800;background:var(--soft);padding:4px 8px;border-radius:8px}
 /* wheel */
@@ -407,6 +410,8 @@ td.n,th.n{text-align:right}
 .seg{display:flex;background:var(--card);border-radius:12px;padding:3px;margin-bottom:12px}
 .seg button{flex:1;padding:8px 0;border-radius:10px;font-weight:700;font-size:calc(17px*var(--fz,1));color:var(--mut)}
 .seg button.on{background:var(--acc);color:#fff}
+.seg.fsz{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
+.seg.fsz button{white-space:normal!important;line-height:1.15;padding:8px 2px;min-width:0;overflow-wrap:normal;word-break:keep-all;font-size:clamp(11px,3.6vw,16px)!important}
 
 body{--bg:#FBE6E3}
 body.mood{--bg:#E2F4E8}
@@ -882,7 +887,7 @@ function adminLink(){return App.admVis?`<div class="box"><b style="font-size:cal
 function viewMe(){const s=st();const m=mode();const cfg=Store.config;const active=s.coupons.filter(c=>!c.used&&c.exp>now());const allTags=[...new Set(visiblePosts(null).flatMap(p=>p.tags||[]))];
  const soc=(cfg[m]||{}).social||{};const SOC=[['vk','ВКонтакте'],['tg','Telegram'],['ok','Одноклассники']].concat(soc.yt?[['yt','YouTube']]:[]);
  return `<h2>Профиль</h2>
- <div class="box"><b style="font-size:calc(22px*var(--fz,1))">🔠 Размер текста</b><div class="seg" style="margin:12px 0 0">${['Обычный','Крупный','Очень крупный'].map((n,i)=>`<button class="${(s.fs||0)===i?'on':''}" data-act="fs${i}" style="font-size:${16+i*2}px">${n}</button>`).join('')}</div></div>
+ <div class="box"><b style="font-size:calc(22px*var(--fz,1))">🔠 Размер текста</b><div class="seg fsz" style="margin:12px 0 0">${['Обычный','Крупный','Очень крупный'].map((n,i)=>`<button class="${(s.fs||0)===i?'on':''}" data-act="fs${i}">${n}</button>`).join('')}</div></div>
  <div class="box"><div class="row between"><b style="font-size:calc(22px*var(--fz,1))">🎟️ Мои скидки</b><span class="muted">${active.length} активн.</span></div><div style="margin-top:10px">${s.coupons.length?s.coupons.slice(0,30).map(couponHTML).join(''):'<p class="muted">Скидки из игры и бонуса дня будут здесь. Код вводится при оформлении заказа на маркетплейсе.</p>'}</div></div>
  <div class="box"><b style="font-size:calc(22px*var(--fz,1))">👫 Пригласи друга</b><p class="muted">Поделитесь приложением с вашим кодом. Друг получит скидку ${cfg.referralPercent||10}%, и вы тоже.</p>
   <div class="row between" style="margin:10px 0"><span class="code" style="font-size:calc(18px*var(--fz,1))">${refCode()}</span><button class="btn sm" data-act="share">Поделиться</button></div>
