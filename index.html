@@ -295,6 +295,18 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .btn.m3go{font-size:20px;padding:16px;background:linear-gradient(180deg,#ffd23f,#ff9a1a);color:#5a2a00;box-shadow:0 6px 0 #d46f00,0 12px 20px rgba(0,0,0,.2);animation:m3beat 1.6s infinite}
 
 /* match-3 v3 */
+.m3top{display:flex;align-items:center;gap:8px}
+.m3goals{flex:1;display:flex;gap:6px;min-width:0}
+.m3goals .m3goal{flex:1 1 0;min-width:0;flex-direction:column;justify-content:center;padding:4px 2px;gap:0}
+.m3goals .m3goal img{width:36px;height:36px}
+.m3goals .m3goal span{font-size:15px;line-height:1.1}
+.m3goals .m3icei{width:28px;height:28px}
+.m3t .lk{position:absolute;inset:6%;border-radius:12px;pointer-events:none;z-index:2;background:repeating-linear-gradient(45deg,transparent 0 38%,rgba(120,120,130,.95) 38% 46%,rgba(220,220,230,.95) 46% 50%,transparent 50% 88%),repeating-linear-gradient(-45deg,transparent 0 38%,rgba(120,120,130,.95) 38% 46%,rgba(220,220,230,.95) 46% 50%,transparent 50% 88%);box-shadow:inset 0 0 0 3px rgba(140,140,150,.9);filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.m3exit{font-weight:900}
+.m3exit.ask{width:auto!important;padding:0 10px;background:#ff4b5c!important;color:#fff;font-size:15px!important}
+.m3gres{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+.m3gres div{display:flex;align-items:center;gap:6px;background:var(--card);border-radius:12px;padding:6px 10px}
+.m3gres img{width:34px;height:34px;object-fit:contain}
 body.m3on header{display:none}
 body.m3on,html:has(body.m3on){overflow:hidden;overscroll-behavior:none}
 body.m3on main{padding-top:8px}
@@ -491,7 +503,7 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 <body>
 <div id="app"></div>
 <script src="zonekit.js"></script>
-<script src="game.js?v=3"></script>
+<script src="game.js?v=4"></script>
 <script>
 "use strict";
 // ================= helpers =================
@@ -811,7 +823,7 @@ function viewGame(){const s=st();const g=App.game;
   ${s.games.bm?`<p class="m3p" style="font-weight:800">🎁 Бонус колеса: +${s.games.bm} ходов на следующий уровень</p>`:''}
   <button class="btn wide m3go" data-act="startgame" data-lv="${next}">▶ Уровень ${next}</button>
   <div class="m3map">${Array.from({length:Math.max(next+3,12)},(_,k)=>k+1).map(n=>`<button ${n>next?'disabled':''} data-act="startgame" data-lv="${n}" class="${n===next?'cur':lv[n]?'done':''}"><b>${n}</b><i>${n>next?'🔒':lv[n]?starTxt(lv[n]):''}</i></button>`).join('')}</div>
-  <p class="m3p">Лучший результат уровня можно улучшить, переиграв его. На уровнях с 3-го появляется лёд: его нужно растопить, собирая продукты прямо на нём.</p>
+  <p class="m3p">Каждый уровень сложнее предыдущего: с 3-го появляется лёд, его надо растопить, собирая продукты прямо на нём. С 5-го цепи: такой продукт нельзя двигать, пока не соберёшь его в ряд. Дальше двойной лёд и новые цели. Пройденный уровень можно переиграть на 3 звезды.</p>
   ${App.admVis?`<button class="btn ghost wide" data-act="gamereset" style="margin-top:6px">🔄 Сброс игры (админ)</button>`:''}</div>`;return h}
 function newBoard(){const b=[];for(let i=0;i<GN*GN;i++){let v;do{v=Math.floor(Math.random()*6)}while((i%GN>=2&&b[i-1]===v&&b[i-2]===v)||(i>=GN*2&&b[i-GN]===v&&b[i-2*GN]===v));b.push(v)}return b}
 function findMatches(b){const m=new Set();for(let r=0;r<GN;r++)for(let c=0;c<GN;c++){const i=r*GN+c;if(b[i]<0)continue;
@@ -832,6 +844,7 @@ async function trySwap(a,b){const g=App.game;g.busy=true;[g.b[a],g.b[b]]=[g.b[b]
   for(let c=0;c<GN;c++){let w=GN-1;for(let r=GN-1;r>=0;r--){const v=g.b[r*GN+c];if(v>=0){g.b[w*GN+c]=v;w--}}for(;w>=0;w--)g.b[w*GN+c]=Math.floor(Math.random()*6)}
   drawBoard();await sleep(200);combo++;m=findMatches(g.b)}
  render();g.busy=false;if(g.moves<=0)endGame()}
+window.m3Exit=function(){App.game=null;render();scrollTo(0,0)};
 window.m3End=function(r){App.game=null;const s=st();s.games.lv=s.games.lv||{};s.games.cl=s.games.cl||[];
  const prev=s.games.lv[r.level]||0;if(r.won&&r.stars>prev)s.games.lv[r.level]=r.stars;
  const tot=gStars();const got=[];gTiers().forEach(t=>{if(tot>=t.min&&!s.games.cl.includes(t.min)){s.games.cl.push(t.min);got.push(addCoupon(t.percent,t.code,'game'))}});
@@ -841,7 +854,7 @@ window.m3End=function(r){App.game=null;const s=st();s.games.lv=s.games.lv||{};s.
  const body=r.won?`<h2 class="m3rt">Уровень ${r.level} пройден!</h2><div class="m3rs">${[0,1,2].map(k=>`<i class="${k<r.stars?'on':''}" style="animation-delay:${.3+k*.35}s">★</i>`).join('')}</div><p class="m3p">${r.score} очков${r.stars>prev&&prev?' · новый рекорд уровня!':''}</p>
    ${got.length?got.map(c=>`<p style="font-weight:800">🎉 Новый купон Ozon −${c.percent}%!</p>${couponHTML(c)}`).join('')+'<p class="m3p">Введите код при оформлении заказа на Ozon</p>':`<p class="m3p">Всего звёзд: ★ ${tot}</p>`}
    <button class="btn wide m3go" data-act="startgame" data-lv="${r.level+1<=nx?r.level+1:nx}">▶ Уровень ${r.level+1<=nx?r.level+1:nx}</button><button class="btn ghost wide" data-act="startgame" data-lv="${r.level}" style="margin-top:8px">↻ Переиграть на 3 звезды</button>`
-  :`<h2 class="m3rt">Почти получилось!</h2><p class="m3p">Не хватило ходов. Собрано: лаванда ${Math.min(r.got[0],r.need)}/${r.need}, Блю Кюрасао ${Math.min(r.got[1],r.need)}/${r.need}${r.ice?`, осталось льда: ${r.ice}`:''}.</p><button class="btn wide m3go" data-act="startgame" data-lv="${r.level}">↻ Ещё раз</button>`;
+  :`<h2 class="m3rt">Почти получилось!</h2><p class="m3p">Не хватило ходов. Собрано:</p><div class="m3gres">${r.goals.map(g=>`<div><img src="${M3.src(g.t)}" alt=""><b>${g.got}/${g.n}</b></div>`).join('')}${r.ice?`<div><i class="m3icei"></i><b>ещё ${r.ice}</b></div>`:''}</div><button class="btn wide m3go" data-act="startgame" data-lv="${r.level}">↻ Ещё раз</button>`;
  sheet(`<div style="text-align:center">${pics}${body}<button class="btn ghost wide" data-act="close" style="margin-top:8px">Закрыть</button></div>`);
  if(r.won)[0,1,2].forEach(k=>{if(k<r.stars)setTimeout(()=>M3.star(k),300+k*350)})};
 
