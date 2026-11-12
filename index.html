@@ -60,7 +60,9 @@ main{padding:4px 16px}
 .media{position:absolute;inset:0;transform-origin:0 0;transition:transform .55s cubic-bezier(.2,.8,.2,1)}
 .media video,.media img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .hint{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 0 0 0 rgba(255,255,255,.8);animation:pulse 1.8s infinite;pointer-events:none;display:grid;place-items:center;font-size:calc(14px*var(--fz,1));color:var(--acc);font-weight:900}
-.slider.zoomed .hint{opacity:0}
+.hint{transition:opacity .45s ease .5s}
+.slider.zoomed .hint{opacity:0;transition:opacity .15s}
+.feedcard .hint{display:none}
 @keyframes pulse{70%{box-shadow:0 0 0 14px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
 .dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px;pointer-events:none}
 .dots i{width:7px;height:7px;border-radius:4px;background:rgba(255,255,255,.55);transition:width .2s}
@@ -70,7 +72,7 @@ main{padding:4px 16px}
 .slider.zoomed .arrow{display:none!important}
 .arrow.l{left:8px}.arrow.r{right:8px}
 .zlabel{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.6);color:#fff;font-size:calc(16px*var(--fz,1));font-weight:700;padding:5px 10px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none}
-.slider.zoomed .zlabel{opacity:1}
+.slider.zoomed .zlabel{opacity:0;display:none}
 .zbtn{position:absolute;top:50%;width:38px;height:38px;margin-top:-19px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;font-size:calc(24px*var(--fz,1));font-weight:700;line-height:1;display:none;place-items:center;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.25);animation:zbin .3s ease}
 .zbtn.l{left:8px}.zbtn.r{right:8px}
 .slider.zoomed.hasz .zbtn{display:grid}
@@ -352,7 +354,7 @@ async function crawl(){const posts=[];
  return {posts,meta}}
 function applyMeta(){const M=Store.meta;Store.config=Object.assign(clone(DEFAULT_CONFIG),M.config||{});
  const byMode={health:[],mood:[]};
- const AU=Store.auto||{};Store.posts=Store.base.map(b=>{const m=M.posts[b.id]||{};const au=AU[b.id]||{};const p=Object.assign({},b,{title:au.title||b.title,text:b.kind==='carousel'?'Карусель · '+b.group:b.group,body:'',tags:au.tags||[],zones:au.zones||[],products:[],publishAt:b.created},m);
+ const AU=Store.auto||{};Store.posts=Store.base.map(b=>{const m=M.posts[b.id]||{};const au=AU[b.id]||{};const p=Object.assign({},b,{title:au.title||b.title,text:au.desc||'',body:'',tags:au.tags||[],zones:au.zones||[],products:[],publishAt:b.created},m);
   p.slides=b.slides.map(s=>Object.assign({},s,{zones:(m.slideZones||{})[s.path]||[]}));if(p.story===undefined)byMode[p.mode].push(p);return p});
  Object.values(byMode).forEach(a=>a.sort((x,y)=>y.publishAt-x.publishAt).forEach((p,i)=>p.story=i<8));}
 async function initStore(){
@@ -416,6 +418,7 @@ function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._
  tr.addEventListener('pointerdown',e=>{downX=e.clientX;downY=e.clientY;downT=Date.now();moved=0;if(zoom){drag={tx:zoom.tx,ty:zoom.ty};try{tr.setPointerCapture(e.pointerId)}catch(_){}}});
  tr.addEventListener('pointermove',e=>{const dx=e.clientX-downX,dy=e.clientY-downY;moved=Math.max(moved,Math.hypot(dx,dy));if(zoom&&drag){zoom.tx=drag.tx+dx;zoom.ty=drag.ty+dy;clampT();setT(false)}});
  tr.addEventListener('pointerup',e=>{const wasDrag=drag;drag=null;if(zoom)zoom.m.style.transition='';if(moved>10||Date.now()-downT>600)return;
+  if(el.closest('.feedcard')){openPost(p.id);return}
   if(zoom){unzoom();return}
   const slideEl=e.target.closest('.slide');if(!slideEl)return;const sl=p.slides[+slideEl.dataset.i];const r=slideEl.getBoundingClientRect();
   const nx=(e.clientX-r.left)/r.width,ny=(e.clientY-r.top)/r.height;const v=slideEl.querySelector('video');
@@ -441,7 +444,7 @@ function render(){
 function cardHTML(p,hl){const f=st().favs.includes(p.id);const isNew=App.prevVisit&&p.publishAt>App.prevVisit&&p.publishAt<=now();const pr=(p.products||[])[0];const sched=p.publishAt&&p.publishAt>now();
  const H=s=>hl?highlight(s,hl):esc(s);
  return `<div class="card feedcard">${isNew?'<span class="newb">Новое</span>':''}${sliderHTML(p)}<div class="cb"><div class="row between"><h3 data-open="${p.id}" style="cursor:pointer">${H(p.title)}</h3><button class="ic fav ${f?'on':''}" data-fav="${p.id}">${IC.heart}</button></div>
- <p data-open="${p.id}" style="cursor:pointer">${H(p.text)}</p>${sched?`<div class="tags"><span class="badge">⏰ Выйдет ${new Date(p.publishAt).toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>`:''}
+ ${p.text?`<p data-open="${p.id}" style="cursor:pointer">${H(p.text)}</p>`:''}${sched?`<div class="tags"><span class="badge">⏰ Выйдет ${new Date(p.publishAt).toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>`:''}
  <div class="tags">${(p.tags||[]).map(t=>`<span class="tag" data-tagq="${esc(t)}">#${esc(t)}</span>`).join('')}</div>
  ${pr?mpRow(pr,p.id):''}</div></div>`}
 function mpRow(pr,pid){const l=Object.keys(MP).filter(k=>pr[k]);if(!l.length)return'';return `<div class="mp">Купить: ${l.map(k=>`<a href="${esc(pr[k])}" target="_blank" rel="noopener" data-mp="${k}" data-pid="${pid}">${MP[k]}</a>`).join(' · ')}</div>`}
@@ -513,11 +516,11 @@ function openPost(id){const p=Store.posts.find(x=>x.id===id);if(!p)return;track(
  const f=st().favs.includes(id);
  sheet(`${sliderHTML(p).replace('class="slider"','class="slider" style="border-radius:20px"')}
  <div class="row between" style="margin-top:14px"><span class="tag">${MODES[p.mode].t}</span><div class="row"><button class="ic" data-share="${id}">↗</button><button class="ic fav ${f?'on':''}" data-fav="${id}">${IC.heart}</button></div></div>
- <h2 style="margin-top:10px">${esc(p.title)}</h2><p style="font-size:calc(20px*var(--fz,1));line-height:1.5;color:var(--ink2);margin-top:0">${esc(p.text)}</p>
+ <h2 style="margin-top:10px">${esc(p.title)}</h2>${p.text?`<p style="font-size:calc(20px*var(--fz,1));line-height:1.5;color:var(--ink2);margin-top:0">${esc(p.text)}</p>`:''}
  <div class="rich">${richHTML(p.body)}</div>
  ${(p.products||[]).length?`<h4>Где купить</h4>${p.products.map(pr=>`<div class="prod"><div><b>${esc(pr.name)}</b>${mpRow(pr,p.id)}</div></div>`).join('')}`:''}
  <div class="tags">${(p.tags||[]).map(t=>`<span class="tag" data-tagq="${esc(t)}">#${esc(t)}</span>`).join('')}</div>${similarHTML(p)}`)}
-function similarHTML(p){const tg=new Set([...(p.tags||[]),...(p.zones||[])]);const sc=visiblePosts(p.mode).filter(x=>x.id!==p.id).map(x=>({x,s:[...(x.tags||[]),...(x.zones||[])].filter(t=>tg.has(t)).length})).filter(o=>o.s>0).sort((a,b)=>b.s-a.s||b.x.publishAt-a.x.publishAt).slice(0,4).map(o=>o.x);
+function similarHTML(p){const tg=new Set([...(p.tags||[]),...(p.zones||[])]);const sc=visiblePosts(p.mode).filter(x=>x.id!==p.id).map(x=>({x,s:[...(x.tags||[]),...(x.zones||[])].filter(t=>tg.has(t)).length})).map(o=>{const tw=new Set(String(p.title).toLowerCase().split(/[^а-яёa-z]+/).filter(w=>w.length>4));o.s=o.s*3+String(o.x.title).toLowerCase().split(/[^а-яёa-z]+/).filter(w=>tw.has(w)).length;return o}).sort((a,b)=>b.s-a.s||b.x.publishAt-a.x.publishAt).slice(0,4).map(o=>o.x);
  if(!sc.length)return'';return `<h4 style="margin-top:22px">Похожие советы</h4><div class="sim">${sc.map(x=>`<button class="simc" data-open="${x.id}"><img src="${esc(x.slides[0].type==='image'?x.slides[0].src:x.slides[0].poster)}" alt=""><span>${esc(x.title)}</span></button>`).join('')}</div>`}
 async function shareImage(id){const p=Store.posts.find(x=>x.id===id);if(!p)return;const url=location.origin+location.pathname;const txt=`${p.title}\nЕщё советы: ${url}`;ut('Поделиться',{title:p.title});
  try{toast('Готовлю картинку…');const sl=p.slides[0];const src=sl.type==='image'?(sl.full||sl.src):sl.poster;const blob=await (await fetch(src,{referrerPolicy:'no-referrer'})).blob();const bmp=await createImageBitmap(blob);
@@ -534,8 +537,8 @@ function sheet(html,onClose){closeSheet();const d=document.createElement('div');
  d.addEventListener('click',e=>{if(e.target===d)closeSheet()});d.querySelector('.in').insertAdjacentHTML('afterbegin','<div class="grab"></div>');bindSwipeClose(d);document.body.appendChild(d);bindSliders(d);d.querySelectorAll('.slider video').forEach(v=>v.play().catch(()=>{}));d._onClose=onClose;d.querySelector('.in').scrollTop=0}
 function bindSwipeClose(d){const box=d.querySelector('.in');let y0=null,x0=0,dy=0,lock=null;
  box.addEventListener('touchstart',e=>{if(box.scrollTop>2||e.target.closest('.zed,.slider.zoomed')){y0=null;return}y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0;lock=null;box.style.transition='none'},{passive:true});
- box.addEventListener('touchmove',e=>{if(y0===null)return;const t=e.touches[0];const ddy=t.clientY-y0,ddx=t.clientX-x0;if(lock===null&&(Math.abs(ddy)>8||Math.abs(ddx)>8))lock=Math.abs(ddy)>Math.abs(ddx)&&ddy>0?'y':'x';if(lock!=='y')return;dy=Math.max(0,ddy);box.style.transform=`translateY(${dy}px)`;if(e.cancelable)e.preventDefault()},{passive:false});
- box.addEventListener('touchend',()=>{if(y0===null)return;box.style.transition='';if(lock==='y'&&dy>110){box.style.transform='translateY(100%)';setTimeout(closeSheet,200)}else box.style.transform='';y0=null})}
+ box.addEventListener('touchmove',e=>{if(y0===null)return;const t=e.touches[0];const ddy=t.clientY-y0,ddx=t.clientX-x0;if(lock===null&&(Math.abs(ddy)>6||Math.abs(ddx)>6))lock=Math.abs(ddy)>Math.abs(ddx)&&ddy>0?'y':'x';if(lock!=='y')return;dy=Math.max(0,ddy);box.style.transform=`translateY(${dy}px)`;if(e.cancelable)e.preventDefault()},{passive:false});
+ box.addEventListener('touchend',()=>{if(y0===null)return;box.style.transition='';if(lock==='y'&&dy>55){box.style.transform='translateY(100%)';setTimeout(closeSheet,200)}else box.style.transform='';y0=null})}
 function speakPost(id,btn){try{const ss=speechSynthesis;if(ss.speaking){ss.cancel();btn.textContent='🔊';return}const p=Store.posts.find(x=>x.id===id);const txt=[p.title,p.text,String(p.body||'').replace(/^[#>\-]\s*/gm,'')].filter(Boolean).join('. ');const u=new SpeechSynthesisUtterance(txt);u.lang='ru-RU';u.rate=.95;const v=ss.getVoices().find(v=>/^ru/i.test(v.lang));if(v)u.voice=v;u.onend=()=>{btn.textContent='🔊'};btn.textContent='⏹';ss.speak(u)}catch(e){toast('Озвучка недоступна на этом телефоне')}}
 function flyHeart(from){const nb=document.querySelector('nav [data-tab=favs]');if(!nb)return;const a=from.getBoundingClientRect(),b=nb.querySelector('svg').getBoundingClientRect();
  const h=document.createElement('div');h.className='flyh';h.innerHTML=IC.favs;h.style.left=(a.left+a.width/2-14)+'px';h.style.top=(a.top+a.height/2-14)+'px';document.body.appendChild(h);
