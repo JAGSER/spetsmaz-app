@@ -103,6 +103,9 @@ h3{font-size:18px}
 .save{position:sticky;bottom:0;background:var(--card);padding-top:8px}
 @media(max-width:1100px){.app{grid-template-columns:280px minmax(0,1fr)}.side{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}.app{height:auto}aside{height:100vh;position:sticky;top:0}}
 @media(max-width:760px){.app{display:block}aside{height:auto;position:static}.list{max-height:40vh}.frame{height:auto;width:100%}}
+#zkbig{width:100%;max-width:640px}
+#zkbig .zk-fr{width:auto;height:min(62vh,720px)}
+@media(max-width:760px){#zkbig .zk-fr{height:auto;width:100%}}
 </style>
 </head>
 <body>
@@ -118,6 +121,7 @@ h3{font-size:18px}
  <div class="side" id="side"></div>
 </div>
 <div class="toast" id="toast"></div>
+<script src="zonekit.js"></script>
 <script>
 const DISK_KEY='https://yadi.sk/d/iDTvVSSsPP7QtA';
 const DISK_PATH='disk:/Клиенты/Спецмазь/Реклама 2026/Посты';
@@ -189,15 +193,14 @@ const slide=()=>E.cur.slides[E.si];
 // ---------- main ----------
 function drawMain(){const p=E.cur;const s=slide();
  $('#main').innerHTML=`<div class="ttl">${esc(p.title)}</div>
- ${E.cam!=null?'':`<div class="mode"><button data-test="0" class="${E.test?'':'on'}">✏️ Рисовать зоны</button><button data-test="1" class="${E.test?'on':''}">👆 Проверить, как в приложении</button></div>`}
- <div class="tools">${E.cam!=null?'':'<button class="mini" data-act="undo" '+(E.hist.length?'':'disabled')+'>↶ Отменить</button>'}${!E.test&&E.cam==null&&E.sel>=0?'<button class="mini" data-cam="'+E.sel+'">🔍 Настроить приближением</button>':''}</div>
- <div class="frame ${E.cam!=null?'camm':''}" id="fr"><div class="media" id="md">${s.type==='image'?`<img src="${esc(s.src)}" alt="">`:`<video src="${esc(s.src)}" poster="${esc(s.poster||'')}" muted loop playsinline autoplay></video>`}</div>
-  ${E.cam!=null?`<div class="camtop"><span>Зона ${E.cam+1}</span></div><div class="cam"><button data-zin="1">+</button><button data-zin="-1">−</button><button data-act="camok" style="background:#1E9E58;font-size:22px">✓</button></div>`:E.test?Z().map(z=>`<div class="hint" style="left:${(z.x+z.w)*100-3}%;top:${z.y*100+3}%">+</div>`).join('')+'<div class="zlabel" id="zl"></div><button class="zbtn l" id="zbl">‹</button><button class="zbtn r" id="zbr">›</button>':'<div class="ov" id="ov"></div>'}</div>
- ${s.type==='video'?`<div class="vctl"><button class="mini" id="vp">⏸</button><input type="range" id="vr" min="0" max="1000" value="0"><span class="tm" id="vt">0:00.0</span></div>`:''}
+ <div class="mode"><button data-test="0" class="${E.test?'':'on'}">✏️ Зоны</button><button data-test="1" class="${E.test?'on':''}">👆 Проверить, как в приложении</button></div>
+ ${E.test?`<div class="frame" id="fr"><div class="media" id="md">${s.type==='image'?`<img src="${esc(s.src)}" alt="">`:`<video src="${esc(s.src)}" poster="${esc(s.poster||'')}" muted loop playsinline autoplay></video>`}</div>
+  ${Z().map(z=>{const h=ZoneKit.hintPos(z);return `<div class="hint" style="left:${h.x*100}%;top:${h.y*100}%">+</div>`}).join('')}<div class="zlabel" id="zl"></div><button class="zbtn l" id="zbl">‹</button><button class="zbtn r" id="zbr">›</button></div>
+  ${s.type==='video'?`<div class="vctl"><button class="mini" id="vp">⏸</button><input type="range" id="vr" min="0" max="1000" value="0"><span class="tm" id="vt">0:00.0</span></div>`:''}`:'<div id="zkbig"></div>'}
  ${p.slides.length>1?`<div class="thumbs">${p.slides.map((x,i)=>`<div class="${i===E.si?'on':''}" data-si="${i}"><img src="${esc(x.type==='image'?x.src:x.poster)}" alt="">${(E.zones[i]||[]).length?`<b>${E.zones[i].length}</b>`:''}</div>`).join('')}</div>`:''}
- <div class="help">${E.cam!=null?'Так зона будет выглядеть на экране телефона. Двигайте пальцем, чтобы сдвинуть, щипком или кнопками +/− меняйте увеличение. Готово: зелёная галочка.':E.test?'Нажмите на зону: приблизится ровно она. Нажмите мимо зон: обычное приближение в точку, картинку можно двигать пальцем или мышкой. Ещё нажатие: отдалить.':'Проведите пальцем или мышкой по картинке, чтобы нарисовать зону. Зону можно двигать пальцем и тянуть за жёлтые ручки на углах и сторонах. Жёлтый пунктир: что именно будет видно на экране телефона после нажатия.'}</div>`;
- const v=$('#md video');if(v)bindVideo(v);
- if(E.cam!=null)bindCam();else if(E.test)bindTest();else{bindDraw();drawZones()}}
+ ${E.test?'<div class="help">Нажмите на плюсик или на зону: приблизится ровно она. Нажмите мимо: обычное приближение в точку, картинку можно двигать. Ещё нажатие: отдалить.</div>':''}`;
+ if(E.test){const v=$('#md video');if(v)bindVideo(v);E.kit=null;bindTest()}
+ else{const si=E.si;E.kit=ZoneKit.mount($('#zkbig'),{media:s,zones:Z(),listEl:$('#zklist')||document.createElement('div'),onChange:zs=>{E.zones[si]=zs;E.dirty=true;markDirty();drawThumbBadges();drawList()}})}}
 function bindVideo(v){const r=$('#vr'),t=$('#vt'),b=$('#vp');let seeking=false;
  v.addEventListener('timeupdate',()=>{if(!seeking&&v.duration)r.value=v.currentTime/v.duration*1000;t.textContent=fmt(v.currentTime)+' / '+fmt(v.duration)});
  r.addEventListener('input',()=>{seeking=true;if(v.duration)v.currentTime=r.value/1000*v.duration;t.textContent=fmt(v.currentTime)});r.addEventListener('change',()=>seeking=false);
@@ -245,7 +248,7 @@ function bindTest(preset){const fr=$('#fr'),m=$('#md'),lab=$('#zl');let zoom=nul
  fr.addEventListener('pointermove',e=>{const dx=e.clientX-dX,dy=e.clientY-dY;moved=Math.max(moved,Math.hypot(dx,dy));if(zoom&&drag){zoom.tx=drag.tx+dx;zoom.ty=drag.ty+dy;clampT();setT(false)}});
  fr.addEventListener('pointerup',e=>{drag=null;if(zoom)m.style.transition='';if(moved>10||Date.now()-dT>600)return;if(zoom){unzoom();return}
   const r=fr.getBoundingClientRect();const nx=(e.clientX-r.left)/r.width,ny=(e.clientY-r.top)/r.height;
-  const zs=Z().filter(z=>zoneOn(z)&&nx>=z.x&&nx<=z.x+z.w&&ny>=z.y&&ny<=z.y+z.h).sort((a,b)=>a.w*a.h-b.w*b.h);
+  const near=Z().filter(zoneOn).map(z=>{const h=ZoneKit.hintPos(z);return [z,Math.hypot((h.x-nx)*r.width,(h.y-ny)*r.height)]}).filter(a=>a[1]<28).sort((a,b)=>a[1]-b[1]).map(a=>a[0]);const zs=near.length?near:Z().filter(z=>zoneOn(z)&&nx>=z.x&&nx<=z.x+z.w&&ny>=z.y&&ny<=z.y+z.h).sort((a,b)=>a.w*a.h-b.w*b.h);
   if(zs.length)zoomZone(zs[0]);else{zoomAt(nx,ny,2.5,'🔍 Двигайте пальцем');fr.classList.toggle('hasz',list().length>0)}});
  if(preset)E.zoomZone(preset)}
 
@@ -270,22 +273,13 @@ function drawSideLite(){const sl=document.querySelector(`[data-card="${E.cam}"] 
 
 // ---------- side ----------
 function drawSide(){const p=E.cur;if(!p){$('#side').innerHTML='';return}const s=slide();const zs=Z();const vid=s.type==='video';
- $('#side').innerHTML=`<h3>Зоны${p.slides.length>1?' на картинке '+(E.si+1):''}: ${zs.length}</h3>
- ${zs.length?'':'<p class="small">Зон нет: в приложении будет обычное приближение в точку нажатия. Нарисуйте зону, если нужно приближать конкретное место.</p>'}
- ${zs.map((z,i)=>{const v=visRect(z);return `<div class="card ${i===E.sel?'sel':''}" data-card="${i}">
-  <div class="row"><span class="num">${i+1}</span><input type="text" data-lab="${i}" value="${esc(z.label||'')}" placeholder="Подпись, например «Состав»"></div>
-  <div class="row" style="align-items:flex-start">${prevHTML(i)}<div style="display:flex;flex-direction:column;gap:6px"><div class="small">Что увидит человек.<br>Увеличение ×${v.s.toFixed(1)}${v.s>=8?' (максимум)':''}</div>
-   <div class="row"><button class="mini" data-mv="${i}" data-dir="-1" ${i?'':'disabled'} title="Выше">↑</button><button class="mini" data-mv="${i}" data-dir="1" ${i<zs.length-1?'':'disabled'} title="Ниже">↓</button><button class="mini" data-dup="${i}" title="Копия">⧉</button></div></div></div>
-  ${vid?`<div class="row small">Действует с <input type="number" step="0.1" min="0" data-t1="${i}" value="${z.t1==null?'':z.t1}" placeholder="нач."> по <input type="number" step="0.1" min="0" data-t2="${i}" value="${z.t2==null?'':z.t2}" placeholder="конец"> сек</div>
-   <div class="row"><button class="mini" data-now1="${i}">⏱ Начало = сейчас</button><button class="mini" data-now2="${i}">⏱ Конец = сейчас</button></div><div class="small">Пусто: зона работает всё видео.</div>`:''}
-  <div class="row" style="flex-wrap:wrap"><button class="mini" data-cam="${i}">🔍 Настроить приближением</button><button class="mini" data-fit="${i}">📱 Ровно под экран</button><button class="mini" data-try="${i}">👁 Показать</button><button class="mini red" data-del="${i}">🗑 Удалить</button></div></div>`}).join('')}
- ${zs.length>1?'<button class="mini red" data-clear="1">Удалить все зоны на этой картинке</button>':''}
+ $('#side').innerHTML=`${E.test?'':'<div id="zklist"></div>'}
  <div class="save">${p.local?`<div class="card"><b>Сохранить как новый пост</b><div class="small">Файл загрузится на Диск в выбранную папку, станет постом в приложении вместе с зонами.</div>
    <select class="inp" id="fold">${E.folders.map(f=>`<option ${(/шуст/i.test(f)?'mood':'health')===E.m?'':''}>${esc(f)}</option>`).join('')}</select>
    <button class="btn" data-act="upload">📤 Загрузить на Диск с зонами</button></div>`:
   `<button class="btn" style="width:100%" data-act="save" ${E.dirty?'':'disabled'}>${E.dirty?'💾 Сохранить зоны в приложение':'✓ Всё сохранено'}</button>`}
  <div class="tok" style="margin-top:12px">${E.token?'<span class="ok">✓ Диск подключён</span>':`<div class="card"><b>Подключите Диск один раз</b><div class="small">Откройте <a href="https://yandex.ru/dev/disk/poligon/" target="_blank" rel="noopener">Полигон Яндекс.Диска</a>, нажмите «Получить OAuth-токен», скопируйте его и вставьте сюда.</div><input class="inp" id="tok" placeholder="Токен"><button class="btn" data-act="tok">Подключить</button></div>`}</div></div>`;
- document.querySelectorAll('#side [data-prevz]').forEach(el=>{const z=Z()[+el.dataset.prevz];if(z)setPrev(el,z)})}
+ if(E.kit&&$('#zklist'))E.kit.attachList($('#zklist'))}
 
 // ---------- save ----------
 async function putFile(path,body,overwrite){const h={Authorization:'OAuth '+E.token};
@@ -293,7 +287,7 @@ async function putFile(path,body,overwrite){const h={Authorization:'OAuth '+E.to
  const {href}=await u.json();const r=await fetch(href,{method:'PUT',body});if(r.status>=300)throw {code:'put'+r.status}}
 async function freshMeta(){const root=await listAll('/');const mf=root.find(x=>x.name==='_app.json');let meta={posts:{},config:{}};
  if(mf){meta=await (await fetch(mf.file+(mf.file.includes('?')?'&':'?')+'nc='+Date.now())).json();meta.posts=meta.posts||{};meta.config=meta.config||{}}return meta}
-function clean(zs){return zs.map(z=>{const o={x:z.x,y:z.y,w:z.w,h:z.h,label:(z.label||'').trim()};if(z.t1!=null&&z.t1!=='')o.t1=+z.t1;if(z.t2!=null&&z.t2!=='')o.t2=+z.t2;return o})}
+function clean(zs){return zs.map(z=>{const o={x:z.x,y:z.y,w:z.w,h:z.h,label:(z.label||'').trim()};if(z.hx!=null){o.hx=z.hx;o.hy=z.hy}if(z.t1!=null&&z.t1!=='')o.t1=+z.t1;if(z.t2!=null&&z.t2!=='')o.t2=+z.t2;return o})}
 async function saveMeta2(id,pairs){const meta=await freshMeta();const P=meta.posts[id]=meta.posts[id]||{};P.slideZones=P.slideZones||{};
  pairs.forEach(([path,zs])=>{if(zs.length)P.slideZones[path]=clean(zs);else delete P.slideZones[path]});
  await putFile('/_app.json',new Blob([JSON.stringify(meta)],{type:'application/json'}),true);E.meta=meta;
@@ -310,7 +304,7 @@ async function doUpload(){if(!E.token){toast('Сначала подключит�
 document.addEventListener('click',async e=>{const t=e.target.closest('[data-m],[data-id],[data-test],[data-si],[data-del],[data-try],[data-fit],[data-now1],[data-now2],[data-clear],[data-act],[data-card],[data-cam],[data-zin],[data-mv],[data-dup]');if(!t)return;const d=t.dataset;
  if(d.m){setMode(d.m)}
  else if(d.id){const p=E.posts.find(x=>x.id===d.id);if(p)openPost(p)}
- else if(d.test!==undefined){E.test=d.test==='1';E.cam=null;drawMain()}
+ else if(d.test!==undefined){E.test=d.test==='1';E.cam=null;drawSide();drawMain()}
  else if(d.si!==undefined){E.si=+d.si;E.sel=-1;E.cam=null;drawMain();drawSide()}
  else if(d.cam!==undefined){snap();const z=Z()[+d.cam];const v=visRect(z);Object.assign(z,{x:r4(v.x),y:r4(v.y),w:r4(v.w),h:r4(v.h)});E.cam=+d.cam;E.sel=+d.cam;E.test=false;E.dirty=true;drawMain();drawSide();$('#fr').scrollIntoView({block:'center',behavior:'smooth'})}
  else if(d.zin!==undefined){E.camZoom&&E.camZoom(+d.zin>0?1.25:0.8)}
@@ -332,7 +326,6 @@ document.addEventListener('input',e=>{const d=e.target.dataset;if(d.lab!==undefi
  else if(d.t1!==undefined||d.t2!==undefined){const i=+(d.t1??d.t2);const v=e.target.value;Z()[i][d.t1!==undefined?'t1':'t2']=v===''?null:+v;E.dirty=true;markDirty()}
  else if(e.target.id==='q'){E.q=e.target.value;drawList()}});
 function markDirty(){const b=document.querySelector('[data-act="save"]');if(b){b.disabled=false;b.textContent='💾 Сохранить зоны в приложение'}}
-document.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&E.sel>=0&&!E.test&&E.cam==null&&!e.target.closest('input')){snap();Z().splice(E.sel,1);E.sel=-1;E.dirty=true;refresh()}});
 $('#file').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const vid=/^video/.test(f.type);const url=URL.createObjectURL(f);
  openPost({id:'local',local:true,mode:E.m,title:f.name,slides:[{type:vid?'video':'image',src:url,poster:'',path:null,file:f}]});e.target.value=''});
 addEventListener('beforeunload',e=>{if(E.dirty){e.preventDefault();e.returnValue=''}});
