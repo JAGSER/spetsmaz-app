@@ -136,14 +136,73 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .bm{text-align:center}.bm .bubble{font-size:calc(17px*var(--fz,1));padding:8px 14px}
 
 .bm .z{cursor:pointer}
-.bm .z>*{transition:fill .2s}
-.bm .z:hover>*{filter:brightness(1.07)}
-.bm .z.on>*{fill:#FF4B4B!important;animation:ouch .7s ease-in-out infinite alternate}
-@keyframes ouch{from{fill:#FF4B4B}to{fill:#FF9A8A}}
-.bm .guy.hurt{animation:shake .45s ease-in-out 2;transform-origin:100px 440px}
-@keyframes shake{25%{transform:rotate(-2.5deg)}75%{transform:rotate(2.5deg)}}
-.bm .pain{animation:blink .5s steps(2) infinite}
+.bm .z:hover{filter:brightness(1.06)}
+.bm .z.on{animation:zglow .7s ease-in-out infinite alternate}
+@keyframes zglow{from{filter:drop-shadow(0 0 1px #ff2020)}to{filter:drop-shadow(0 0 5px #ff2020) brightness(1.08)}}
+.bm .guy,.bm .guy g{transform-box:view-box}
+.bm .eye{transform-box:fill-box;transform-origin:center;animation:eblink 4.5s infinite}
+@keyframes eblink{0%,93%,100%{transform:none}96%{transform:scaleY(.12)}}
+.bm .drop{animation:blink .5s steps(2) infinite}
 @keyframes blink{50%{opacity:.25}}
+@keyframes pose{to{transform:var(--p)}}
+@keyframes wig{from{transform:var(--a)}to{transform:var(--b)}}
+@keyframes creak{50%{transform:var(--a)}}
+@keyframes cough{0%,45%,100%{transform:none}8%,26%{transform:translateY(3px) rotate(4deg)}17%,35%{transform:none}}
+@keyframes stiff{0%,100%{transform:none}25%{transform:rotate(-7deg)}50%{transform:none}75%{transform:rotate(7deg)}}
+.bm .P{animation:pose .45s cubic-bezier(.3,1.4,.5,1) forwards}
+/* idle */
+.bm .idle .bd{--a:scaleY(1);--b:scaleY(1.012);animation:wig 1.6s ease-in-out infinite alternate}
+.bm .idle .hd{--a:rotate(-2deg);--b:rotate(2deg);animation:wig 2.4s ease-in-out infinite alternate}
+/* голова: держится за голову и качает ей */
+.bm .a-head .uaL{--p:rotate(150deg)}.bm .a-head .faL{--p:rotate(104deg)}.bm .a-head .uaR{--p:rotate(-150deg)}.bm .a-head .faR{--p:rotate(-104deg)}
+.bm .a-head :is(.uaL,.faL,.uaR,.faR){animation:pose .45s cubic-bezier(.3,1.3,.5,1) forwards}
+.bm .a-head .hd{--a:rotate(-7deg);--b:rotate(7deg);animation:wig .35s .4s ease-in-out infinite alternate}
+/* шея: трёт шею, голова набок */
+.bm .a-neck .uaR{--p:rotate(-160deg);animation:pose .45s ease-out forwards}
+.bm .a-neck .faR{--p:rotate(-139deg);--a:rotate(-130deg);--b:rotate(-148deg);animation:pose .45s ease-out forwards,wig .3s .45s ease-in-out infinite alternate}
+.bm .a-neck .hd{--p:rotate(-10deg);animation:pose .5s ease-out forwards}
+/* плечи: пожимает и разминает */
+.bm .a-shoulders :is(.uaL,.uaR,.shc){--a:translateY(0);--b:translateY(-8px);animation:wig .4s ease-in-out infinite alternate}
+.bm .a-shoulders .hd{--a:translateY(0);--b:translateY(-3px);animation:wig .4s ease-in-out infinite alternate}
+/* грудь: кашляет, рука на груди */
+.bm .a-chest .uaL{--p:rotate(-20deg)}.bm .a-chest .faL{--p:rotate(-107deg)}
+.bm .a-chest :is(.uaL,.faL){animation:pose .45s ease-out forwards}
+.bm .a-chest .bd{animation:cough 1.8s .4s ease-in-out infinite}
+/* живот: держится, живот качается */
+.bm .a-belly .faL{--p:rotate(-55deg)}.bm .a-belly .faR{--p:rotate(55deg)}
+.bm .a-belly :is(.faL,.faR){animation:pose .45s ease-out forwards}
+.bm .a-belly .hdL{--a:rotate(-14deg);--b:rotate(14deg);animation:wig .3s .45s ease-in-out infinite alternate}
+.bm .a-belly .hdR{--a:rotate(14deg);--b:rotate(-14deg);animation:wig .3s .45s ease-in-out infinite alternate}
+.bm .a-belly .bd{--a:scaleX(1);--b:scaleX(1.05);animation:wig .45s ease-in-out infinite alternate}
+/* спина: тянется рукой за спину */
+.bm .a-back .uaR{--p:rotate(-165deg);animation:pose .5s ease-out forwards}
+.bm .a-back .faR{--p:rotate(-165deg);--a:rotate(-155deg);--b:rotate(-178deg);animation:pose .5s ease-out forwards,wig .32s .5s ease-in-out infinite alternate}
+.bm .a-back .bd{--a:rotate(-3deg);--b:rotate(3deg);animation:wig .7s ease-in-out infinite alternate}
+/* поясница: руки в бока, наклоны со скрипом */
+.bm :is(.a-lower,.a-hips) .uaL{--p:rotate(35deg)}.bm :is(.a-lower,.a-hips) .faL{--p:rotate(-72deg)}.bm :is(.a-lower,.a-hips) .uaR{--p:rotate(-35deg)}.bm :is(.a-lower,.a-hips) .faR{--p:rotate(72deg)}
+.bm :is(.a-lower,.a-hips) :is(.uaL,.faL,.uaR,.faR){animation:pose .45s ease-out forwards}
+.bm .a-lower .bd{animation:stiff 2.4s .4s ease-in-out infinite}
+/* бёдра: качает тазом */
+.bm .a-hips .low{--a:translateX(-5px);--b:translateX(5px);animation:wig .38s ease-in-out infinite alternate}
+.bm .a-hips .bd{--a:translateX(3px);--b:translateX(-3px);animation:wig .38s ease-in-out infinite alternate}
+/* руки: локти скрипят */
+.bm .a-arms .uaL{--p:rotate(12deg)}.bm .a-arms .uaR{--p:rotate(-12deg)}
+.bm .a-arms :is(.uaL,.uaR){animation:pose .4s ease-out forwards}
+.bm .a-arms .faL{--a:rotate(-100deg);animation:creak 1.6s steps(5) infinite}
+.bm .a-arms .faR{--a:rotate(100deg);animation:creak 1.6s .8s steps(5) infinite}
+/* кисти: пальцы трясутся */
+.bm .a-hands .uaL{--p:rotate(10deg)}.bm .a-hands .faL{--p:rotate(-160deg)}.bm .a-hands .uaR{--p:rotate(-10deg)}.bm .a-hands .faR{--p:rotate(160deg)}
+.bm .a-hands :is(.uaL,.faL,.uaR,.faR){animation:pose .45s ease-out forwards}
+.bm .a-hands :is(.hdL,.hdR){--a:rotate(-14deg);--b:rotate(14deg);animation:wig .09s .45s linear infinite alternate}
+/* колени: хрустят, дрожат внутрь */
+.bm .a-knees .lgL{--a:rotate(0deg);--b:rotate(-6deg)}.bm .a-knees .shL{--a:rotate(0deg);--b:rotate(12deg)}
+.bm .a-knees .lgR{--a:rotate(0deg);--b:rotate(6deg)}.bm .a-knees .shR{--a:rotate(0deg);--b:rotate(-12deg)}
+.bm .a-knees :is(.lgL,.shL,.lgR,.shR){animation:wig .7s steps(3) infinite alternate}
+/* стопы: прыгает на одной ноге */
+.bm .a-feet{--a:translateY(0);--b:translateY(-14px);animation:wig .32s ease-out infinite alternate}
+.bm .a-feet .lgR{--p:translateY(-24px);animation:pose .3s ease-out forwards}
+.bm .a-feet .uaL{--a:rotate(20deg);--b:rotate(50deg);animation:wig .32s ease-in-out infinite alternate}
+.bm .a-feet .uaR{--a:rotate(-20deg);--b:rotate(-50deg);animation:wig .32s ease-in-out infinite alternate}
 .bubble{display:inline-block;position:relative;background:var(--card);border:2.5px solid #1d1b1a;border-radius:18px;padding:10px 16px;font-weight:800;font-size:calc(19px*var(--fz,1));margin:4px 0 2px;max-width:92%}
 .bubble::after{content:'';position:absolute;left:50%;bottom:-11px;margin-left:-9px;border:9px solid transparent;border-top-color:#1d1b1a;border-bottom:0}
 .bmseg{display:inline-flex;background:var(--bg);border-radius:14px;padding:3px;margin:8px 0}
@@ -467,31 +526,29 @@ function viewFeed(){const m=mode();const ps=visiblePosts(m);const stories=ps.fil
  h+=list.length?list.slice(0,App.feedN||12).map(p=>cardHTML(p)).join('')+(list.length>(App.feedN||12)?`<button class="btn ghost wide" data-act="more" style="margin-bottom:16px">Показать ещё</button>`:''):(Store.loading?'<div class="skel"></div><div class="skel"></div>':Store.err?`<div class="empty">${esc(Store.err)}</div>`:`<div class="empty">Пока нет постов${App.bodyZone?' про эту зону':''}</div>`);
  return h}
 function bodyMapHTML(){const z=App.bodyZone;const back=App.bodyView==='back'||(!App.bodyView&&BODY_BACK.includes(z));const hurt=!!z;
- const SK='#F3C7A5',SK2='#E3A985',SH='#D7141A',SH2='#B50F17',TR='#2F4A7A',TR2='#3B5C95',BOOT='#4A3426',HAIR='#C9CED6';
- const Z=(k,inner)=>`<g class="z ${z===k?'on':''}" data-zone="${k}">${inner}</g>`;
- const M=(x)=>200-x;
- const armL=(f)=>`<path d="${f('M52 112 L72 118 L68 148 L47 143 Z')}" fill="${SH}"/><path d="${f('M47 143 L68 148 L63 178 L45 174 Z')}" fill="${SK}"/><path d="${f('M45 176 L63 179 L59 226 L43 223 Z')}" fill="${SK}"/>`;
- const mirPath=d=>d.replace(/([ML]) ?(\d+(?:\.\d+)?) (\d+(?:\.\d+)?)/g,(m,c,x,y)=>`${c}${M(+x)} ${y}`);
- const id=d=>d;
- const elbows=`<circle cx="54" cy="177" r="8" fill="${SK2}"/><circle cx="${M(54)}" cy="177" r="8" fill="${SK2}"/>`;
- const hands=`<ellipse cx="51" cy="236" rx="10" ry="13" fill="${SK}"/><ellipse cx="${M(51)}" cy="236" rx="10" ry="13" fill="${SK}"/>`;
- const thighs=`<path d="M61 256 L99 256 L95 328 L66 328 Z" fill="${TR}"/><path d="M${M(61)} 256 L${M(99)} 256 L${M(95)} 328 L${M(66)} 328 Z" fill="${TR}"/>`;
- const knees=`<ellipse cx="80" cy="338" rx="16" ry="14" fill="${TR2}"/><ellipse cx="${M(80)}" cy="338" rx="16" ry="14" fill="${TR2}"/>`;
- const shins=`<path d="M66 348 L94 348 L91 418 L70 418 Z" fill="${TR}"/><path d="M${M(66)} 348 L${M(94)} 348 L${M(91)} 418 L${M(70)} 418 Z" fill="${TR}"/>`;
- const feet=`<path d="M58 428 Q60 416 72 416 L92 416 Q96 428 92 434 L60 434 Q56 432 58 428Z" fill="${BOOT}"/><path d="M${M(58)} 428 Q${M(60)} 416 ${M(72)} 416 L${M(92)} 416 Q${M(96)} 428 ${M(92)} 434 L${M(60)} 434 Q${M(56)} 432 ${M(58)} 428Z" fill="${BOOT}"/>`;
- const faceN=`<path d="M82 46 q6 -4 12 0 M106 46 q6 -4 12 0" stroke="#8a8f99" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="88" cy="56" r="3.6" fill="#2a1a10"/><circle cx="112" cy="56" r="3.6" fill="#2a1a10"/><path d="M98 60 q2 8 -2 10" stroke="${SK2}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M82 74 q9 -7 18 -2 q9 -5 18 2 q-6 6 -18 3 q-12 3 -18 -3z" fill="${HAIR}"/><path d="M92 82 q8 5 16 0" stroke="#9b3b3b" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="80" cy="68" r="5" fill="rgba(255,120,120,.35)"/><circle cx="120" cy="68" r="5" fill="rgba(255,120,120,.35)"/>`;
- const faceH=`<path d="M80 44 l14 4 M120 44 l-14 4" stroke="#8a8f99" stroke-width="3" stroke-linecap="round"/><path d="M83 52 l9 4 l-9 4 M117 52 l-9 4 l9 4" stroke="#2a1a10" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M98 60 q2 8 -2 10" stroke="${SK2}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M82 74 q9 -7 18 -2 q9 -5 18 2 q-6 6 -18 3 q-12 3 -18 -3z" fill="${HAIR}"/><ellipse cx="100" cy="84" rx="6" ry="5" fill="#7a1f1f"/><path class="pain" d="M128 34 q6 4 4 10 q-5 -1 -4 -10z" fill="#7cc4ff"/><path class="pain" d="M60 40 l-8 -4 M58 50 l-9 0" stroke="#FF4B4B" stroke-width="3" stroke-linecap="round"/>`;
- let svg=`<svg viewBox="0 0 200 446" role="img" aria-label="Человек: нажмите, где болит"><g class="guy ${hurt?'hurt':''}">
- <ellipse cx="100" cy="438" rx="62" ry="6" fill="rgba(0,0,0,.08)"/>
- ${thighs}${shins}${Z('knees',knees)}${Z('feet',feet)}
- ${Z('hips',`<path d="M63 222 Q100 230 137 222 L140 258 L60 258 Z" fill="${TR}"/><rect x="62" y="220" width="76" height="9" rx="4" fill="#3a2a20"/><rect x="94" y="219" width="12" height="11" rx="2" fill="#d9b44a"/>`)}
- ${Z('arms',armL(id)+armL(mirPath)+elbows)}${Z('hands',hands)}`;
- if(!back)svg+=`${Z('chest',`<path d="M64 110 Q100 100 136 110 L139 168 L61 168 Z" fill="${SH}"/><path d="M90 104 L100 118 L110 104" stroke="${SH2}" stroke-width="3" fill="none"/>`)}${Z('belly',`<path d="M61 168 L139 168 L137 220 Q100 228 63 220 Z" fill="${SH}"/><path d="M70 168 h60" stroke="${SH2}" stroke-width="2" stroke-dasharray="4 4"/>`)}`;
- else svg+=`${Z('back',`<path d="M64 110 Q100 100 136 110 L139 170 L61 170 Z" fill="${SH}"/><path d="M100 112 v56" stroke="${SH2}" stroke-width="2.5"/><path d="M76 128 q8 8 16 0 M108 128 q8 8 16 0" stroke="${SH2}" stroke-width="2" fill="none"/>`)}${Z('lower',`<path d="M61 170 L139 170 L137 220 Q100 228 63 220 Z" fill="${SH2}"/><path d="M80 196 q20 8 40 0" stroke="rgba(255,255,255,.35)" stroke-width="2.5" fill="none"/>`)}`;
- svg+=`${Z('shoulders',`<circle cx="64" cy="117" r="14" fill="${SH2}"/><circle cx="136" cy="117" r="14" fill="${SH2}"/>`)}
- ${Z('neck',`<rect x="89" y="86" width="22" height="22" rx="7" fill="${SK2}"/>`)}
- ${Z('head',`<ellipse cx="69" cy="60" rx="6" ry="9" fill="${SK2}"/><ellipse cx="131" cy="60" rx="6" ry="9" fill="${SK2}"/><ellipse cx="100" cy="58" rx="30" ry="33" fill="${SK}"/>`+(back?`<path d="M70 52 Q72 24 100 23 Q128 24 130 52 Q132 78 118 88 Q100 94 82 88 Q68 78 70 52Z" fill="${HAIR}"/>`:`<path d="M70 50 Q72 22 100 22 Q128 22 130 50 Q124 34 112 33 Q100 40 88 33 Q76 34 70 50Z" fill="${HAIR}"/>`))}
- ${back?'':`<g pointer-events="none">${hurt?faceH:faceN}</g>`}
+ const SK=['#F9C29E','#EFAC86'],SH=['#EE1F2B','#CC1220'],SD=['#C30F1C','#AA0C17'],ST=['#F9C62B','#E9B21A'],JN=['#2559A8','#1C4891'],KN=['#3C7ED1','#2F69BA'],HR=['#D0D4DC','#BBC0C9'],SHOE='#15304A';
+ const P=k=>k?` class="z${z===k?' on':''}" data-zone="${k}"`:'';
+ const rp=(x,y,w,h,[a,b,c,d])=>`M${x+a} ${y}H${x+w-b}Q${x+w} ${y} ${x+w} ${y+b}V${y+h-c}Q${x+w} ${y+h} ${x+w-c} ${y+h}H${x+d}Q${x} ${y+h} ${x} ${y+h-d}V${y+a}Q${x} ${y} ${x+a} ${y}Z`;
+ const two=(x,y,w,h,r,c,k)=>{const R=Array.isArray(r)?r:[r,r,r,r];return `<g${P(k)}><path d="${rp(x,y,w/2,h,[R[0],0,0,R[3]])}" fill="${c[0]}"/><path d="${rp(x+w/2,y,w/2,h,[0,R[1],R[2],0])}" fill="${c[1]}"/></g>`};
+ const c2=(cx,cy,r,c,k)=>`<g${P(k)}><circle cx="${cx}" cy="${cy}" r="${r}" fill="${c[0]}"/><path d="M${cx} ${cy-r}A${r} ${r} 0 0 1 ${cx} ${cy+r}Z" fill="${c[1]}"/></g>`;
+ const O=(x,y)=>` style="transform-origin:${x}px ${y}px"`;
+ const leg=(s,x)=>`<g class="lg${s}"${O(x+15,236)}><g class="sh${s}"${O(x+15,334)}>${two(x+1,344,28,74,[2,2,3,3],JN)}<path${P('feet')} d="${rp(x-4,416,38,8,[4,4,4,4])}" fill="${SHOE}"/></g>${two(x,236,30,96,[0,0,4,4],JN)}${two(x-2,321,34,26,12,KN,'knees')}</g>`;
+ const arm=(s,x)=>`<g class="ua${s}"${O(x+9,118)}>${two(x-2,106,22,30,[10,10,3,3],SH,'arms')}${two(x,132,18,42,0,SK,'arms')}<g class="fa${s}"${O(x+9,172)}>${two(x,172,18,42,[0,0,6,6],SK,'arms')}<circle${P('arms')} cx="${x+9}" cy="172" r="9" fill="${SK[0]}"/><circle cx="${x+9}" cy="173" r="5" fill="#E89C7C" opacity=".5" pointer-events="none"/><g class="hd${s}"${O(x+9,212)}>${c2(x+9,222,12.5,SK,'hands')}</g></g></g>`;
+ const faceN=`<path d="M82 53 q6 -4 12 0 M106 53 q6 -4 12 0" stroke="#9AA0AA" stroke-width="3.5" fill="none" stroke-linecap="round"/><ellipse class="eye" cx="88" cy="62" rx="3.2" ry="4" fill="#2A1A12"/><ellipse class="eye" cx="112" cy="62" rx="3.2" ry="4" fill="#2A1A12"/><circle cx="78" cy="74" r="6" fill="#F27C6E" opacity=".5"/><circle cx="122" cy="74" r="6" fill="#F27C6E" opacity=".5"/><path d="M84 82 Q100 104 116 82Z" fill="#fff"/>`;
+ const faceH=`<path d="M80 51 l14 5 M120 51 l-14 5" stroke="#9AA0AA" stroke-width="3.5" stroke-linecap="round"/><path d="M83 58 l8 4 l-8 4 M117 58 l-8 4 l8 4" stroke="#2A1A12" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="78" cy="74" r="6" fill="#F27C6E" opacity=".6"/><circle cx="122" cy="74" r="6" fill="#F27C6E" opacity=".6"/><ellipse cx="100" cy="89" rx="6.5" ry="6" fill="#8A2424"/><path class="drop" d="M134 34 q6 8 2 13 q-7 1 -6 -6z" fill="#7CC4FF"/>`;
+ const must=`<path d="M100 80 Q92 70 81 74 Q75 78 79 84 Q91 86 100 81 Q109 86 121 84 Q125 78 119 74 Q108 70 100 80Z" fill="${HR[0]}"/><path d="M100 80 Q108 70 119 74 Q125 78 121 84 Q109 86 100 81Z" fill="${HR[1]}"/>`;
+ const head=back?`${c2(66,66,7.5,SK)}${c2(134,66,7.5,SK)}${c2(100,62,34,HR,'head')}`:
+  `${c2(66,66,7.5,SK)}${c2(134,66,7.5,SK)}${c2(100,62,34,SK,'head')}<path${P('head')} d="M66 60 Q66 26 100 26 Q134 26 134 60 Q128 44 116 42 Q100 46 84 42 Q72 44 66 60Z" fill="${HR[0]}"/><path d="M100 26 Q134 26 134 60 Q128 44 116 42 Q108 44 100 45Z" fill="${HR[1]}" pointer-events="none"/><g pointer-events="none">${hurt?faceH:faceN}${must}</g>`;
+ const torso=back?`${two(64,102,72,106,12,SH,'back')}${two(64,160,72,46,[0,0,10,10],SD,'lower')}<path d="M100 108v52" stroke="${SD[1]}" stroke-width="2.5" pointer-events="none"/>`:
+  `${two(64,102,72,106,12,SH,'chest')}${two(64,160,72,46,[0,0,10,10],SH,'belly')}${two(64,140,72,8,0,ST,'chest')}`;
+ const svg=`<svg viewBox="0 0 200 446" role="img" aria-label="Человек: нажмите, где болит"><ellipse cx="100" cy="434" rx="64" ry="6" fill="rgba(0,0,0,.08)"/>
+ <g class="guy ${z?'a-'+z:'idle'}${back?' back':''}"${O(100,430)}>
+  <g class="low"${O(100,236)}>${leg('L',68)}${leg('R',102)}${two(64,206,72,38,[0,0,6,6],JN,'hips')}</g>
+  <g class="bd"${O(100,210)}>${torso}<g${P('hips')}><path d="${rp(64,202,72,9,[2,2,2,2])}" fill="#2A2A2E"/><path d="${rp(94,200.5,12,12,[2,2,2,2])}" fill="${ST[0]}"/></g>
+   ${arm('L',48.5)}${arm('R',133.5)}
+   <g class="shc"${O(100,116)}>${c2(64,116,15,SD,'shoulders')}${c2(136,116,15,SD,'shoulders')}</g>
+   ${two(90,90,20,18,[4,4,0,0],SK,'neck')}
+   <g class="hd"${O(100,100)}>${head}</g></g>
  </g></svg>`;
  return `<div class="box bm"><div class="row between" style="flex-wrap:wrap;margin-bottom:4px"><b style="font-size:calc(21px*var(--fz,1))">Где болит?</b><div class="bmseg"><button class="${back?'':'on'}" data-act="bmfront">Спереди</button><button class="${back?'on':''}" data-act="bmback">Сзади</button></div></div>
  <div class="bubble">${z?esc(BODY_FUN[z]||BODY[z]):'Нажмите, где болит!'}</div>
