@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="theme-color" content="#d7141a">
+<meta name="theme-color" content="#FBE6E3">
 <meta name="referrer" content="no-referrer">
 <title>Спецмазь и Доктор Шустер</title>
 <link rel="manifest" href="manifest.json">
@@ -458,7 +458,8 @@ const SOCIC={vk:'<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="11" f
 let DEFERRED=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();DEFERRED=e});
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone;
 function isDark(){const t=(Store.state&&Store.state.theme)||'auto';return t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches)}
-function applyTheme(){document.body.classList.toggle('dark',isDark());applyFS()}
+function syncBar(){try{const c=getComputedStyle(document.body).getPropertyValue('--bg').trim()||'#f6f4f2';document.querySelector('meta[name=theme-color]').content=c}catch(e){}}
+function applyTheme(){setTimeout(syncBar,0);document.body.classList.toggle('dark',isDark());applyFS()}
 function applyFS(){const z=[1,1.12,1.25][(Store.state&&Store.state.fs)||0]||1;document.body.style.zoom='';document.documentElement.style.setProperty('--fz',z)}
 async function doInstall(){ut('Установка нажата');if(DEFERRED){DEFERRED.prompt();try{await DEFERRED.userChoice}catch(e){}DEFERRED=null;return}
  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);sheet(`<h2>Установить приложение</h2>${ios?'<p class="muted" style="font-size:calc(19px*var(--fz,1))">1. Нажмите кнопку «Поделиться» внизу Safari (квадрат со стрелкой).<br><br>2. Выберите «На экран Домой».<br><br>3. Нажмите «Добавить».</p>':'<p class="muted" style="font-size:calc(19px*var(--fz,1))">1. Нажмите меню браузера ⋮ в правом верхнем углу.<br><br>2. Выберите «Установить приложение» или «Добавить на главный экран».<br><br>3. Подтвердите.</p>'}`)}
@@ -468,7 +469,7 @@ const st=()=>Store.state;
 const mode=()=>st().mode||'health';
 const now=()=>Date.now();
 function visiblePosts(m){return Store.posts.filter(p=>(!m||p.mode===m)&&(Store.isAdmin||!p.hidden)&&(Store.isAdmin||!p.publishAt||p.publishAt<=now())).sort((a,b)=>(b.publishAt||0)-(a.publishAt||0))}
-function setMode(m){if(st().mode&&st().mode!==m)ut('Раздел',{mode:m});const prev=st().mode;const changed=prev&&prev!==m;App.scr=App.scr||{};if(changed)App.scr[prev]=scrollY;st().mode=m;document.body.classList.toggle('mood',m==='mood');document.querySelector('meta[name=theme-color]').content=m==='mood'?'#1E9E58':'#d7141a';saveState();App.bodyZone='';render();if(changed){const sy=App.scr[m]||0;scrollTo(0,sy);requestAnimationFrame(()=>scrollTo(0,sy));const dir=m==='mood'?1:-1;const mn=document.querySelector('main');if(mn)mn.animate([{opacity:0,transform:`translateX(${dir*60}px)`},{opacity:1,transform:'none'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});const mk=document.querySelector('.logo .mark');if(mk)mk.animate([{transform:'rotateY(90deg) scale(.6)'},{transform:'none'}],{duration:450,easing:'cubic-bezier(.3,1.6,.5,1)'});const pl=document.querySelector('.switch .pill');if(pl)pl.animate([{left:dir>0?'3px':'50%',background:dir>0?'#d7141a':'#1E9E58'},{left:dir>0?'50%':'3px',background:dir>0?'#1E9E58':'#d7141a'}],{duration:420,easing:'cubic-bezier(.3,1.3,.5,1)'});const lg=document.querySelector('.logo');if(lg)lg.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:350})}}
+function setMode(m){if(st().mode&&st().mode!==m)ut('Раздел',{mode:m});const prev=st().mode;const changed=prev&&prev!==m;App.scr=App.scr||{};if(changed)App.scr[prev]=scrollY;st().mode=m;document.body.classList.toggle('mood',m==='mood');saveState();App.bodyZone='';render();syncBar();if(changed){const sy=App.scr[m]||0;scrollTo(0,sy);requestAnimationFrame(()=>scrollTo(0,sy));const dir=m==='mood'?1:-1;const mn=document.querySelector('main');if(mn)mn.animate([{opacity:0,transform:`translateX(${dir*60}px)`},{opacity:1,transform:'none'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});const mk=document.querySelector('.logo .mark');if(mk)mk.animate([{transform:'rotateY(90deg) scale(.6)'},{transform:'none'}],{duration:450,easing:'cubic-bezier(.3,1.6,.5,1)'});const pl=document.querySelector('.switch .pill');if(pl)pl.animate([{left:dir>0?'3px':'50%',background:dir>0?'#d7141a':'#1E9E58'},{left:dir>0?'50%':'3px',background:dir>0?'#1E9E58':'#d7141a'}],{duration:420,easing:'cubic-bezier(.3,1.3,.5,1)'});const lg=document.querySelector('.logo');if(lg)lg.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:350})}}
 function ut(n,d){try{window.umami&&umami.track(n,d)}catch(e){}}
 function track(kind,id,extra){const P=Store.posts.find(x=>x.id===id);if(kind==='view')ut('Пост открыт',{title:P?P.title:id,mode:P?P.mode:''});else if(kind==='click')ut('Маркетплейс',{mp:MP[extra]||extra,title:P?P.title:id});const s=st();if(kind==='view'){s.views[id]=(s.views[id]||0)+1}else if(kind==='click'){s.clicks[id]=s.clicks[id]||{};s.clicks[id][extra]=(s.clicks[id][extra]||0)+1}saveState()}
 
