@@ -843,7 +843,7 @@ function openStory(id){const list=visiblePosts(mode()).filter(p=>p.story&&(p.sli
  const d=document.createElement('div');d.className='sv';document.body.appendChild(d);let tm=null;
  function show(){const p=list[pi];if(!st().seenStories.includes(p.id)){st().seenStories.push(p.id);saveState()}track('view',p.id);const s=p.slides[si];
   d.innerHTML=`<div class="st"><div class="bars">${p.slides.map((_,i)=>`<i><b style="width:${i<si?100:0}%"></b></i>`).join('')}</div><div class="ttl">${esc(p.title)}</div><button class="x">✕</button>
-  <div class="media">${mediaHTML(s)}</div><div class="tapL"></div><div class="tapR"></div><button class="btn go" data-go="${p.id}">Читать пост</button></div>`;
+  <div class="media">${mediaHTML(s,true,true)}</div><div class="tapL"></div><div class="tapR"></div><button class="btn go" data-go="${p.id}">Читать пост</button></div>`;
   d.querySelectorAll('video').forEach(v=>{v.muted=true;v.play().catch(()=>{})});const bar=d.querySelectorAll('.bars b')[si];bar.style.transition='width 5s linear';requestAnimationFrame(()=>requestAnimationFrame(()=>bar.style.width='100%'));
   clearTimeout(tm);tm=setTimeout(next,5000);
   d.querySelector('.x').onclick=close;d.querySelector('.tapL').onclick=prev;d.querySelector('.tapR').onclick=next;d.querySelector('.go').onclick=()=>{close();openPost(p.id)}}
