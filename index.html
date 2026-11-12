@@ -556,7 +556,7 @@ function cleanFolder(n){let t=n.replace(/^\+/,'').replace(/\s*\((карусел�
 function cleanFile(n){return n.replace(/\.[^.]+$/,'').replace(/^\d+[\s._-]*/,'').trim()}
 const isCar=n=>/карус|карсуел/i.test(n||'');
 async function crawl(){const posts=[];
- async function walk(path,mode,names){const items=await listAll(path);const files=items.filter(isMedia).sort(natural);const dirs=items.filter(x=>x.type==='dir');
+ async function walk(path,mode,names){const items=await listAll(path);const files=items.filter(isMedia).sort(natural);const dirs=items.filter(x=>x.type==='dir'&&!/редизайн/i.test(x.name));
   const name=names[names.length-1],parent=names[names.length-2]||'';const month=names.slice().reverse().find(n=>MONTHS.test(n));
   const label=cleanFolder(month||name);
   if(files.length){
@@ -736,7 +736,7 @@ function richHTML(t){let h='',ul=false;const end=()=>{if(ul){h+='</ul>';ul=false
   if(s.startsWith('# '))h+=`<h2>${esc(s.slice(2))}</h2>`;else if(s.startsWith('> '))h+=`<div class="tipb">💡 ${esc(s.slice(2))}</div>`;else h+=`<p>${esc(s)}</p>`});end();return h}
 function openPost(id){const p=Store.posts.find(x=>x.id===id);if(!p)return;track('view',id);
  const f=st().favs.includes(id);const adm=App.adminOn&&App.admVis;App.zp={id,i:0,dirty:false};
- sheet(`${adm?`<div class="admzk"><div class="row between"><b>🔍 Зоны приближения</b><button class="btn sm ghost" data-editp="${id}">⚙ Пост</button></div>${p.slides.length>1?`<div class="thumbs">${p.slides.map((x,i)=>`<div class="t ${i?'':'on'}" data-zsl="${i}">${mediaHTML(x,false)}</div>`).join('')}</div>`:''}<div id="zkpost"></div><button class="btn wide" data-act="savezones" id="zksave">💾 Сохранить зоны</button></div>`:sliderHTML(p).replace('class="slider"','class="slider" style="border-radius:20px"')}
+ sheet(`${adm?`<div class="admzk"><div class="row between"><b>🔍 Зоны приближения</b><span><button class="btn sm ghost" data-act="aizones">🪄 Расставить</button> <button class="btn sm ghost" data-editp="${id}">⚙ Пост</button></span></div>${p.slides.length>1?`<div class="thumbs">${p.slides.map((x,i)=>`<div class="t ${i?'':'on'}" data-zsl="${i}">${mediaHTML(x,false)}</div>`).join('')}</div>`:''}<div id="zkpost"></div><button class="btn wide" data-act="savezones" id="zksave">💾 Сохранить зоны</button></div>`:sliderHTML(p).replace('class="slider"','class="slider" style="border-radius:20px"')}
  <div class="row between" style="margin-top:14px"><span class="tag">${MODES[p.mode].t}</span><div class="row"><button class="ic" data-share="${id}">↗</button><button class="ic fav ${f?'on':''}" data-fav="${id}">${IC.heart}</button></div></div>
  <h2 style="margin-top:10px">${esc(p.title)}</h2>${p.text?`<p style="font-size:calc(20px*var(--fz,1));line-height:1.5;color:var(--ink2);margin-top:0">${esc(p.text)}</p>`:''}
  <div class="rich">${richHTML(p.body)}</div>
@@ -745,6 +745,43 @@ function openPost(id){const p=Store.posts.find(x=>x.id===id);if(!p)return;track(
 function mountPostZK(){const z=App.zp,p=Store.posts.find(x=>x.id===z.id);const host=$('#zkpost');if(!p||!host)return;const s=p.slides[z.i];host.innerHTML='';host.className='';
  ZoneKit.mount(host,{media:s,zones:s.zones||[],onChange:zs=>{s.zones=zs;z.dirty=true;const b=$('#zksave');if(b){b.textContent='💾 Сохранить зоны';b.classList.add('pulse')}}});document.querySelectorAll('#sheet [data-zsl]').forEach(t=>t.classList.toggle('on',+t.dataset.zsl===z.i))}
 function tokenBoxHTML(){return `<h2>Подключите Диск</h2><p class="muted">Чтобы правки сохранялись: откройте «Полигон Диска», нажмите «Получить OAuth-токен», скопируйте и вставьте сюда. Это нужно один раз на этом устройстве.</p><a class="btn ghost wide" href="https://yandex.ru/dev/disk/poligon/" target="_blank" rel="noopener" style="margin-bottom:8px;text-decoration:none;display:block;text-align:center">Открыть Полигон Диска</a><div class="row"><input id="tokin" placeholder="Вставьте токен"><button class="btn sm" data-act="settoken">ОК</button></div>`}
+// ===== авторасстановка зон через Gemini (служебная страница pomoshnik.ai) =====
+const AIZ_PROMPT=`You place "zoom zones" on a Russian social-media poster for a phone app. When the user taps, the app zooms into one zone so it fills the screen. Return ONLY JSON: {"zones":[{"box":[ymin,xmin,ymax,xmax],"label":"short Russian label"}]}
+Coordinates are integers 0-1000 normalized to image height (y) and width x. IMPORTANT: every zone must have EXACTLY the same proportions as the whole image, i.e. (ymax-ymin) == (xmax-xmin) in these normalized units.
+Rules (strict):
+1. Few zones: 1 to 5 for the whole image, only as many as needed to read all meaningful text comfortably on a phone.
+2. A zone contains complete meaningful text: headline and/or main text paragraphs, list items. Never cut a word, a line or a sentence. Never cut any other text either: if a zone edge would cross another text, move the zone up/down/sideways or resize it so that other text is either completely outside or (only if unavoidable) completely inside.
+3. No duplication: text shown in one zone must not appear in another zone, unless geometrically impossible otherwise. Zones should not overlap or barely overlap.
+4. Text should fill the zone edge to edge with small margins; maximize zoom.
+5. Ignore purely decorative text (handwritten taglines, labels on objects, vk.com links, logos) - do not make zones for them, and do not cut them in half: either fully include or fully exclude.
+6. Do not cut a character's face or a logo in half if avoidable; shift the zone.
+7. If a headline alone is too wide to zoom, combine it with the text below it.
+8. A zone must ALWAYS actually zoom in: never return a zone covering the whole image. Crop tightly to the outer edges of the text it contains (zone side at most ~85% of the image).
+9. Minimal empty space: the text block should touch the zone edges with only a thin margin (about 1-2% of image). Do not leave empty bands above or below the text; shift the zone so the text is centered.
+10. Headlines and subtitles ALWAYS get a zone (their own, or combined with adjacent main text). Never skip a headline.
+11. Order zones in reading order.`;
+let AIZ_FR=null,AIZ_READY=null;const AIZ_WAIT={};
+function aizFrame(){if(AIZ_READY)return AIZ_READY;AIZ_READY=new Promise((res,rej)=>{const f=document.createElement('iframe');f.src='https://pomoshnik.ai/zones-helper.html';f.style.display='none';document.body.appendChild(f);AIZ_FR=f;const t=setTimeout(()=>{AIZ_READY=null;f.remove();rej(new Error('helper'))},20000);
+ addEventListener('message',e=>{if(e.origin!=='https://pomoshnik.ai')return;const d=e.data||{};if(d.type==='zones-ready'){clearTimeout(t);res(f)}if(d.type==='zones-res'&&AIZ_WAIT[d.id]){AIZ_WAIT[d.id](d);delete AIZ_WAIT[d.id]}})});return AIZ_READY}
+async function aizRun(src){const blob=await (await fetch(src,{referrerPolicy:'no-referrer'})).blob();const bm=await createImageBitmap(blob);
+ const sc=Math.min(1,900/Math.max(bm.width,bm.height)),W=Math.round(bm.width*sc),H=Math.round(bm.height*sc);const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.drawImage(bm,0,0,W,H);
+ const jb=await new Promise(r=>c.toBlob(r,'image/jpeg',.88));const buf=await jb.arrayBuffer();
+ // карта «чернил» для доводки краёв
+ const d=x.getImageData(0,0,W,H).data;const I=new Float64Array((W+1)*(H+1));const L=i=>0.3*d[i*4]+0.59*d[i*4+1]+0.11*d[i*4+2];
+ for(let j=0;j<H;j++){let row=0;for(let i=0;i<W;i++){let g=0;if(i>0&&j>0&&i<W-1&&j<H-1){g=(Math.abs(L(j*W+i+1)-L(j*W+i-1))+Math.abs(L((j+1)*W+i)-L((j-1)*W+i)))>60?1:0}row+=g;I[(j+1)*(W+1)+i+1]=I[j*(W+1)+i+1]+row}}
+ const ink=b=>{const x0=Math.max(0,Math.floor(b[0]*W)),y0=Math.max(0,Math.floor(b[1]*H)),x1=Math.min(W,Math.ceil(b[2]*W)),y1=Math.min(H,Math.ceil(b[3]*H));if(x1<=x0||y1<=y0)return 0;return(I[y1*(W+1)+x1]-I[y0*(W+1)+x1]-I[y1*(W+1)+x0]+I[y0*(W+1)+x0])/((x1-x0)*(y1-y0))};
+ const f=await aizFrame();const id=Math.random().toString(36).slice(2);
+ const res=await new Promise((ok,no)=>{const t=setTimeout(()=>{delete AIZ_WAIT[id];no(new Error('timeout'))},180000);AIZ_WAIT[id]=v=>{clearTimeout(t);ok(v)};f.contentWindow.postMessage({type:'zones',id,prompt:AIZ_PROMPT,buf},'https://pomoshnik.ai',[buf])});
+ if(res.error)throw new Error(res.error);let t=(res.text||'').replace(/```json|```/g,'');const j=JSON.parse(t.slice(t.indexOf('{'),t.lastIndexOf('}')+1));
+ const T=0.003,cost=(x,y,s)=>{let c=0;if(x>0.002)c+=ink([x-T,y,x+T,y+s]);if(x+s<0.998)c+=ink([x+s-T,y,x+s+T,y+s]);if(y>0.002)c+=ink([x,y-T,x+s,y+T]);if(y+s<0.998)c+=ink([x,y+s-T,x+s,y+s+T]);return c};
+ return(j.zones||[]).map(z=>{const[y0,x0,y1,x1]=z.box.map(v=>v/1000);const s0=Math.min(1,Math.max(x1-x0,y1-y0)),cx=(x0+x1)/2,cy=(y0+y1)/2;let best=null;
+  for(let ds=0;ds<=0.05;ds+=0.01){const sz=Math.min(1,s0+ds);for(let dx=-0.04;dx<=0.0401;dx+=0.005)for(let dy=-0.04;dy<=0.0401;dy+=0.005){const xx=Math.max(0,Math.min(1-sz,cx-sz/2+dx)),yy=Math.max(0,Math.min(1-sz,cy-sz/2+dy));if(xx>x0+0.003||yy>y0+0.003||xx+sz<x1-0.003||yy+sz<y1-0.003)continue;const c=cost(xx,yy,sz)+ds*1.5+(Math.abs(dx)+Math.abs(dy))*0.3;if(!best||c<best.c)best={c,r:[xx,yy,sz]}}}
+  const r=best?best.r:[Math.max(0,Math.min(1-s0,cx-s0/2)),Math.max(0,Math.min(1-s0,cy-s0/2)),s0];return{x:+r[0].toFixed(4),y:+r[1].toFixed(4),w:+r[2].toFixed(4),h:+r[2].toFixed(4),label:(z.label||'').slice(0,40)}}).filter(z=>z.w<=0.9)}
+async function aiZonesPost(btn){const z=App.zp,p=Store.posts.find(x=>x.id===z.id);if(!p)return;const s=p.slides[z.i];if(s.type!=='image'){toast('Только для картинок');return}
+ const old=btn.textContent;btn.disabled=true;btn.textContent='⏳ Gemini думает…';
+ try{const zs=await aizRun(s.src);if(!zs.length){toast('Gemini не нашёл текст');return}s.zones=zs;z.dirty=true;mountPostZK();const b=$('#zksave');if(b){b.textContent='💾 Сохранить зоны';b.classList.add('pulse')}toast('Зоны расставлены: '+zs.length+'. Проверьте и сохраните')}
+ catch(e){toast(/login/.test(e.message)?'Войдите в pomoshnik.ai на этом устройстве':'Не получилось: '+e.message)}
+ finally{btn.disabled=false;btn.textContent=old}}
 async function saveZonesFromPost(){const z=App.zp,p=Store.posts.find(x=>x.id===z.id);if(!p)return;if(!Store.token){App.zpPending=true;toast('Сначала подключите Диск');const keep=$('#sheet .in');const box=document.createElement('div');box.className='box';box.innerHTML=tokenBoxHTML();$('#zksave').after(box);return}
  const b=$('#zksave');if(b)b.textContent='Сохраняю…';const M=Store.meta;const prev=clone(M);M.posts[p.id]=Object.assign({},M.posts[p.id]||{},{slideZones:Object.fromEntries(p.slides.map(s=>[s.path,s.zones||[]]))});M.zm=M.zm||{};p.slides.forEach(s=>{if(s.md5)M.zm[s.md5]=s.zones||[]});
  try{await saveMeta();z.dirty=false;if(b){b.textContent='✓ Зоны сохранены';b.classList.remove('pulse')}toast('Зоны сохранены, в приложении уже работают')}catch(e){Store.meta=prev;if(b)b.textContent='💾 Сохранить зоны';toast(e&&e.code==='notoken'?'Токен не подошёл, вставьте заново':'Не удалось сохранить, попробуйте ещё раз')}}
@@ -1015,6 +1052,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
   else if(a==='bodymap'){sheet(bodyMapHTML())}
   else if(a==='cal'){sheet(`<h2>Календарь праздников</h2>${upcomingHolidays().map(holRow).join('')||'<div class="empty">Скоро добавим</div>'}`)}
   else if(a==='pushperm')askPush();
+  else if(a==='aizones')aiZonesPost(t);
   else if(a==='startgame'){closeSheet();startGame(d.lv)}
   else if(a==='gamereset'){const s=st();s.games.lv={};s.games.cl=[];s.games.best=0;s.games.bm=0;s.wheel.date='';s.coupons=s.coupons.filter(c=>c.src!=='game');App.game=null;saveState();render();toast('Игра и бонус дня сброшены')}
   else if(a==='wheel')openWheel();
