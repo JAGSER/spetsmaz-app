@@ -335,7 +335,7 @@ const natural=(a,b)=>a.name.localeCompare(b.name,'ru',{numeric:true});
 function hid(s){let h=5381;for(const c of s)h=((h*33)^c.charCodeAt(0))>>>0;return 'y'+h.toString(36)}
 const isVid=f=>f.media_type==='video'||/\.(mp4|webm|mov)$/i.test(f.name);
 const isMedia=f=>f.type==='file'&&(isVid(f)||f.media_type==='image'||/\.(png|jpe?g|webp|gif)$/i.test(f.name));
-function slideOf(f){return isVid(f)?{src:f.file,poster:f.preview||'',type:'video',path:f.path}:{src:f.preview||f.file,full:f.file,type:'image',path:f.path}}
+function slideOf(f){return isVid(f)?{src:f.file,poster:f.preview||'',type:'video',path:f.path,md5:f.md5||''}:{src:f.preview||f.file,full:f.file,type:'image',path:f.path,md5:f.md5||''}}
 const MONTHS=/(январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр)/i;
 function cleanFolder(n){let t=n.replace(/^\+/,'').replace(/\s*\((карусель|карсуель)\)/ig,'').replace(/^(Спецмазь|Шустер)\s*/i,'').replace(/(Карусель|Карсуель)\s*/i,'').trim()||n;const m=t.match(/^(20\d\d)\s+(.+)$/);return m?m[2]+' '+m[1]:t}
 function cleanFile(n){return n.replace(/\.[^.]+$/,'').replace(/^\d+[\s._-]*/,'').trim()}
@@ -353,10 +353,11 @@ async function crawl(){const posts=[];
  const mf=root.find(x=>x.name==='_app.json');let meta={posts:{},config:{}};
  if(mf){try{meta=await (await fetch(mf.file+(mf.file.includes('?')?'&':'?')+'nc='+Date.now())).json();meta.posts=meta.posts||{};meta.config=meta.config||{}}catch(e){}}
  return {posts,meta}}
+function slideZonesOf(m,s){const sz=m.slideZones||{},zm=Store.meta.zm||{},A=Store.autoZ||{};if(sz[s.path]!==undefined)return sz[s.path]||[];if(s.md5&&zm[s.md5]!==undefined)return zm[s.md5]||[];return A[s.path]||(s.md5&&A['m:'+s.md5])||[]}
 function applyMeta(){const M=Store.meta;Store.config=Object.assign(clone(DEFAULT_CONFIG),M.config||{});
  const byMode={health:[],mood:[]};
- const AU=Store.auto||{};Store.posts=Store.base.map(b=>{const m=M.posts[b.id]||{};const au=AU[b.id]||{};const p=Object.assign({},b,{title:au.title||b.title,text:au.desc||'',body:'',tags:au.tags||[],zones:au.zones||[],products:[],publishAt:b.created},m);
-  p.slides=b.slides.map(s=>Object.assign({},s,{zones:((m.slideZones||{})[s.path]!==undefined?m.slideZones[s.path]:(Store.autoZ||{})[s.path])||[]}));if(p.story===undefined)byMode[p.mode].push(p);return p});
+ const AU=Store.auto||{};Store.posts=Store.base.map(b=>{const m=M.posts[b.id]||{};const au=AU[b.id]||(b.slides[0]&&b.slides[0].md5&&AU['m:'+b.slides[0].md5])||{};const p=Object.assign({},b,{title:au.title||b.title,text:au.desc||'',body:'',tags:au.tags||[],zones:au.zones||[],products:[],publishAt:b.created},m);
+  p.slides=b.slides.map(s=>Object.assign({},s,{zones:slideZonesOf(m,s)}));if(p.story===undefined)byMode[p.mode].push(p);return p});
  Object.values(byMode).forEach(a=>a.sort((x,y)=>y.publishAt-x.publishAt).forEach((p,i)=>p.story=i<8));}
 async function initStore(){
  Store.state=Object.assign(defState(),LS.get('sm_state',{}));
@@ -719,7 +720,7 @@ function bindEditor(){const e=App.edit;const host=$('#zkmini');if(!host||!window
  ZoneKit.mount(host,{media:s,zones:s.zones||[],onChange:zs=>{s.zones=zs;const t=document.querySelector(`#sheet [data-es="${e._s}"]`);if(t){let b=t.querySelector('b');if(zs.length){if(!b){b=document.createElement('b');b.style.cssText='position:absolute;right:3px;bottom:3px;background:var(--acc);color:#fff;font-size:11px;padding:1px 5px;border-radius:6px';t.appendChild(b)}b.textContent=zs.length}else b&&b.remove()}}})}
 async function doSavePost(){syncEditorFields();const e=App.edit;if(!Store.token){toast('Сначала подключите Диск в разделе «Админ»');return}
  const prev=clone(Store.meta.posts[e.id]||{});
- Store.meta.posts[e.id]={title:e.title,text:e.text,body:e.body,tags:e.tags,zones:e.mode==='health'?e.zones:[],products:e.products.filter(x=>x.name||x.wb||x.ozon||x.ym),publishAt:e.publishAt,story:!!e.story,hidden:!!e.hidden,slideZones:Object.fromEntries(e.slides.map(s=>[s.path,s.zones||[]]))};
+ Store.meta.posts[e.id]={title:e.title,text:e.text,body:e.body,tags:e.tags,zones:e.mode==='health'?e.zones:[],products:e.products.filter(x=>x.name||x.wb||x.ozon||x.ym),publishAt:e.publishAt,story:!!e.story,hidden:!!e.hidden,slideZones:Object.fromEntries(e.slides.map(s=>[s.path,s.zones||[]]))};Store.meta.zm=Store.meta.zm||{};e.slides.forEach(s=>{if(s.md5)Store.meta.zm[s.md5]=s.zones||[]});
  toast('Сохраняю…');try{await saveMeta();applyMeta();App.edit=null;closeSheet();toast('Сохранено на Диск');render()}catch(err){Store.meta.posts[e.id]=prev;toast(err&&err.code==='notoken'?'Подключите Диск заново в разделе «Админ»':'Не удалось сохранить на Диск')}}
 
 // ================= events =================
