@@ -512,7 +512,7 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 .plaque i{width:6px;height:6px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e8e2d6,#7a6f62);box-shadow:0 1px 1px rgba(0,0,0,.4)}
 .plaque small{background:#4a2c14;color:#fbeccb;border-radius:10px;padding:0 7px;font-size:.8em}
 .shf.on .plaque{background:linear-gradient(180deg,#d6f7e1,#8fdcab);box-shadow:0 2px 0 #4f9d6b,0 5px 10px rgba(0,0,0,.4)}
-.items{display:flex;gap:10px;align-items:flex-end;overflow-x:auto;padding:12px 4px 0;scrollbar-width:none;min-height:112px}.items::-webkit-scrollbar{display:none}
+.items{display:flex;gap:10px;align-items:flex-end;overflow-x:auto;overflow-y:hidden;touch-action:pan-x pan-y;overscroll-behavior-x:contain;padding:12px 4px 0;scrollbar-width:none;min-height:112px}.items::-webkit-scrollbar{display:none}
 .bk{flex:0 0 auto;border:none;background:none;padding:0;cursor:pointer;transform-origin:50% 100%;transition:transform .2s}
 .bk img{display:block;width:76px;height:101px;object-fit:cover;border-radius:3px 5px 5px 3px;box-shadow:inset 3px 0 0 rgba(0,0,0,.25),3px 4px 8px rgba(0,0,0,.6);border-left:4px solid rgba(0,0,0,.25)}
 .bk:nth-child(4n+2){transform:rotate(-2.5deg)}.bk:nth-child(5n+4){transform:rotate(2deg)}.bk:hover,.bk:active{transform:translateY(-6px) rotate(0)}
@@ -1061,7 +1061,7 @@ async function doSavePost(){syncEditorFields();const e=App.edit;if(!Store.token)
  document.addEventListener('pointerup',e=>{if(e.pointerType==='mouse')end(e.clientX,e.clientY)},true);
  function end(x,y){if(sx==null)return;const dx=x-sx,dy=Math.abs(y-sy);sx=null;if(dx<-innerWidth*0.35&&dy<70){App.admVis=!App.admVis;LS.set('sm_admvis',App.admVis);if(!App.admVis){App.adminOn=false;LS.set('sm_admon',false);if(App.tab==='admin')App.tab='feed'}else Store.isAdmin=true;closeSheet();render();toast(App.admVis?'Кнопка «Админ» включена':'Кнопка «Админ» скрыта')}}})();
 document.addEventListener('click',ev=>{const t=ev.target.closest('[data-zsl]');if(!t)return;App.zp.i=+t.dataset.zsl;mountPostZK()});
-document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-tab],[data-mode],[data-act],[data-fav],[data-open],[data-story],[data-zone],[data-shelf],[data-gift],[data-tagq],[data-rem],[data-qall],[data-mp],[data-copyc],[data-usec],[data-topic],[data-share],[data-atab],[data-editp],[data-es],[data-zdel],[data-emode],[data-ebz],[data-prdel]');if(!t)return;const d=t.dataset;
+document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-tab],[data-mode],[data-act],[data-fav],[data-open],[data-story],[data-zone],[data-shelf],[data-gift],[data-giftgo],[data-tagq],[data-rem],[data-qall],[data-mp],[data-copyc],[data-usec],[data-topic],[data-share],[data-atab],[data-editp],[data-es],[data-zdel],[data-emode],[data-ebz],[data-prdel]');if(!t)return;const d=t.dataset;
  if(d.tab==='admin'){App.adminOn=!App.adminOn;LS.set('sm_admon',App.adminOn);if(App.tab==='admin')App.tab='feed';closeSheet();render();toast(App.adminOn?'Режим админа: кнопки правки на карточках и в постах':'Режим админа выключен')}
  else if(d.tab){App.tab=d.tab;closeSheet();render();scrollTo(0,0);const mn=document.querySelector('main');if(mn){mn.classList.remove('tabin');void mn.offsetWidth;mn.classList.add('tabin')}}
  else if(d.mode){if(d.mode!==mode())setMode(d.mode)}
