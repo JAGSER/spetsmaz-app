@@ -504,6 +504,22 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 .onbd{display:flex;justify-content:center;gap:8px;margin-bottom:18px}
 .onbd i{width:10px;height:10px;border-radius:5px;background:var(--line);transition:width .3s}
 .onbd i.on{width:28px;background:var(--acc)}
+
+.bookcase{background:linear-gradient(180deg,#6b4527,#4e311b);padding:14px 12px 8px;border-radius:20px;box-shadow:inset 0 0 0 5px #7d5531,inset 0 0 0 7px #3a2312,0 10px 24px rgba(60,35,15,.35);color:#fff}
+.bc-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:2px 4px 6px}.bc-top b{font-size:calc(19px*var(--fz,1));color:#fff6df;text-shadow:0 2px 0 #3a2312}.bc-top span{font-size:calc(13px*var(--fz,1));color:#e9cfa4;opacity:.85}
+.shf{position:relative;margin:10px 0 16px;padding:8px 8px 0;border-radius:10px 10px 0 0;background:linear-gradient(180deg,#2e1c0e 0,#432a17 35%,#523420 100%);box-shadow:inset 0 12px 20px rgba(0,0,0,.5),inset 6px 0 10px rgba(0,0,0,.25),inset -6px 0 10px rgba(0,0,0,.25)}
+.plaque{display:inline-flex;align-items:center;gap:7px;border:none;cursor:pointer;font:inherit;font-weight:800;font-size:calc(15px*var(--fz,1));color:#4a2c14;padding:6px 12px;border-radius:8px;background:linear-gradient(180deg,#fbeccb,#e6cb93);box-shadow:0 2px 0 #b48a52,0 5px 10px rgba(0,0,0,.4)}
+.plaque i{width:6px;height:6px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e8e2d6,#7a6f62);box-shadow:0 1px 1px rgba(0,0,0,.4)}
+.plaque small{background:#4a2c14;color:#fbeccb;border-radius:10px;padding:0 7px;font-size:.8em}
+.shf.on .plaque{background:linear-gradient(180deg,#d6f7e1,#8fdcab);box-shadow:0 2px 0 #4f9d6b,0 5px 10px rgba(0,0,0,.4)}
+.items{display:flex;gap:10px;align-items:flex-end;overflow-x:auto;padding:12px 4px 0;scrollbar-width:none;min-height:112px}.items::-webkit-scrollbar{display:none}
+.bk{flex:0 0 auto;border:none;background:none;padding:0;cursor:pointer;transform-origin:50% 100%;transition:transform .2s}
+.bk img{display:block;width:76px;height:101px;object-fit:cover;border-radius:3px 5px 5px 3px;box-shadow:inset 3px 0 0 rgba(0,0,0,.25),3px 4px 8px rgba(0,0,0,.6);border-left:4px solid rgba(0,0,0,.25)}
+.bk:nth-child(4n+2){transform:rotate(-2.5deg)}.bk:nth-child(5n+4){transform:rotate(2deg)}.bk:hover,.bk:active{transform:translateY(-6px) rotate(0)}
+.bk.more{width:70px;height:101px;border-radius:6px;background:linear-gradient(180deg,#fbeccb,#e6cb93);color:#4a2c14;font-weight:800;font-size:calc(14px*var(--fz,1));box-shadow:3px 4px 8px rgba(0,0,0,.5)}
+.gbox{flex:0 0 auto;width:84px;border:none;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff6df;font:inherit;font-weight:700;font-size:calc(12px*var(--fz,1));line-height:1.15;text-align:center;transition:transform .2s}
+.gbox img{height:84px;object-fit:contain;filter:drop-shadow(2px 4px 4px rgba(0,0,0,.6))}.gbox:hover,.gbox:active,.gbox.on{transform:translateY(-6px)}.gbox.on span{color:#8fdcab}
+.plank{height:18px;margin:0 -8px;border-radius:0 0 5px 5px;background:repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 2px,transparent 2px 11px),linear-gradient(180deg,#c48d55 0,#a87140 35%,#7c5029 100%);box-shadow:0 7px 10px rgba(0,0,0,.45),inset 0 2px 0 rgba(255,240,210,.35)}
 </style>
 </head>
 <body>
@@ -538,9 +554,14 @@ function shelfOf(p){const t=(p.title||'').toLowerCase(),g=(p.tags||[]).join(' ')
 function giftFits(p,w){const s=shelfOf(p),t=((p.title||'')+' '+(p.tags||[]).join(' ')).toLowerCase();
  if(w==='friend')return s==='tea';if(w==='mom')return s==='care'||s==='tea'&&/без сахара|десерт|сладк|мармелад/.test(t);if(w==='parents')return s==='health';
  if(w==='ny')return /напит|чаепит|специ|глинтвейн|имбир|коктейл|горяч|сироп|чай/.test(t)&&s!=='choose';return['tea','care','health'].includes(s)}
-function shelfHTML(ps){const c={};ps.forEach(p=>{const k=shelfOf(p);c[k]=(c[k]||0)+1});const on=App.shelf;
- let h=`<div class="box shelves"><b style="font-size:calc(19px*var(--fz,1));display:block;margin-bottom:10px">🐼 Полки Шустера</b><div class="chips">${SHELVES.map(([k,e,t])=>`<button class="chip ${on===k?'on':''}" data-shelf="${k}">${e} ${t}${k!=='gift'&&c[k]?` <small>${c[k]}</small>`:''}</button>`).join('')}</div>`;
- if(on==='gift')h+=`<div style="margin-top:12px"><b style="display:block;margin-bottom:8px">Кому дарим?</b><div class="chips">${GIFTS.map(([k,t])=>`<button class="chip ${App.giftTo===k?'on':''}" data-gift="${k}">${t}</button>`).join('')}</div></div>`;
+function shelfHTML(ps){const by={};ps.forEach(p=>{const k=shelfOf(p);(by[k]=by[k]||[]).push(p)});const on=App.shelf;
+ const cov=p=>{const s=p.slides[0]||{};return s.type==='image'?s.src:(s.poster||'')};
+ let h=`<div class="box shelves bookcase"><div class="bc-top"><b>🐼 Полки Шустера</b><span>выбирайте полку или пост</span></div>`;
+ SHELVES.forEach(([k,e,t])=>{const its=by[k]||[];
+  h+=`<div class="shf ${on===k?'on':''}"><button class="plaque" data-shelf="${k}"><i></i>${e} ${t}${k!=='gift'&&its.length?` <small>${its.length}</small>`:''}<i></i></button><div class="items">`;
+  if(k==='gift')h+=GIFTS.map(([g,gt],n)=>`<button class="gbox ${App.giftTo===g?'on':''}" data-giftgo="${g}"><img src="game/t${[3,0,2,5,1][n]}.png" alt=""><span>${gt}</span></button>`).join('');
+  else{h+=its.slice(0,10).map(p=>`<button class="bk" data-open="${p.id}" title="${esc(p.title)}"><img src="${esc(cov(p))}" alt="${esc(p.title)}" loading="lazy"></button>`).join('');if(its.length>10)h+=`<button class="bk more" data-shelf="${k}">ещё ${its.length-10} ›</button>`}
+  h+=`</div><div class="plank"></div></div>`});
  return h+'</div>'}
 const BODY_FUN={head:'Ой, голова трещит!',neck:'Шею не повернуть!',shoulders:'Плечи, будто мешки таскал!',chest:'Кхе-кхе, дышать тяжко!',belly:'Живот бурчит, как трактор!',back:'Спину заклинило!',lower:'Поясница стреляет!',arms:'Локти скрипят, как дверь!',hands:'Пальцы не слушаются!',hips:'Бёдра ноют после дачи!',knees:'Колени хрустят, как сухарики!',feet:'Ноги гудят!'};
 const MODES={health:{t:'Здоровье',brand:'Спецмазь',em:'🛡️'},mood:{t:'Настроение',brand:'Доктор Шустер',em:'🐼'}};
@@ -1051,6 +1072,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
  else if(d.tagq==='подарок'){ev.preventDefault();openGifts()}
   else if(d.shelf){App.shelf=App.shelf===d.shelf?'':d.shelf;if(App.shelf!=='gift')App.giftTo='';App.feedN=12;render()}
   else if(d.gift){App.giftTo=App.giftTo===d.gift?'':d.gift;App.feedN=12;render()}
+  else if(d.giftgo){const was=App.shelf==='gift'&&App.giftTo===d.giftgo;App.shelf='gift';App.giftTo=was?'':d.giftgo;App.feedN=12;render();requestAnimationFrame(()=>{const e=document.querySelector('.gset');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})})}
   else if(d.tagq){ev.preventDefault();closeSheet();App.tab='search';App.q=d.tagq;render();scrollTo(0,0)}
  else if(d.rem){const r=st().holRem;const i=r.indexOf(d.rem);if(i>=0)r.splice(i,1);else{r.push(d.rem);toast('Напомним за 3 дня')}saveState();if($('#sheet'))$('#sheet').querySelectorAll(`[data-rem="${d.rem}"]`).forEach(b=>{b.textContent=i<0?'🔔 Напомню':'Напомнить';b.classList.toggle('ghost',i>=0)});render()}
  else if(d.qall!==undefined){App.qAll=d.qall==='1';render()}
