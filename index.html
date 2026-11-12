@@ -77,8 +77,14 @@ main{padding:4px 16px}
 .zbtn.l{left:8px}.zbtn.r{right:8px}
 .slider.zoomed.hasz .zbtn{display:grid}
 @keyframes zbin{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+/* admin */
+.admbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.admzk{display:flex;flex-direction:column;gap:10px}
+.admzk .thumbs{display:flex;gap:6px;overflow-x:auto}.admzk .thumbs .t{width:54px;height:72px;border-radius:8px;overflow:hidden;flex:none;opacity:.55;outline:2px solid transparent;cursor:pointer;position:relative}.admzk .thumbs .t.on{opacity:1;outline-color:var(--acc)}.admzk .thumbs img{width:100%;height:100%;object-fit:cover}
+#zksave{position:sticky;bottom:8px;z-index:5;box-shadow:0 6px 16px rgba(0,0,0,.2)}
+#zksave.pulse{animation:zkp 1.4s infinite}@keyframes zkp{50%{transform:scale(1.03)}}
 /* nav */
-nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;background:var(--nav);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav{touch-action:pan-y;position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;background:var(--nav);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 nav .in{display:flex;width:100%;max-width:480px}
 nav button{flex:1;padding:5px 0 6px;font-size:calc(12px*var(--fz,1));font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
 nav button span{font-size:calc(22px*var(--fz,1));filter:grayscale(1);opacity:.6}
@@ -362,7 +368,7 @@ function applyMeta(){const M=Store.meta;Store.config=Object.assign(clone(DEFAULT
 async function initStore(){
  Store.state=Object.assign(defState(),LS.get('sm_state',{}));
  const h=new URLSearchParams(location.hash.slice(1));if(h.get('access_token')){Store.token=h.get('access_token');LS.set('sm_token',Store.token);history.replaceState(null,'',location.pathname+'#admin');App.tab='admin'}
- Store.isAdmin=location.hash==='#admin'||!!Store.token;
+ Store.isAdmin=location.hash==='#admin'||!!Store.token||App.admVis;
  try{Store.auto=await (await fetch('titles.json',{cache:'no-cache'})).json()}catch(e){Store.auto={}}
  try{Store.autoZ=await (await fetch('zones.json',{cache:'no-cache'})).json()}catch(e){Store.autoZ={}}
  const cache=LS.get('sm_cache',null);if(cache&&Date.now()-cache.t<20*60e3){Store.base=cache.posts;Store.meta=cache.meta;applyMeta();Store.loading=false;render()}
@@ -387,7 +393,7 @@ function applyFS(){const z=[1,1.12,1.25][(Store.state&&Store.state.fs)||0]||1;do
 async function doInstall(){ut('Установка нажата');if(DEFERRED){DEFERRED.prompt();try{await DEFERRED.userChoice}catch(e){}DEFERRED=null;return}
  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);sheet(`<h2>Установить приложение</h2>${ios?'<p class="muted" style="font-size:calc(19px*var(--fz,1))">1. Нажмите кнопку «Поделиться» внизу Safari (квадрат со стрелкой).<br><br>2. Выберите «На экран Домой».<br><br>3. Нажмите «Добавить».</p>':'<p class="muted" style="font-size:calc(19px*var(--fz,1))">1. Нажмите меню браузера ⋮ в правом верхнем углу.<br><br>2. Выберите «Установить приложение» или «Добавить на главный экран».<br><br>3. Подтвердите.</p>'}`)}
 // ================= app state =================
-const App={tab:'feed',q:'',qAll:false,bodyZone:'',game:null,adminTab:'posts',edit:null};
+const App={admVis:LS.get('sm_admvis',false),adminOn:LS.get('sm_admvis',false)&&LS.get('sm_admon',false),tab:'feed',q:'',qAll:false,bodyZone:'',game:null,adminTab:'posts',edit:null};
 const st=()=>Store.state;
 const mode=()=>st().mode||'health';
 const now=()=>Date.now();
@@ -436,12 +442,12 @@ function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._
 function render(){
  const m=mode();document.body.classList.toggle('mood',m==='mood');
  const cfg=Store.config[m]||{};const n=notifications().length;
- const tabs=[['feed',IC.feed,'Лента'],['search',IC.search,'Поиск'],['game',IC.game,'Скидки'],['favs',IC.favs,'Избранное'],['me',IC.me,'Профиль']];if(Store.isAdmin)tabs.push(['admin',IC.admin,'Админ']);applyTheme();
+ const tabs=[['feed',IC.feed,'Лента'],['search',IC.search,'Поиск'],['game',IC.game,'Скидки'],['favs',IC.favs,'Избранное'],['me',IC.me,'Профиль']];if(App.admVis)tabs.push(['admin',IC.admin,'Админ']);applyTheme();
  $('#app').innerHTML=`<header><div class="top"><div class="logo"><div class="mark">${cfg.logo?`<img src="${esc(cfg.logo)}" alt="">`:MODES[m].em}</div>${esc(cfg.brand||MODES[m].brand)}</div>
   <div class="hdbtns"><button class="bell" data-act="theme" aria-label="Тёмная или светлая тема">${isDark()?IC.sun:IC.moon}</button><button class="bell" data-act="bell" aria-label="Уведомления">${IC.bell}${n?`<b>${n}</b>`:''}</button></div></div>
   <div class="switch"><div class="pill"></div><button class="h" data-mode="health">Здоровье</button><button class="m" data-mode="mood">Настроение</button></div></header>
   <main>${({feed:viewFeed,search:viewSearch,game:viewGame,favs:viewFavs,me:viewMe,admin:viewAdmin})[App.tab]()}</main>
-  <nav><div class="in">${tabs.map(t=>`<button class="${App.tab===t[0]?'on':''}" data-tab="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('')}</div></nav>`;
+  <nav><div class="in">${tabs.map(t=>`<button class="${(t[0]==='admin'?App.adminOn:App.tab===t[0])?'on':''}" data-tab="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('')}</div></nav>`;
  bindSliders($('#app'));afterRender();
 }
 function cardHTML(p,hl){const f=st().favs.includes(p.id);const isNew=App.prevVisit&&p.publishAt>App.prevVisit&&p.publishAt<=now();const pr=(p.products||[])[0];const sched=p.publishAt&&p.publishAt>now();
@@ -449,7 +455,7 @@ function cardHTML(p,hl){const f=st().favs.includes(p.id);const isNew=App.prevVis
  return `<div class="card feedcard">${isNew?'<span class="newb">Новое</span>':''}${sliderHTML(p)}<div class="cb"><div class="row between"><h3 data-open="${p.id}" style="cursor:pointer">${H(p.title)}</h3><button class="ic fav ${f?'on':''}" data-fav="${p.id}">${IC.heart}</button></div>
  ${p.text?`<p data-open="${p.id}" style="cursor:pointer">${H(p.text)}</p>`:''}${sched?`<div class="tags"><span class="badge">⏰ Выйдет ${new Date(p.publishAt).toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>`:''}
  <div class="tags">${(p.tags||[]).map(t=>`<span class="tag" data-tagq="${esc(t)}">#${esc(t)}</span>`).join('')}</div>
- ${pr?mpRow(pr,p.id):''}</div></div>`}
+ ${pr?mpRow(pr,p.id):''}${App.adminOn&&App.admVis?`<div class="admbar"><button class="btn sm" data-open="${p.id}">🔍 Зоны (${p.slides.reduce((a,s)=>a+(s.zones||[]).length,0)})</button><button class="btn sm ghost" data-editp="${p.id}">⚙ Настроить пост</button></div>`:''}</div></div>`}
 function mpRow(pr,pid){const l=Object.keys(MP).filter(k=>pr[k]);if(!l.length)return'';return `<div class="mp">Купить: ${l.map(k=>`<a href="${esc(pr[k])}" target="_blank" rel="noopener" data-mp="${k}" data-pid="${pid}">${MP[k]}</a>`).join(' · ')}</div>`}
 function highlight(s,q){const t=esc(s);if(!q)return t;const words=q.trim().split(/\s+/).filter(w=>w.length>1).map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));if(!words.length)return t;return t.replace(new RegExp('('+words.join('|')+')','gi'),'<mark>$1</mark>')}
 function viewFeed(){const m=mode();const ps=visiblePosts(m);const stories=ps.filter(p=>p.story&&(p.slides||[]).length);
@@ -516,13 +522,19 @@ function richHTML(t){let h='',ul=false;const end=()=>{if(ul){h+='</ul>';ul=false
   if(s.startsWith('- ')){if(!ul){h+='<ul>';ul=true}h+=`<li>${esc(s.slice(2))}</li>`;return}end();
   if(s.startsWith('# '))h+=`<h2>${esc(s.slice(2))}</h2>`;else if(s.startsWith('> '))h+=`<div class="tipb">💡 ${esc(s.slice(2))}</div>`;else h+=`<p>${esc(s)}</p>`});end();return h}
 function openPost(id){const p=Store.posts.find(x=>x.id===id);if(!p)return;track('view',id);
- const f=st().favs.includes(id);
- sheet(`${sliderHTML(p).replace('class="slider"','class="slider" style="border-radius:20px"')}
+ const f=st().favs.includes(id);const adm=App.adminOn&&App.admVis;App.zp={id,i:0,dirty:false};
+ sheet(`${adm?`<div class="admzk"><div class="row between"><b>🔍 Зоны приближения</b><button class="btn sm ghost" data-editp="${id}">⚙ Пост</button></div>${p.slides.length>1?`<div class="thumbs">${p.slides.map((x,i)=>`<div class="t ${i?'':'on'}" data-zsl="${i}">${mediaHTML(x,false)}</div>`).join('')}</div>`:''}<div id="zkpost"></div><button class="btn wide" data-act="savezones" id="zksave">💾 Сохранить зоны</button></div>`:sliderHTML(p).replace('class="slider"','class="slider" style="border-radius:20px"')}
  <div class="row between" style="margin-top:14px"><span class="tag">${MODES[p.mode].t}</span><div class="row"><button class="ic" data-share="${id}">↗</button><button class="ic fav ${f?'on':''}" data-fav="${id}">${IC.heart}</button></div></div>
  <h2 style="margin-top:10px">${esc(p.title)}</h2>${p.text?`<p style="font-size:calc(20px*var(--fz,1));line-height:1.5;color:var(--ink2);margin-top:0">${esc(p.text)}</p>`:''}
  <div class="rich">${richHTML(p.body)}</div>
  ${(p.products||[]).length?`<h4>Где купить</h4>${p.products.map(pr=>`<div class="prod"><div><b>${esc(pr.name)}</b>${mpRow(pr,p.id)}</div></div>`).join('')}`:''}
- <div class="tags">${(p.tags||[]).map(t=>`<span class="tag" data-tagq="${esc(t)}">#${esc(t)}</span>`).join('')}</div>${similarHTML(p)}`)}
+ <div class="tags">${(p.tags||[]).map(t=>`<span class="tag" data-tagq="${esc(t)}">#${esc(t)}</span>`).join('')}</div>${similarHTML(p)}`);if(adm)mountPostZK()}
+function mountPostZK(){const z=App.zp,p=Store.posts.find(x=>x.id===z.id);const host=$('#zkpost');if(!p||!host)return;const s=p.slides[z.i];host.innerHTML='';host.className='';
+ ZoneKit.mount(host,{media:s,zones:s.zones||[],onChange:zs=>{s.zones=zs;z.dirty=true;const b=$('#zksave');if(b){b.textContent='💾 Сохранить зоны';b.classList.add('pulse')}}});document.querySelectorAll('#sheet [data-zsl]').forEach(t=>t.classList.toggle('on',+t.dataset.zsl===z.i))}
+function tokenBoxHTML(){return `<h2>Подключите Диск</h2><p class="muted">Чтобы правки сохранялись: откройте «Полигон Диска», нажмите «Получить OAuth-токен», скопируйте и вставьте сюда. Это нужно один раз на этом устройстве.</p><a class="btn ghost wide" href="https://yandex.ru/dev/disk/poligon/" target="_blank" rel="noopener" style="margin-bottom:8px;text-decoration:none;display:block;text-align:center">Открыть Полигон Диска</a><div class="row"><input id="tokin" placeholder="Вставьте токен"><button class="btn sm" data-act="settoken">ОК</button></div>`}
+async function saveZonesFromPost(){const z=App.zp,p=Store.posts.find(x=>x.id===z.id);if(!p)return;if(!Store.token){App.zpPending=true;toast('Сначала подключите Диск');const keep=$('#sheet .in');const box=document.createElement('div');box.className='box';box.innerHTML=tokenBoxHTML();$('#zksave').after(box);return}
+ const b=$('#zksave');if(b)b.textContent='Сохраняю…';const M=Store.meta;const prev=clone(M);M.posts[p.id]=Object.assign({},M.posts[p.id]||{},{slideZones:Object.fromEntries(p.slides.map(s=>[s.path,s.zones||[]]))});M.zm=M.zm||{};p.slides.forEach(s=>{if(s.md5)M.zm[s.md5]=s.zones||[]});
+ try{await saveMeta();z.dirty=false;if(b){b.textContent='✓ Зоны сохранены';b.classList.remove('pulse')}toast('Зоны сохранены, в приложении уже работают')}catch(e){Store.meta=prev;if(b)b.textContent='💾 Сохранить зоны';toast(e&&e.code==='notoken'?'Токен не подошёл, вставьте заново':'Не удалось сохранить, попробуйте ещё раз')}}
 function similarHTML(p){const tg=new Set([...(p.tags||[]),...(p.zones||[])]);const sc=visiblePosts(p.mode).filter(x=>x.id!==p.id).map(x=>({x,s:[...(x.tags||[]),...(x.zones||[])].filter(t=>tg.has(t)).length})).map(o=>{const tw=new Set(String(p.title).toLowerCase().split(/[^а-яёa-z]+/).filter(w=>w.length>4));o.s=o.s*3+String(o.x.title).toLowerCase().split(/[^а-яёa-z]+/).filter(w=>tw.has(w)).length;return o}).sort((a,b)=>b.s-a.s||b.x.publishAt-a.x.publishAt).slice(0,4).map(o=>o.x);
  if(!sc.length)return'';return `<h4 style="margin-top:22px">Похожие советы</h4><div class="sim">${sc.map(x=>`<button class="simc" data-open="${x.id}"><img src="${esc(x.slides[0].type==='image'?x.slides[0].src:x.slides[0].poster)}" alt=""><span>${esc(x.title)}</span></button>`).join('')}</div>`}
 async function shareImage(id){const p=Store.posts.find(x=>x.id===id);if(!p)return;const url=location.origin+location.pathname;const txt=`${p.title}\nЕщё советы: ${url}`;ut('Поделиться',{title:p.title});
@@ -640,6 +652,7 @@ function openWheel(){const cols=['#d7141a','#ffb000','#1f6fd6','#2fa84f','#ff6fa
 
 // ================= profile =================
 function refCode(){const s=st();if(!s.ref.code){s.ref.code=('DRUG'+(Store.uid||uid()).replace(/[^a-z0-9]/gi,'').slice(-5)).toUpperCase();saveState()}return s.ref.code}
+function adminLink(){return App.admVis?`<div class="box"><b style="font-size:calc(20px*var(--fz,1))">⚙ Админ</b><p class="muted">Статистика, настройки, список всех постов.</p><button class="btn ghost wide" data-act="openadmin">Открыть админ-панель</button></div>`:''}
 function viewMe(){const s=st();const m=mode();const cfg=Store.config;const active=s.coupons.filter(c=>!c.used&&c.exp>now());const allTags=[...new Set(visiblePosts(null).flatMap(p=>p.tags||[]))];
  const soc=(cfg[m]||{}).social||{};const SOC=[['vk','ВКонтакте'],['tg','Telegram'],['ok','Одноклассники']].concat(soc.yt?[['yt','YouTube']]:[]);
  return `<h2>Профиль</h2>
@@ -652,7 +665,7 @@ function viewMe(){const s=st();const m=mode();const cfg=Store.config;const activ
  <div class="box"><b style="font-size:calc(22px*var(--fz,1))">🔔 Уведомления</b><p class="muted">О каких темах сообщать (если ничего не выбрать, то обо всех):</p>${tagCloud(visiblePosts(null),'topic')}
   <button class="btn ghost wide" data-act="pushperm" style="margin-top:12px">Получать на телефон</button></div>
  <div class="box"><b style="font-size:calc(22px*var(--fz,1))">Мы в соцсетях</b><div class="social" style="margin-top:12px;grid-template-columns:repeat(${SOC.length},minmax(0,1fr))">${SOC.map(x=>soc[x[0]]?`<a href="${esc(soc[x[0]])}" target="_blank" rel="noopener">${SOCIC[x[0]]}${x[1]}</a>`:`<a href="#" class="off" data-act="nosoc">${SOCIC[x[0]]}${x[1]}</a>`).join('')}</div></div>
- <div class="box"><b style="font-size:calc(22px*var(--fz,1))">📲 Приложение на телефон</b><p class="muted">Значок появится на экране, как у обычного приложения.</p><button class="btn wide" data-act="install">Установить приложение</button></div>`}
+ <div class="box"><b style="font-size:calc(22px*var(--fz,1))">📲 Приложение на телефон</b><p class="muted">Значок появится на экране, как у обычного приложения.</p><button class="btn wide" data-act="install">Установить приложение</button></div>${adminLink()}`}
 function shareApp(){const t=`Полезные советы и скидки Спецмазь и Доктор Шустер. Мой код на скидку: ${refCode()}\n${location.href.split('#')[0]}`;
  if(navigator.share){navigator.share({text:t}).catch(()=>copy(t))}else copy(t)}
 
@@ -724,8 +737,16 @@ async function doSavePost(){syncEditorFields();const e=App.edit;if(!Store.token)
  toast('Сохраняю…');try{await saveMeta();applyMeta();App.edit=null;closeSheet();toast('Сохранено на Диск');render()}catch(err){Store.meta.posts[e.id]=prev;toast(err&&err.code==='notoken'?'Подключите Диск заново в разделе «Админ»':'Не удалось сохранить на Диск')}}
 
 // ================= events =================
+(()=>{let sx=null,sy=0;const start=(x,y,t)=>{if(t.closest&&t.closest('nav')&&x>innerWidth*0.6){sx=x;sy=y}else sx=null};
+ document.addEventListener('touchstart',e=>{const t=e.touches[0];start(t.clientX,t.clientY,e.target)},{passive:true,capture:true});
+ document.addEventListener('touchend',e=>{const t=e.changedTouches[0];end(t.clientX,t.clientY)},{passive:true,capture:true});
+ document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')start(e.clientX,e.clientY,e.target)},true);
+ document.addEventListener('pointerup',e=>{if(e.pointerType==='mouse')end(e.clientX,e.clientY)},true);
+ function end(x,y){if(sx==null)return;const dx=x-sx,dy=Math.abs(y-sy);sx=null;if(dx<-innerWidth*0.35&&dy<70){App.admVis=!App.admVis;LS.set('sm_admvis',App.admVis);if(!App.admVis){App.adminOn=false;LS.set('sm_admon',false);if(App.tab==='admin')App.tab='feed'}else Store.isAdmin=true;closeSheet();render();toast(App.admVis?'Кнопка «Админ» включена':'Кнопка «Админ» скрыта')}}})();
+document.addEventListener('click',ev=>{const t=ev.target.closest('[data-zsl]');if(!t)return;App.zp.i=+t.dataset.zsl;mountPostZK()});
 document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-tab],[data-mode],[data-act],[data-fav],[data-open],[data-story],[data-zone],[data-tagq],[data-rem],[data-qall],[data-mp],[data-copyc],[data-usec],[data-topic],[data-share],[data-atab],[data-editp],[data-es],[data-zdel],[data-emode],[data-ebz],[data-prdel]');if(!t)return;const d=t.dataset;
- if(d.tab){App.tab=d.tab;closeSheet();render();scrollTo(0,0);const mn=document.querySelector('main');if(mn){mn.classList.remove('tabin');void mn.offsetWidth;mn.classList.add('tabin')}}
+ if(d.tab==='admin'){App.adminOn=!App.adminOn;LS.set('sm_admon',App.adminOn);if(App.tab==='admin')App.tab='feed';closeSheet();render();toast(App.adminOn?'Режим админа: кнопки правки на карточках и в постах':'Режим админа выключен')}
+ else if(d.tab){App.tab=d.tab;closeSheet();render();scrollTo(0,0);const mn=document.querySelector('main');if(mn){mn.classList.remove('tabin');void mn.offsetWidth;mn.classList.add('tabin')}}
  else if(d.mode){if(d.mode!==mode())setMode(d.mode)}
  else if(d.fav){const f=st().favs;const i=f.indexOf(d.fav);if(i>=0)f.splice(i,1);else{f.push(d.fav);flyHeart(t)}saveState();document.querySelectorAll(`[data-fav="${d.fav}"]`).forEach(b=>{b.classList.toggle('on',i<0)});if(App.tab==='favs'&&!$('#sheet'))render()}
  else if(d.open){openPost(d.open)}
@@ -767,7 +788,9 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
   else if(a==='wheel')openWheel();
   else if(a==='share')shareApp();
   else if(a==='applyref'){const v=($('#refin').value||'').trim().toUpperCase();if(!v||v===refCode()){toast('Введите код друга');return}if(!/^DRUG[A-Z0-9]{3,}$/.test(v)){toast('Такого кода нет');return}st().ref.used=true;addCoupon(Store.config.referralPercent||10,Store.config.referralCode||'DRUG10','ref');toast('Скидка добавлена в кошелёк');render()}
-  else if(a==='settoken'){const v=($('#tokin').value||'').trim();if(!v){toast('Вставьте токен');return}const r=await fetch(API+'/',{headers:{Authorization:'OAuth '+v}});if(r.ok){Store.token=v;LS.set('sm_token',v);Store.isAdmin=true;toast('Диск подключён');render()}else toast('Токен не подошёл')}
+  else if(a==='openadmin'){App.tab='admin';closeSheet();render();scrollTo(0,0)}
+  else if(a==='savezones'){saveZonesFromPost()}
+  else if(a==='settoken'){const v=($('#tokin').value||'').trim();if(!v){toast('Вставьте токен');return}const r=await fetch(API+'/',{headers:{Authorization:'OAuth '+v}});if(r.ok){Store.token=v;LS.set('sm_token',v);Store.isAdmin=true;toast('Диск подключён');if(App.zpPending&&$('#zksave')){App.zpPending=false;$('#tokin').closest('.box').remove();saveZonesFromPost()}else render()}else toast('Токен не подошёл')}
   else if(a==='logout'){Store.token='';LS.set('sm_token','');render()}
   else if(a==='more'){App.feedN=(App.feedN||12)+12;render()}
   else if(a==='reload'){localStorage.removeItem('sm_cache');toast('Обновляю с Диска…');Store.loading=true;render();initStore().then(render)}
@@ -782,7 +805,7 @@ function afterRender(){const aq=$('#aq');if(aq)aq.oninput=()=>{App.aq=aq.value;c
  bindBoard();revealCards();
  // autoplay only visible videos
  if(window.IntersectionObserver){const io=new IntersectionObserver(es=>es.forEach(en=>{const v=en.target;if(en.isIntersecting)v.play().catch(()=>{});else v.pause()}),{threshold:.25});document.querySelectorAll('#app .slider video').forEach(v=>io.observe(v))}}
-window.addEventListener('hashchange',()=>{Store.isAdmin=location.hash==='#admin'||!!Store.token;render()});
+window.addEventListener('hashchange',()=>{Store.isAdmin=location.hash==='#admin'||!!Store.token||App.admVis;render()});
 
 // ================= boot =================
 (async()=>{Store.state=Object.assign(defState(),LS.get('sm_state',{}));applyTheme();try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{applyTheme();render()})}catch(e){}document.body.classList.toggle('mood',Store.state.mode==='mood');render();
