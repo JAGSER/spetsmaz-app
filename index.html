@@ -520,6 +520,11 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 .gbox{flex:0 0 auto;width:auto;min-width:84px;padding:0 2px!important;white-space:nowrap;border:none;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff6df;font:inherit;font-weight:700;font-size:calc(12px*var(--fz,1));line-height:1.15;text-align:center;transition:transform .2s}
 .gbox img{height:84px;object-fit:contain;filter:drop-shadow(2px 4px 4px rgba(0,0,0,.6))}.gbox:hover,.gbox:active,.gbox.on{transform:translateY(-6px)}.gbox.on span{color:#8fdcab}
 .plank{height:18px;margin:0 -8px;border-radius:0 0 5px 5px;background:repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 2px,transparent 2px 11px),linear-gradient(180deg,#c48d55 0,#a87140 35%,#7c5029 100%);box-shadow:0 7px 10px rgba(0,0,0,.45),inset 0 2px 0 rgba(255,240,210,.35)}
+
+.bk.big img{width:100px;height:133px}.bk{position:relative}.bk em{position:absolute;left:4px;right:4px;bottom:6px;background:#1E9E58;color:#fff;font-style:normal;font-weight:800;font-size:calc(11px*var(--fz,1));border-radius:6px;padding:1px 0;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.shint{color:#e9cfa4;font-weight:700;padding:30px 6px;font-size:calc(15px*var(--fz,1))}
+.tagrow{display:flex;flex-wrap:wrap;gap:8px;margin:4px 2px 8px}.plaque.sm{font-size:calc(13px*var(--fz,1));padding:5px 10px}.plaque.on{background:linear-gradient(180deg,#d6f7e1,#8fdcab);box-shadow:0 2px 0 #4f9d6b,0 5px 10px rgba(0,0,0,.4)}
+.prodhd{display:flex;gap:14px;align-items:center}.prodhd img{height:120px;object-fit:contain;filter:drop-shadow(2px 4px 4px rgba(0,0,0,.3))}.prodhd b{font-size:calc(19px*var(--fz,1))}
 </style>
 </head>
 <body>
@@ -554,14 +559,17 @@ function shelfOf(p){const t=(p.title||'').toLowerCase(),g=(p.tags||[]).join(' ')
 function giftFits(p,w){const s=shelfOf(p),t=((p.title||'')+' '+(p.tags||[]).join(' ')).toLowerCase();
  if(w==='friend')return s==='tea';if(w==='mom')return s==='care'||s==='tea'&&/без сахара|десерт|сладк|мармелад/.test(t);if(w==='parents')return s==='health';
  if(w==='ny')return /напит|чаепит|специ|глинтвейн|имбир|коктейл|горяч|сироп|чай/.test(t)&&s!=='choose';return['tea','care','health'].includes(s)}
-function shelfHTML(ps){const by={};ps.forEach(p=>{const k=shelfOf(p);(by[k]=by[k]||[]).push(p)});const on=App.shelf;
- const cov=p=>{const s=p.slides[0]||{};return s.type==='image'?s.src:(s.poster||'')};
- let h=`<div class="box shelves bookcase"><div class="bc-top"><b>🐼 Полки Шустера</b><span>выбирайте полку или пост</span></div>`;
- SHELVES.forEach(([k,e,t])=>{const its=by[k]||[];
-  h+=`<div class="shf ${on===k?'on':''}"><button class="plaque" data-shelf="${k}"><i></i>${e} ${t}${k!=='gift'&&its.length?` <small>${its.length}</small>`:''}<i></i></button><div class="items">`;
-  if(k==='gift')h+=GIFTS.map(([g,gt],n)=>`<button class="gbox ${App.giftTo===g?'on':''}" data-giftgo="${g}"><img src="game/t${[3,0,2,5,1][n]}.png" alt=""><span>${gt}</span></button>`).join('');
-  else{h+=its.slice(0,10).map(p=>`<button class="bk" data-open="${p.id}" title="${esc(p.title)}"><img src="${esc(cov(p))}" alt="${esc(p.title)}" loading="lazy"></button>`).join('');if(its.length>10)h+=`<button class="bk more" data-shelf="${k}">ещё ${its.length-10} ›</button>`}
-  h+=`</div><div class="plank"></div></div>`});
+const PROD_RX=[/лаванд/,/кюрасао|голуб|синего|синий/,/клубни/,/абрикос/,/мятн|мята|мяты/,/шоколад|какао/];
+function prodPosts(ps,i){const tx=p=>((p.title||'')+' '+(p.text||'')+' '+(p.tags||[]).join(' ')).toLowerCase();let r=ps.filter(p=>PROD_RX[i].test(tx(p)));if(r.length<2){const g=[1,4].includes(i)?/мармелад/:/сироп/;r=r.concat(ps.filter(p=>g.test(tx(p))&&!r.includes(p)))}return r}
+function shelfHTML(ps){const on=App.shelf;const cov=p=>{const s=p.slides[0]||{};return s.type==='image'?s.src:(s.poster||'')};
+ const favs=ps.filter(p=>st().favs.includes(p.id));const unread=ps.filter(p=>!st().views[p.id]&&!st().favs.includes(p.id)).slice(0,8);
+ const bk=(p,nw)=>`<button class="bk big" data-open="${p.id}" title="${esc(p.title)}"><img src="${esc(cov(p))}" alt="${esc(p.title)}" loading="lazy">${nw?'<em>не читали</em>':''}</button>`;
+ let h=`<div class="box shelves bookcase"><div class="bc-top"><b>🐼 Полки Шустера</b></div>`;
+ h+=`<div class="shf"><button class="plaque" data-tab="favs"><i></i>❤️ Моя полка${favs.length?` <small>${favs.length}</small>`:''}<i></i></button><div class="items">`+
+  (favs.length||unread.length?favs.map(p=>bk(p)).join('')+unread.map(p=>bk(p,1)).join(''):`<div class="shint">Нажмите ♡ на посте, и он встанет на эту полку</div>`)+`</div><div class="plank"></div></div>`;
+ h+=`<div class="shf"><button class="plaque" data-prod="-1"><i></i>🍯 Сиропы и мармелад<i></i></button><div class="items">`+SH_PROD.map(([n],i)=>`<button class="gbox ${App.prod===i?'on':''}" data-prod="${i}"><img src="game/t${i}.png" alt=""><span>${esc(n.replace(/^(Сироп|Мармелад) /,''))}</span></button>`).join('')+`</div><div class="plank"></div></div>`;
+ h+=`<div class="shf"><button class="plaque" data-shelf="gift"><i></i>🎁 Подарки<i></i></button><div class="items">`+GIFTS.map(([g,gt],n)=>`<button class="gbox ${App.giftTo===g?'on':''}" data-giftgo="${g}"><img src="game/t${[3,0,2,5,1][n]}.png" alt=""><span>${gt}</span></button>`).join('')+`</div><div class="plank"></div></div>`;
+ h+=`<div class="tagrow">${SHELVES.filter(x=>x[0]!=='gift').map(([k,e,t])=>{const c=ps.filter(p=>shelfOf(p)===k).length;return `<button class="plaque sm ${on===k?'on':''}" data-shelf="${k}">${e} ${t}${c?` <small>${c}</small>`:''}</button>`}).join('')}</div>`;
  return h+'</div>'}
 const BODY_FUN={head:'Ой, голова трещит!',neck:'Шею не повернуть!',shoulders:'Плечи, будто мешки таскал!',chest:'Кхе-кхе, дышать тяжко!',belly:'Живот бурчит, как трактор!',back:'Спину заклинило!',lower:'Поясница стреляет!',arms:'Локти скрипят, как дверь!',hands:'Пальцы не слушаются!',hips:'Бёдра ноют после дачи!',knees:'Колени хрустят, как сухарики!',feet:'Ноги гудят!'};
 const MODES={health:{t:'Здоровье',brand:'Спецмазь',em:'🛡️'},mood:{t:'Настроение',brand:'Доктор Шустер',em:'🐼'}};
@@ -649,7 +657,7 @@ const st=()=>Store.state;
 const mode=()=>st().mode||'health';
 const now=()=>Date.now();
 function visiblePosts(m){return Store.posts.filter(p=>(!m||p.mode===m)&&(Store.isAdmin||!p.hidden)&&(Store.isAdmin||!p.publishAt||p.publishAt<=now())).sort((a,b)=>(b.publishAt||0)-(a.publishAt||0))}
-function setMode(m){if(st().mode&&st().mode!==m)ut('Раздел',{mode:m});const prev=st().mode;const changed=prev&&prev!==m;App.scr=App.scr||{};if(changed)App.scr[prev]=scrollY;st().mode=m;document.body.classList.toggle('mood',m==='mood');saveState();App.bodyZone='';App.shelf='';render();syncBar();if(changed){const sy=App.scr[m]||0;scrollTo(0,sy);requestAnimationFrame(()=>scrollTo(0,sy));const dir=m==='mood'?1:-1;const mn=document.querySelector('main');if(mn)mn.animate([{opacity:0,transform:`translateX(${dir*60}px)`},{opacity:1,transform:'none'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});const mk=document.querySelector('.logo .mark');if(mk)mk.animate([{transform:'rotateY(90deg) scale(.6)'},{transform:'none'}],{duration:450,easing:'cubic-bezier(.3,1.6,.5,1)'});const pl=document.querySelector('.switch .pill');if(pl)pl.animate([{left:dir>0?'3px':'50%',background:dir>0?'#d7141a':'#1E9E58'},{left:dir>0?'50%':'3px',background:dir>0?'#1E9E58':'#d7141a'}],{duration:420,easing:'cubic-bezier(.3,1.3,.5,1)'});const lg=document.querySelector('.logo');if(lg)lg.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:350})}}
+function setMode(m){if(st().mode&&st().mode!==m)ut('Раздел',{mode:m});const prev=st().mode;const changed=prev&&prev!==m;App.scr=App.scr||{};if(changed)App.scr[prev]=scrollY;st().mode=m;document.body.classList.toggle('mood',m==='mood');saveState();App.bodyZone='';App.shelf='';App.prod=null;render();syncBar();if(changed){const sy=App.scr[m]||0;scrollTo(0,sy);requestAnimationFrame(()=>scrollTo(0,sy));const dir=m==='mood'?1:-1;const mn=document.querySelector('main');if(mn)mn.animate([{opacity:0,transform:`translateX(${dir*60}px)`},{opacity:1,transform:'none'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});const mk=document.querySelector('.logo .mark');if(mk)mk.animate([{transform:'rotateY(90deg) scale(.6)'},{transform:'none'}],{duration:450,easing:'cubic-bezier(.3,1.6,.5,1)'});const pl=document.querySelector('.switch .pill');if(pl)pl.animate([{left:dir>0?'3px':'50%',background:dir>0?'#d7141a':'#1E9E58'},{left:dir>0?'50%':'3px',background:dir>0?'#1E9E58':'#d7141a'}],{duration:420,easing:'cubic-bezier(.3,1.3,.5,1)'});const lg=document.querySelector('.logo');if(lg)lg.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:350})}}
 function ut(n,d){try{window.umami&&umami.track(n,d)}catch(e){}}
 function track(kind,id,extra){const P=Store.posts.find(x=>x.id===id);if(kind==='view')ut('Пост открыт',{title:P?P.title:id,mode:P?P.mode:''});else if(kind==='click')ut('Маркетплейс',{mp:MP[extra]||extra,title:P?P.title:id});const s=st();if(kind==='view'){s.views[id]=(s.views[id]||0)+1}else if(kind==='click'){s.clicks[id]=s.clicks[id]||{};s.clicks[id][extra]=(s.clicks[id][extra]||0)+1}saveState()}
 
@@ -720,6 +728,7 @@ function viewFeed(){const m=mode();const ps=visiblePosts(m);const stories=ps.fil
  if(m==='health')h+=bodyMapHTML();else h+=shelfHTML(ps);
  let list=ps;if(m==='health'&&App.bodyZone)list=ps.filter(p=>(p.zones||[]).includes(App.bodyZone));
  if(m==='mood'&&App.shelf){list=App.shelf==='gift'?[]:ps.filter(p=>shelfOf(p)===App.shelf);const sh=SHELVES.find(x=>x[0]===App.shelf);h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">${sh[1]} ${App.shelf==='gift'&&App.giftTo?'Подарок: '+GIFTS.find(x=>x[0]===App.giftTo)[1].toLowerCase():sh[2]}</b><button class="btn sm ghost" data-act="clearshelf">Все посты</button></div>`}
+ if(m==='mood'&&App.prod!=null&&App.prod>=0){const i=App.prod;list=prodPosts(ps,i);h+=`<div class="box prodhd"><img src="game/t${i}.png" alt=""><div style="flex:1"><b>${esc(SH_PROD[i][0])}</b><div class="muted">Рецепты и советы: ${list.length}</div><div class="row" style="margin-top:8px"><a class="btn sm" href="https://www.ozon.ru/search/?text=${enc(SH_PROD[i][1])}" target="_blank" rel="noopener" data-mp="ozon" data-pid="prod-${i}">Купить на Ozon</a><button class="btn sm ghost" data-prod="-1">Все посты</button></div></div></div>`}
  if(App.bodyZone)h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">Про «${BODY[App.bodyZone]}»</b><button class="btn sm ghost" data-act="clearzone">Все посты</button></div>`;
  if(m==='mood'&&App.shelf==='gift'){h+=giftSetsHTML();return h}
  h+=list.length?list.slice(0,App.feedN||12).map(p=>cardHTML(p)).join('')+(list.length>(App.feedN||12)?`<button class="btn ghost wide" data-act="more" style="margin-bottom:16px">Показать ещё</button>`:''):(Store.loading?'<div class="skel"></div><div class="skel"></div>':Store.err?`<div class="empty">${esc(Store.err)}</div>`:`<div class="empty">Пока нет постов${App.bodyZone?' про эту зону':''}</div>`);
@@ -1064,7 +1073,7 @@ async function doSavePost(){syncEditorFields();const e=App.edit;if(!Store.token)
  document.addEventListener('pointerup',e=>{if(e.pointerType==='mouse')end(e.clientX,e.clientY)},true);
  function end(x,y){if(sx==null)return;const dx=x-sx,dy=Math.abs(y-sy);sx=null;if(dx<-innerWidth*0.35&&dy<70){App.admVis=!App.admVis;LS.set('sm_admvis',App.admVis);if(!App.admVis){App.adminOn=false;LS.set('sm_admon',false);if(App.tab==='admin')App.tab='feed'}else Store.isAdmin=true;closeSheet();render();toast(App.admVis?'Кнопка «Админ» включена':'Кнопка «Админ» скрыта')}}})();
 document.addEventListener('click',ev=>{const t=ev.target.closest('[data-zsl]');if(!t)return;App.zp.i=+t.dataset.zsl;mountPostZK()});
-document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-tab],[data-mode],[data-act],[data-fav],[data-open],[data-story],[data-zone],[data-shelf],[data-gift],[data-giftgo],[data-tagq],[data-rem],[data-qall],[data-mp],[data-copyc],[data-usec],[data-topic],[data-share],[data-atab],[data-editp],[data-es],[data-zdel],[data-emode],[data-ebz],[data-prdel]');if(!t)return;const d=t.dataset;
+document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-tab],[data-mode],[data-act],[data-fav],[data-open],[data-story],[data-zone],[data-shelf],[data-gift],[data-giftgo],[data-prod],[data-tagq],[data-rem],[data-qall],[data-mp],[data-copyc],[data-usec],[data-topic],[data-share],[data-atab],[data-editp],[data-es],[data-zdel],[data-emode],[data-ebz],[data-prdel]');if(!t)return;const d=t.dataset;
  if(d.tab==='admin'){App.adminOn=!App.adminOn;LS.set('sm_admon',App.adminOn);if(App.tab==='admin')App.tab='feed';closeSheet();render();toast(App.adminOn?'Режим админа: кнопки правки на карточках и в постах':'Режим админа выключен')}
  else if(d.tab){App.tab=d.tab;closeSheet();render();scrollTo(0,0);const mn=document.querySelector('main');if(mn){mn.classList.remove('tabin');void mn.offsetWidth;mn.classList.add('tabin')}}
  else if(d.mode){if(d.mode!==mode())setMode(d.mode)}
@@ -1073,9 +1082,10 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
  else if(d.story){openStory(d.story)}
  else if(d.zone){App.bodyZone=App.bodyZone===d.zone?'':d.zone;if(BODY_BACK.includes(App.bodyZone))App.bodyView='back';else if(App.bodyZone&&!['head','neck','shoulders','arms','hands','hips','knees','feet'].includes(App.bodyZone))App.bodyView='front';render()}
  else if(d.tagq==='подарок'){ev.preventDefault();openGifts()}
-  else if(d.shelf){App.shelf=App.shelf===d.shelf?'':d.shelf;if(App.shelf!=='gift')App.giftTo='';App.feedN=12;render()}
+  else if(d.shelf){App.prod=null;App.shelf=App.shelf===d.shelf?'':d.shelf;if(App.shelf!=='gift')App.giftTo='';App.feedN=12;render()}
   else if(d.gift){App.giftTo=App.giftTo===d.gift?'':d.gift;App.feedN=12;render()}
-  else if(d.giftgo){const was=App.shelf==='gift'&&App.giftTo===d.giftgo;App.shelf='gift';App.giftTo=was?'':d.giftgo;App.feedN=12;render();requestAnimationFrame(()=>{const e=document.querySelector('.gset');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})})}
+  else if(d.prod!=null){const i=+d.prod;App.prod=i<0||App.prod===i?null:i;App.shelf='';App.giftTo='';App.feedN=12;render();if(App.prod!=null)requestAnimationFrame(()=>{const e=document.querySelector('.prodhd');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})})}
+  else if(d.giftgo){App.prod=null;const was=App.shelf==='gift'&&App.giftTo===d.giftgo;App.shelf='gift';App.giftTo=was?'':d.giftgo;App.feedN=12;render();requestAnimationFrame(()=>{const e=document.querySelector('.gset');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})})}
   else if(d.tagq){ev.preventDefault();closeSheet();App.tab='search';App.q=d.tagq;render();scrollTo(0,0)}
  else if(d.rem){const r=st().holRem;const i=r.indexOf(d.rem);if(i>=0)r.splice(i,1);else{r.push(d.rem);toast('Напомним за 3 дня')}saveState();if($('#sheet'))$('#sheet').querySelectorAll(`[data-rem="${d.rem}"]`).forEach(b=>{b.textContent=i<0?'🔔 Напомню':'Напомнить';b.classList.toggle('ghost',i>=0)});render()}
  else if(d.qall!==undefined){App.qAll=d.qall==='1';render()}
