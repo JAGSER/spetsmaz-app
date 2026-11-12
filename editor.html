@@ -152,7 +152,7 @@ function cleanFolder(n){let t=n.replace(/^\+/,'').replace(/\s*\((карусел�
 function cleanFile(n){return n.replace(/\.[^.]+$/,'').replace(/^\d+[\s._-]*/,'').trim()}
 const isCar=n=>/карус|карсуел/i.test(n||'');
 async function crawl(){const posts=[];
- async function walk(path,mode,names){const items=await listAll(path);const files=items.filter(isMedia).sort(natural);const dirs=items.filter(x=>x.type==='dir'&&!/редизайн|креатив/i.test(x.name));
+ async function walk(path,mode,names){const items=await listAll(path);const files=items.filter(isMedia).sort(natural);const dirs=items.filter(x=>x.type==='dir'&&!/редизайн|креатив|анимации постов/i.test(x.name));
   const name=names[names.length-1],parent=names[names.length-2]||'';const month=names.slice().reverse().find(n=>MONTHS.test(n));
   const label=cleanFolder(month||name);
   if(files.length){
