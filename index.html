@@ -1084,7 +1084,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
  else if(d.tagq==='подарок'){ev.preventDefault();openGifts()}
   else if(d.shelf){App.prod=null;App.shelf=App.shelf===d.shelf?'':d.shelf;if(App.shelf!=='gift')App.giftTo='';App.feedN=12;render()}
   else if(d.gift){App.giftTo=App.giftTo===d.gift?'':d.gift;App.feedN=12;render()}
-  else if(d.prod!=null){const i=+d.prod;App.prod=i<0||App.prod===i?null:i;App.shelf='';App.giftTo='';App.feedN=12;render();if(App.prod!=null)requestAnimationFrame(()=>{const e=document.querySelector('.prodhd');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})})}
+  else if(d.prod!=null){const i=+d.prod;App.prod=i<0||App.prod===i?null:i;App.shelf='';App.giftTo='';App.feedN=12;render();if(App.prod!=null)requestAnimationFrame(()=>{const e=document.querySelector('.prodhd');if(e)scrollTo({top:e.getBoundingClientRect().top+scrollY-120,behavior:'smooth'})})}
   else if(d.giftgo){App.prod=null;const was=App.shelf==='gift'&&App.giftTo===d.giftgo;App.shelf='gift';App.giftTo=was?'':d.giftgo;App.feedN=12;render();requestAnimationFrame(()=>{const e=document.querySelector('.gset');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})})}
   else if(d.tagq){ev.preventDefault();closeSheet();App.tab='search';App.q=d.tagq;render();scrollTo(0,0)}
  else if(d.rem){const r=st().holRem;const i=r.indexOf(d.rem);if(i>=0)r.splice(i,1);else{r.push(d.rem);toast('Напомним за 3 дня')}saveState();if($('#sheet'))$('#sheet').querySelectorAll(`[data-rem="${d.rem}"]`).forEach(b=>{b.textContent=i<0?'🔔 Напомню':'Напомнить';b.classList.toggle('ghost',i>=0)});render()}
