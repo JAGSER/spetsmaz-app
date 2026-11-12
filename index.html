@@ -86,7 +86,7 @@ main{padding:4px 16px}
 /* nav */
 html,body{overflow-x:clip}
 main{overflow-x:clip}
-nav{transform:translateZ(0);touch-action:pan-y;position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;background:var(--nav);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav{transform:translateZ(0);touch-action:pan-y;position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;background:var(--nav);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 nav .in{display:flex;width:100%;max-width:480px}
 nav button{flex:1;padding:5px 0 6px;font-size:calc(12px*var(--fz,1));font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
 nav button span{font-size:calc(22px*var(--fz,1));filter:grayscale(1);opacity:.6}
@@ -242,13 +242,13 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .m3bar em{position:absolute;top:22px;left:50%;transform:translateX(-50%);font-style:normal;font-size:11px;font-weight:800;white-space:nowrap;color:#005bff}
 .m3next{text-align:center;margin:0 0 6px;font-size:14px}
 .m3stage{position:relative;perspective:1000px;perspective-origin:50% 20%;padding:8px 0 22px;width:var(--gw);margin:0 auto}
-.m3board{position:relative;width:100%;aspect-ratio:1;border-radius:24px;transform:rotateX(12deg);transition:transform .35s ease-out;overflow:hidden;touch-action:none;
+.m3board{position:relative;width:100%;aspect-ratio:1;border-radius:24px;transform:rotateX(10deg);overflow:hidden;touch-action:none;
  background:radial-gradient(circle at 30% 15%,rgba(255,255,255,.55),transparent 55%),linear-gradient(160deg,color-mix(in srgb,var(--acc) 35%,#fff),color-mix(in srgb,var(--acc) 70%,#000 5%));
  box-shadow:0 10px 0 color-mix(in srgb,var(--acc) 55%,#000),0 26px 40px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.6)}
 .m3c{position:absolute;padding:3px;pointer-events:none}.m3c i{display:block;width:100%;height:100%;border-radius:12px;background:rgba(255,255,255,.42);box-shadow:inset 0 3px 6px rgba(0,0,0,.12),inset 0 -2px 0 rgba(255,255,255,.5)}
 .m3t{position:absolute;left:0;top:0;will-change:transform;z-index:2}
-.m3t .in{position:absolute;inset:0;display:grid;place-items:center;animation:m3bob 3s ease-in-out infinite;transition:transform .15s}
-.m3t img{position:relative;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 5px 3px rgba(0,0,0,.35));pointer-events:none}.m3t img.bt{transform:scale(1.1)}.m3t img.mr{transform:scale(.9)}
+.m3t .in{position:absolute;inset:0;display:grid;place-items:center;transition:transform .15s}
+.m3t img{position:relative;width:100%;height:100%;object-fit:contain;pointer-events:none}.m3t img.bt{transform:scale(1.1)}.m3t img.mr{transform:scale(.9)}
 .m3t .pl{position:absolute;inset:12%;border-radius:50%;background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.95) 0,rgba(255,255,255,.35) 18%,transparent 40%),radial-gradient(circle at 50% 55%,var(--c) 0,color-mix(in srgb,var(--c) 70%,#000) 100%);box-shadow:0 4px 0 color-mix(in srgb,var(--c) 55%,#000),0 8px 12px rgba(0,0,0,.25),inset 0 -5px 8px rgba(0,0,0,.25)}
 @keyframes m3bob{50%{transform:translateY(-2px) rotate(1.5deg)}}
 .m3t.lift .in,.m3t.sel .in{transform:scale(1.18) translateY(-4px);animation:none}
@@ -270,7 +270,7 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
  text-shadow:-2px -2px 0 #c04208,2px -2px 0 #c04208,-2px 2px 0 #c04208,2px 2px 0 #c04208,0 -2px 0 #c04208,0 2px 0 #c04208,-2px 0 0 #c04208,2px 0 0 #c04208,0 4px 0 #d4520a,0 6px 0 #c04208,0 8px 0 #a83806,0 12px 16px rgba(0,0,0,.45)}
 .m3say.big{font-size:clamp(26px,9vw,46px)}
 .m3pts{position:absolute;z-index:19;pointer-events:none;font-weight:900;font-size:26px;color:#fff;text-shadow:-2px -2px 0 #1d5fc0,2px -2px 0 #1d5fc0,-2px 2px 0 #1d5fc0,2px 2px 0 #1d5fc0,0 -2px 0 #1d5fc0,0 2px 0 #1d5fc0,-2px 0 0 #1d5fc0,2px 0 0 #1d5fc0,0 4px 0 #1d5fc0,0 7px 10px rgba(0,0,0,.4);}
-.m3fly{position:fixed;left:0;top:0;z-index:9998;pointer-events:none;object-fit:contain;filter:drop-shadow(0 6px 6px rgba(0,0,0,.35))}
+.m3fly{position:fixed;left:0;top:0;z-index:9998;pointer-events:none;object-fit:contain;will-change:transform}
 .m3fx{position:fixed;inset:0;width:100vw;height:100vh;z-index:9997;pointer-events:none}
 .m3tip{text-align:center;font-size:13px;margin:0}
 .m3tools{display:flex;gap:6px}
@@ -301,7 +301,7 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .m3goals .m3goal img{width:36px;height:36px}
 .m3goals .m3goal span{font-size:15px;line-height:1.1}
 .m3goals .m3icei{width:28px;height:28px}
-.m3t .lk{position:absolute;inset:6%;border-radius:12px;pointer-events:none;z-index:2;background:repeating-linear-gradient(45deg,transparent 0 38%,rgba(120,120,130,.95) 38% 46%,rgba(220,220,230,.95) 46% 50%,transparent 50% 88%),repeating-linear-gradient(-45deg,transparent 0 38%,rgba(120,120,130,.95) 38% 46%,rgba(220,220,230,.95) 46% 50%,transparent 50% 88%);box-shadow:inset 0 0 0 3px rgba(140,140,150,.9);filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.m3t .lk{position:absolute;inset:6%;border-radius:12px;pointer-events:none;z-index:2;background:repeating-linear-gradient(45deg,transparent 0 38%,rgba(120,120,130,.95) 38% 46%,rgba(220,220,230,.95) 46% 50%,transparent 50% 88%),repeating-linear-gradient(-45deg,transparent 0 38%,rgba(120,120,130,.95) 38% 46%,rgba(220,220,230,.95) 46% 50%,transparent 50% 88%);box-shadow:inset 0 0 0 3px rgba(140,140,150,.9)}
 .m3exit{font-weight:900}
 .m3exit.ask{width:auto!important;padding:0 10px;background:#ff4b5c!important;color:#fff;font-size:15px!important}
 .m3gres{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
@@ -323,7 +323,7 @@ body.m3on main{padding-top:8px}
 .m3bar{margin:4px 0 18px}
 .m3bar em{color:#e8a000;font-size:12px;top:20px;text-shadow:0 1px 0 #fff}
 .m3c.ice,.m3c.ice2{z-index:3}
-.m3c.ice i{background:linear-gradient(135deg,rgba(240,250,255,.55),rgba(160,215,255,.38) 55%,rgba(110,190,255,.45));backdrop-filter:blur(.6px);box-shadow:inset 0 0 0 2px rgba(255,255,255,.9),inset 0 -4px 8px rgba(40,120,200,.35)}
+.m3c.ice i{background:linear-gradient(135deg,rgba(240,250,255,.55),rgba(160,215,255,.38) 55%,rgba(110,190,255,.45));box-shadow:inset 0 0 0 2px rgba(255,255,255,.9),inset 0 -4px 8px rgba(40,120,200,.35)}
 .m3c.ice2 i{background:linear-gradient(135deg,rgba(255,255,255,.75),rgba(190,228,255,.6) 40%,rgba(95,179,245,.6));box-shadow:inset 0 0 0 3px #fff,inset 0 -6px 10px rgba(20,90,180,.5),0 0 0 2px rgba(80,170,255,.6)}
 .m3c.ice i::after,.m3c.ice2 i::after{content:'';position:absolute;inset:12% 50% 40% 18%;border-top:2px solid rgba(255,255,255,.95);transform:rotate(-30deg);border-radius:2px}
 .m3c i{position:relative}
@@ -503,7 +503,7 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 <body>
 <div id="app"></div>
 <script src="zonekit.js"></script>
-<script src="game.js?v=4"></script>
+<script src="game.js?v=5"></script>
 <script>
 "use strict";
 // ================= helpers =================
