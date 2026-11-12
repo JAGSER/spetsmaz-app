@@ -138,7 +138,7 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .bm .z{cursor:pointer}
 .bm .z:hover{filter:brightness(1.06)}
 .bm .z.on{animation:zglow .7s ease-in-out infinite alternate}
-@keyframes zglow{from{filter:drop-shadow(0 0 1px #ff2020)}to{filter:drop-shadow(0 0 5px #ff2020) brightness(1.08)}}
+@keyframes zglow{from{filter:drop-shadow(0 0 2px #ff2020)}to{filter:drop-shadow(0 0 9px #ff2020) brightness(1.08)}}
 .bm .guy,.bm .guy g{transform-box:view-box}
 .bm .eye{transform-box:fill-box;transform-origin:center;animation:eblink 4.5s infinite}
 @keyframes eblink{0%,93%,100%{transform:none}96%{transform:scaleY(.12)}}
@@ -146,63 +146,68 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 @keyframes blink{50%{opacity:.25}}
 @keyframes pose{to{transform:var(--p)}}
 @keyframes wig{from{transform:var(--a)}to{transform:var(--b)}}
-@keyframes creak{50%{transform:var(--a)}}
-@keyframes cough{0%,45%,100%{transform:none}8%,26%{transform:translateY(3px) rotate(4deg)}17%,35%{transform:none}}
-@keyframes stiff{0%,100%{transform:none}25%{transform:rotate(-7deg)}50%{transform:none}75%{transform:rotate(7deg)}}
-.bm .P{animation:pose .45s cubic-bezier(.3,1.4,.5,1) forwards}
-/* idle */
-.bm .idle .bd{--a:scaleY(1);--b:scaleY(1.012);animation:wig 1.6s ease-in-out infinite alternate}
+@keyframes cough{0%,45%,100%{transform:none}8%,26%{transform:translateY(5px) rotate(3deg)}17%,35%{transform:none}}
+@keyframes stiff{0%,100%{transform:none}25%{transform:rotate(-6deg)}50%{transform:none}75%{transform:rotate(6deg)}}
+@keyframes squat{0%,100%{transform:none}45%,60%{transform:translateY(11px)}}
+@keyframes squatL{0%,100%{transform:none}45%,60%{transform:rotate(18deg)}}
+@keyframes squatS{0%,100%{transform:none}45%,60%{transform:rotate(-36deg)}}
+@keyframes squatLR{0%,100%{transform:none}45%,60%{transform:rotate(-18deg)}}
+@keyframes squatSR{0%,100%{transform:none}45%,60%{transform:rotate(36deg)}}
+@keyframes rub{0%,100%{transform:var(--p)}50%{transform:var(--b)}}
+.bm .idle .bd{--a:scaleY(1);--b:scaleY(1.01);animation:wig 1.6s ease-in-out infinite alternate}
 .bm .idle .hd{--a:rotate(-2deg);--b:rotate(2deg);animation:wig 2.4s ease-in-out infinite alternate}
-/* голова: держится за голову и качает ей */
-.bm .a-head .uaL{--p:rotate(150deg)}.bm .a-head .faL{--p:rotate(104deg)}.bm .a-head .uaR{--p:rotate(-150deg)}.bm .a-head .faR{--p:rotate(-104deg)}
+/* голова */
+.bm .a-head .uaL{--p:rotate(167deg)}.bm .a-head .faL{--p:rotate(61deg)}.bm .a-head .uaR{--p:rotate(-167deg)}.bm .a-head .faR{--p:rotate(-61deg)}
 .bm .a-head :is(.uaL,.faL,.uaR,.faR){animation:pose .45s cubic-bezier(.3,1.3,.5,1) forwards}
-.bm .a-head .hd{--a:rotate(-7deg);--b:rotate(7deg);animation:wig .35s .4s ease-in-out infinite alternate}
-/* шея: трёт шею, голова набок */
-.bm .a-neck .uaR{--p:rotate(-160deg);animation:pose .45s ease-out forwards}
-.bm .a-neck .faR{--p:rotate(-139deg);--a:rotate(-130deg);--b:rotate(-148deg);animation:pose .45s ease-out forwards,wig .3s .45s ease-in-out infinite alternate}
-.bm .a-neck .hd{--p:rotate(-10deg);animation:pose .5s ease-out forwards}
-/* плечи: пожимает и разминает */
-.bm .a-shoulders :is(.uaL,.uaR,.shc){--a:translateY(0);--b:translateY(-8px);animation:wig .4s ease-in-out infinite alternate}
-.bm .a-shoulders .hd{--a:translateY(0);--b:translateY(-3px);animation:wig .4s ease-in-out infinite alternate}
-/* грудь: кашляет, рука на груди */
-.bm .a-chest .uaL{--p:rotate(-20deg)}.bm .a-chest .faL{--p:rotate(-107deg)}
+.bm .a-head .hd{--a:rotate(-6deg);--b:rotate(6deg);animation:wig .35s .4s ease-in-out infinite alternate}
+/* шея */
+.bm .a-neck .uaR{--p:rotate(-164deg);animation:pose .45s ease-out forwards}
+.bm .a-neck .faR{--p:rotate(-128deg);--b:rotate(-142deg);animation:pose .45s ease-out forwards,rub .5s .45s ease-in-out infinite}
+.bm .a-neck .hd{--p:rotate(-9deg);animation:pose .5s ease-out forwards}
+/* плечи */
+.bm .a-shoulders :is(.uaL,.uaR,.shc){--a:translateY(0);--b:translateY(-12px);animation:wig .4s ease-in-out infinite alternate}
+.bm .a-shoulders .hd{--a:translateY(0);--b:translateY(-4px);animation:wig .4s ease-in-out infinite alternate}
+/* грудь */
+.bm .a-chest .uaL{--p:rotate(-16deg)}.bm .a-chest .faL{--p:rotate(-133deg)}
 .bm .a-chest :is(.uaL,.faL){animation:pose .45s ease-out forwards}
 .bm .a-chest .bd{animation:cough 1.8s .4s ease-in-out infinite}
-/* живот: держится, живот качается */
-.bm .a-belly .faL{--p:rotate(-55deg)}.bm .a-belly .faR{--p:rotate(55deg)}
-.bm .a-belly :is(.faL,.faR){animation:pose .45s ease-out forwards}
-.bm .a-belly .hdL{--a:rotate(-14deg);--b:rotate(14deg);animation:wig .3s .45s ease-in-out infinite alternate}
-.bm .a-belly .hdR{--a:rotate(14deg);--b:rotate(-14deg);animation:wig .3s .45s ease-in-out infinite alternate}
-.bm .a-belly .bd{--a:scaleX(1);--b:scaleX(1.05);animation:wig .45s ease-in-out infinite alternate}
-/* спина: тянется рукой за спину */
-.bm .a-back .uaR{--p:rotate(-165deg);animation:pose .5s ease-out forwards}
-.bm .a-back .faR{--p:rotate(-165deg);--a:rotate(-155deg);--b:rotate(-178deg);animation:pose .5s ease-out forwards,wig .32s .5s ease-in-out infinite alternate}
-.bm .a-back .bd{--a:rotate(-3deg);--b:rotate(3deg);animation:wig .7s ease-in-out infinite alternate}
-/* поясница: руки в бока, наклоны со скрипом */
-.bm :is(.a-lower,.a-hips) .uaL{--p:rotate(35deg)}.bm :is(.a-lower,.a-hips) .faL{--p:rotate(-72deg)}.bm :is(.a-lower,.a-hips) .uaR{--p:rotate(-35deg)}.bm :is(.a-lower,.a-hips) .faR{--p:rotate(72deg)}
+/* живот */
+.bm .a-belly .uaL{--p:rotate(14deg)}.bm .a-belly .faL{--p:rotate(-98deg)}.bm .a-belly .uaR{--p:rotate(-14deg)}.bm .a-belly .faR{--p:rotate(98deg)}
+.bm .a-belly :is(.uaL,.faL,.uaR,.faR){animation:pose .45s ease-out forwards}
+.bm .a-belly :is(.hdL,.hdR){--a:rotate(-16deg);--b:rotate(16deg);animation:wig .3s .45s ease-in-out infinite alternate}
+.bm .a-belly .bd{--a:scaleX(1);--b:scaleX(1.04);animation:wig .45s ease-in-out infinite alternate}
+/* спина */
+.bm .a-back .uaR{--p:rotate(-151deg);animation:pose .5s ease-out forwards}
+.bm .a-back .faR{--p:rotate(-139deg);--b:rotate(-155deg);animation:pose .5s ease-out forwards,rub .35s .5s ease-in-out infinite}
+.bm .a-back .bd{--a:rotate(-2deg);--b:rotate(2deg);animation:wig .7s ease-in-out infinite alternate}
+/* поясница и бёдра: руки в бока */
+.bm :is(.a-lower,.a-hips) .uaL{--p:rotate(25deg)}.bm :is(.a-lower,.a-hips) .faL{--p:rotate(-73deg)}.bm :is(.a-lower,.a-hips) .uaR{--p:rotate(-25deg)}.bm :is(.a-lower,.a-hips) .faR{--p:rotate(73deg)}
 .bm :is(.a-lower,.a-hips) :is(.uaL,.faL,.uaR,.faR){animation:pose .45s ease-out forwards}
-.bm .a-lower .bd{animation:stiff 2.4s .4s ease-in-out infinite}
-/* бёдра: качает тазом */
-.bm .a-hips .low{--a:translateX(-5px);--b:translateX(5px);animation:wig .38s ease-in-out infinite alternate}
-.bm .a-hips .bd{--a:translateX(3px);--b:translateX(-3px);animation:wig .38s ease-in-out infinite alternate}
-/* руки: локти скрипят */
-.bm .a-arms .uaL{--p:rotate(12deg)}.bm .a-arms .uaR{--p:rotate(-12deg)}
-.bm .a-arms :is(.uaL,.uaR){animation:pose .4s ease-out forwards}
-.bm .a-arms .faL{--a:rotate(-100deg);animation:creak 1.6s steps(5) infinite}
-.bm .a-arms .faR{--a:rotate(100deg);animation:creak 1.6s .8s steps(5) infinite}
-/* кисти: пальцы трясутся */
-.bm .a-hands .uaL{--p:rotate(10deg)}.bm .a-hands .faL{--p:rotate(-160deg)}.bm .a-hands .uaR{--p:rotate(-10deg)}.bm .a-hands .faR{--p:rotate(160deg)}
+.bm .a-lower .bd{animation:stiff 2.6s .4s ease-in-out infinite}
+/* бёдра: таз ходит влево-вправо, стопы на месте */
+.bm .a-hips .low{--a:translateX(-9px);--b:translateX(9px);animation:wig .55s ease-in-out infinite alternate}
+.bm .a-hips :is(.lgL,.lgR){--a:rotate(-2.5deg);--b:rotate(2.5deg);animation:wig .55s ease-in-out infinite alternate}
+.bm .a-hips .bd{--a:translateX(-5px) rotate(2.5deg);--b:translateX(5px) rotate(-2.5deg);animation:wig .55s ease-in-out infinite alternate}
+/* колени: медленно приседает, колени в стороны */
+.bm .a-knees :is(.low,.bd){animation:squat 1.8s ease-in-out infinite}
+.bm .a-knees .lgL{animation:squatL 1.8s ease-in-out infinite}.bm .a-knees .shL{animation:squatS 1.8s ease-in-out infinite}
+.bm .a-knees .lgR{animation:squatLR 1.8s ease-in-out infinite}.bm .a-knees .shR{animation:squatSR 1.8s ease-in-out infinite}
+.bm .a-knees .hd{--a:translateY(0);--b:translateY(2px);animation:wig .2s steps(2) infinite alternate}
+/* руки и локти: трёт локоть другой рукой */
+.bm .a-arms .uaL{--p:rotate(0deg)}.bm .a-arms .faL{--p:rotate(-90deg);--b:rotate(-70deg)}
+.bm .a-arms .uaL{animation:pose .4s ease-out forwards}
+.bm .a-arms .faL{animation:pose .4s ease-out forwards,rub 1.2s .4s ease-in-out infinite}
+.bm .a-arms .uaR{--p:rotate(42deg);animation:pose .45s ease-out forwards}
+.bm .a-arms .faR{--p:rotate(30deg);--b:rotate(18deg);animation:pose .45s ease-out forwards,rub .35s .45s ease-in-out infinite}
+/* кисти */
+.bm .a-hands .uaL{--p:rotate(8deg)}.bm .a-hands .faL{--p:rotate(-137deg)}.bm .a-hands .uaR{--p:rotate(-8deg)}.bm .a-hands .faR{--p:rotate(137deg)}
 .bm .a-hands :is(.uaL,.faL,.uaR,.faR){animation:pose .45s ease-out forwards}
 .bm .a-hands :is(.hdL,.hdR){--a:rotate(-14deg);--b:rotate(14deg);animation:wig .09s .45s linear infinite alternate}
-/* колени: хрустят, дрожат внутрь */
-.bm .a-knees .lgL{--a:rotate(0deg);--b:rotate(-6deg)}.bm .a-knees .shL{--a:rotate(0deg);--b:rotate(12deg)}
-.bm .a-knees .lgR{--a:rotate(0deg);--b:rotate(6deg)}.bm .a-knees .shR{--a:rotate(0deg);--b:rotate(-12deg)}
-.bm .a-knees :is(.lgL,.shL,.lgR,.shR){animation:wig .7s steps(3) infinite alternate}
-/* стопы: прыгает на одной ноге */
-.bm .a-feet{--a:translateY(0);--b:translateY(-14px);animation:wig .32s ease-out infinite alternate}
-.bm .a-feet .lgR{--p:translateY(-24px);animation:pose .3s ease-out forwards}
-.bm .a-feet .uaL{--a:rotate(20deg);--b:rotate(50deg);animation:wig .32s ease-in-out infinite alternate}
-.bm .a-feet .uaR{--a:rotate(-20deg);--b:rotate(-50deg);animation:wig .32s ease-in-out infinite alternate}
+/* стопы */
+.bm .a-feet{--a:translateY(0);--b:translateY(-22px);animation:wig .32s ease-out infinite alternate}
+.bm .a-feet .lgR{--p:translateY(-34px);animation:pose .3s ease-out forwards}
+.bm .a-feet .uaL{--a:rotate(60deg);--b:rotate(85deg);animation:wig .32s ease-in-out infinite alternate}
+.bm .a-feet .uaR{--a:rotate(-60deg);--b:rotate(-85deg);animation:wig .32s ease-in-out infinite alternate}
 .bubble{display:inline-block;position:relative;background:var(--card);border:2.5px solid #1d1b1a;border-radius:18px;padding:10px 16px;font-weight:800;font-size:calc(19px*var(--fz,1));margin:4px 0 2px;max-width:92%}
 .bubble::after{content:'';position:absolute;left:50%;bottom:-11px;margin-left:-9px;border:9px solid transparent;border-top-color:#1d1b1a;border-bottom:0}
 .bmseg{display:inline-flex;background:var(--bg);border-radius:14px;padding:3px;margin:8px 0}
@@ -303,7 +308,8 @@ nav button.on svg{transform:scale(1.1)}
 .sheet .in{transition:transform .25s;touch-action:pan-y}
 .sheet .grab{width:48px;height:5px;border-radius:3px;background:var(--line);margin:-6px auto 6px}
 .bmgrid{grid-template-columns:54% 1fr!important;align-items:stretch!important}
-.bmfig{position:relative;min-height:380px}
+.bmfig{position:relative;min-height:465px}
+.bmfig svg{overflow:visible}
 .bmfig svg{position:absolute;inset:0;width:100%!important;height:100%!important}
 .bmlist{gap:5px!important}
 .bmlist button{padding:8px 10px!important;font-size:calc(15px*var(--fz,1))!important;color:var(--ink)}
@@ -526,29 +532,33 @@ function viewFeed(){const m=mode();const ps=visiblePosts(m);const stories=ps.fil
  h+=list.length?list.slice(0,App.feedN||12).map(p=>cardHTML(p)).join('')+(list.length>(App.feedN||12)?`<button class="btn ghost wide" data-act="more" style="margin-bottom:16px">Показать ещё</button>`:''):(Store.loading?'<div class="skel"></div><div class="skel"></div>':Store.err?`<div class="empty">${esc(Store.err)}</div>`:`<div class="empty">Пока нет постов${App.bodyZone?' про эту зону':''}</div>`);
  return h}
 function bodyMapHTML(){const z=App.bodyZone;const back=App.bodyView==='back'||(!App.bodyView&&BODY_BACK.includes(z));const hurt=!!z;
- const SK=['#F9C29E','#EFAC86'],SH=['#EE1F2B','#CC1220'],SD=['#C30F1C','#AA0C17'],ST=['#F9C62B','#E9B21A'],JN=['#2559A8','#1C4891'],KN=['#3C7ED1','#2F69BA'],HR=['#D0D4DC','#BBC0C9'],SHOE='#15304A';
+ const SK=['#FBC4A0','#F2B08A'],SH=['#EE1C2B','#D51523'],SV=['#E4192A','#C8121F'],SD=['#CC111E','#B80D19'],ST=['#F9C620','#EFB817'],JN=['#1D56A6','#154A94'],KN=['#2F6EC2','#2763B3'],HR=['#D0D3DB','#BCC1CA'],SHOE='#1E465A';
  const P=k=>k?` class="z${z===k?' on':''}" data-zone="${k}"`:'';
  const rp=(x,y,w,h,[a,b,c,d])=>`M${x+a} ${y}H${x+w-b}Q${x+w} ${y} ${x+w} ${y+b}V${y+h-c}Q${x+w} ${y+h} ${x+w-c} ${y+h}H${x+d}Q${x} ${y+h} ${x} ${y+h-d}V${y+a}Q${x} ${y} ${x+a} ${y}Z`;
- const two=(x,y,w,h,r,c,k)=>{const R=Array.isArray(r)?r:[r,r,r,r];return `<g${P(k)}><path d="${rp(x,y,w/2,h,[R[0],0,0,R[3]])}" fill="${c[0]}"/><path d="${rp(x+w/2,y,w/2,h,[0,R[1],R[2],0])}" fill="${c[1]}"/></g>`};
+ const two=(x,y,w,h,r,c,k,sx)=>{const R=Array.isArray(r)?r:[r,r,r,r];const m=sx??x+w/2;return `<g${P(k)}><path d="${rp(x,y,m-x,h,[R[0],0,0,R[3]])}" fill="${c[0]}"/><path d="${rp(m,y,x+w-m,h,[0,R[1],R[2],0])}" fill="${c[1]}"/></g>`};
  const c2=(cx,cy,r,c,k)=>`<g${P(k)}><circle cx="${cx}" cy="${cy}" r="${r}" fill="${c[0]}"/><path d="M${cx} ${cy-r}A${r} ${r} 0 0 1 ${cx} ${cy+r}Z" fill="${c[1]}"/></g>`;
  const O=(x,y)=>` style="transform-origin:${x}px ${y}px"`;
- const leg=(s,x)=>`<g class="lg${s}"${O(x+15,236)}><g class="sh${s}"${O(x+15,334)}>${two(x+1,344,28,74,[2,2,3,3],JN)}<path${P('feet')} d="${rp(x-4,416,38,8,[4,4,4,4])}" fill="${SHOE}"/></g>${two(x,236,30,96,[0,0,4,4],JN)}${two(x-2,321,34,26,12,KN,'knees')}</g>`;
- const arm=(s,x)=>`<g class="ua${s}"${O(x+9,118)}>${two(x-2,106,22,30,[10,10,3,3],SH,'arms')}${two(x,132,18,42,0,SK,'arms')}<g class="fa${s}"${O(x+9,172)}>${two(x,172,18,42,[0,0,6,6],SK,'arms')}<circle${P('arms')} cx="${x+9}" cy="172" r="9" fill="${SK[0]}"/><circle cx="${x+9}" cy="173" r="5" fill="#E89C7C" opacity=".5" pointer-events="none"/><g class="hd${s}"${O(x+9,212)}>${c2(x+9,222,12.5,SK,'hands')}</g></g></g>`;
- const faceN=`<path d="M82 53 q6 -4 12 0 M106 53 q6 -4 12 0" stroke="#9AA0AA" stroke-width="3.5" fill="none" stroke-linecap="round"/><ellipse class="eye" cx="88" cy="62" rx="3.2" ry="4" fill="#2A1A12"/><ellipse class="eye" cx="112" cy="62" rx="3.2" ry="4" fill="#2A1A12"/><circle cx="78" cy="74" r="6" fill="#F27C6E" opacity=".5"/><circle cx="122" cy="74" r="6" fill="#F27C6E" opacity=".5"/><path d="M84 82 Q100 104 116 82Z" fill="#fff"/>`;
- const faceH=`<path d="M80 51 l14 5 M120 51 l-14 5" stroke="#9AA0AA" stroke-width="3.5" stroke-linecap="round"/><path d="M83 58 l8 4 l-8 4 M117 58 l-8 4 l8 4" stroke="#2A1A12" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="78" cy="74" r="6" fill="#F27C6E" opacity=".6"/><circle cx="122" cy="74" r="6" fill="#F27C6E" opacity=".6"/><ellipse cx="100" cy="89" rx="6.5" ry="6" fill="#8A2424"/><path class="drop" d="M134 34 q6 8 2 13 q-7 1 -6 -6z" fill="#7CC4FF"/>`;
- const must=`<path d="M100 80 Q92 70 81 74 Q75 78 79 84 Q91 86 100 81 Q109 86 121 84 Q125 78 119 74 Q108 70 100 80Z" fill="${HR[0]}"/><path d="M100 80 Q108 70 119 74 Q125 78 121 84 Q109 86 100 81Z" fill="${HR[1]}"/>`;
- const head=back?`${c2(66,66,7.5,SK)}${c2(134,66,7.5,SK)}${c2(100,62,34,HR,'head')}`:
-  `${c2(66,66,7.5,SK)}${c2(134,66,7.5,SK)}${c2(100,62,34,SK,'head')}<path${P('head')} d="M66 60 Q66 26 100 26 Q134 26 134 60 Q128 44 116 42 Q100 46 84 42 Q72 44 66 60Z" fill="${HR[0]}"/><path d="M100 26 Q134 26 134 60 Q128 44 116 42 Q108 44 100 45Z" fill="${HR[1]}" pointer-events="none"/><g pointer-events="none">${hurt?faceH:faceN}${must}</g>`;
- const torso=back?`${two(64,102,72,106,12,SH,'back')}${two(64,160,72,46,[0,0,10,10],SD,'lower')}<path d="M100 108v52" stroke="${SD[1]}" stroke-width="2.5" pointer-events="none"/>`:
-  `${two(64,102,72,106,12,SH,'chest')}${two(64,160,72,46,[0,0,10,10],SH,'belly')}${two(64,140,72,8,0,ST,'chest')}`;
- const svg=`<svg viewBox="0 0 200 446" role="img" aria-label="Человек: нажмите, где болит"><ellipse cx="100" cy="434" rx="64" ry="6" fill="rgba(0,0,0,.08)"/>
- <g class="guy ${z?'a-'+z:'idle'}${back?' back':''}"${O(100,430)}>
-  <g class="low"${O(100,236)}>${leg('L',68)}${leg('R',102)}${two(64,206,72,38,[0,0,6,6],JN,'hips')}</g>
-  <g class="bd"${O(100,210)}>${torso}<g${P('hips')}><path d="${rp(64,202,72,9,[2,2,2,2])}" fill="#2A2A2E"/><path d="${rp(94,200.5,12,12,[2,2,2,2])}" fill="${ST[0]}"/></g>
-   ${arm('L',48.5)}${arm('R',133.5)}
-   <g class="shc"${O(100,116)}>${c2(64,116,15,SD,'shoulders')}${c2(136,116,15,SD,'shoulders')}</g>
-   ${two(90,90,20,18,[4,4,0,0],SK,'neck')}
-   <g class="hd"${O(100,100)}>${head}</g></g>
+ // ноги: бедро 455-558, голень 558-662
+ const leg=(s,x)=>{const cx=x+28.5;return `<g class="lg${s}"${O(cx,455)}><g class="sh${s}"${O(cx,558)}>${two(x,548,57,114,0,JN)}<path${P('feet')} d="${rp(x-8,660,73,8,[3,3,3,3])}" fill="${SHOE}"/></g>${two(x,440,57,122,[0,0,6,6],JN)}${two(x-2,537,61,42,18,KN,'knees')}</g>`};
+ // руки: плечо (x,255), локоть (x,345), кисть (x,428)
+ const arm=(s,cx,left)=>{const sl=`<path d="${rp(cx-20,236,40,64,[18,18,3,3])}" fill="${left?SV[0]:SV[1]}"/>`;
+  return `<g class="ua${s}"${O(cx,255)}>${two(cx-16,262,32,90,0,SK,'arms')}<g${P('arms')}>${sl}</g><g class="fa${s}"${O(cx,345)}>${two(cx-16,345,32,72,[0,0,4,4],SK,'arms')}<circle${P('arms')} cx="${cx}" cy="345" r="16" fill="${left?SK[0]:SK[1]}"/><g class="hd${s}"${O(cx,412)}>${c2(cx,428,21,SK,'hands')}</g></g></g>`};
+ const brows=hurt?`<path d="M236 99 l20 6 M300 99 l-20 6" stroke="#9EA3AD" stroke-width="6" stroke-linecap="round"/>`:`<path d="M238 104 q9 -7 19 -2 M279 102 q10 -5 19 2" stroke="#9EA3AD" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+ const eyes=hurt?`<path d="M240 118 l11 7 l-11 7 M296 118 l-11 7 l11 7" stroke="#2A1A12" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<ellipse class="eye" cx="247" cy="124" rx="4.6" ry="6.2" fill="#2A1A12"/><ellipse class="eye" cx="289" cy="124" rx="4.6" ry="6.2" fill="#2A1A12"/>`;
+ const mouth=hurt?`<ellipse cx="268" cy="168" rx="11" ry="12" fill="#8E2424"/>`:`<path d="M240 151 Q268 208 296 151Z" fill="#fff"/>`;
+ const must=`<path d="M268 141 Q257 128 242 132 Q228 138 232 153 Q250 161 268 152 Z" fill="${HR[0]}"/><path d="M268 141 Q279 128 294 132 Q308 138 304 153 Q286 161 268 152 Z" fill="${HR[1]}"/>`;
+ const face=`<g pointer-events="none">${brows}${eyes}<circle cx="225" cy="145" r="11" fill="#F3816F" opacity=".75"/><circle cx="311" cy="145" r="11" fill="#E87363" opacity=".75"/>${mouth}${must}${hurt?'<path class="drop" d="M322 74 q11 14 3 23 q-12 2 -10 -11z" fill="#7CC4FF"/>':''}</g>`;
+ const hair=`<g${P('head')}><path d="M268 58 Q213 58 211 118 Q211 128 214 132 Q218 108 236 100 Q252 94 268 93 Z" fill="${HR[0]}"/><path d="M268 58 Q323 58 325 118 Q325 128 322 132 Q318 108 300 100 Q284 94 268 93 Z" fill="${HR[1]}"/></g>`;
+ const head=back?`${c2(211,140,13,SK)}${c2(325,140,13,SK)}${c2(268,134,59,HR,'head')}`:`${c2(211,140,13,SK)}${c2(325,140,13,SK)}${c2(268,136,58,SK,'head')}${hair}${face}`;
+ const torso=back?`${two(200,220,136,172,[30,30,0,0],SH,'back',268)}${two(200,320,136,72,0,SD,'lower',268)}`:`${two(200,220,136,172,[30,30,0,0],SH,'chest',268)}${two(200,322,136,70,0,SH,'belly',268)}<path d="M200 322H336" stroke="rgba(0,0,0,.06)" stroke-width="2" pointer-events="none"/>`;
+ const svg=`<svg viewBox="150 50 236 622" preserveAspectRatio="xMidYMax meet" role="img" aria-label="Человек: нажмите, где болит"><ellipse cx="268" cy="667" rx="88" ry="7" fill="rgba(0,0,0,.12)"/>
+ <g class="guy ${z?'a-'+z:'idle'}${back?' back':''}"${O(268,668)}>
+  <g class="low"${O(268,455)}>${leg('L',205)}${leg('R',274)}${two(205,400,125,55,[0,0,4,4],JN,'hips',268)}</g>
+  <g class="bd"${O(268,400)}>${torso}${two(205,287,125,11,0,ST,'chest',268)}<g${P('hips')}><path d="${rp(205,389,125,16,[2,2,2,2])}" fill="#2D2D30"/><path d="${rp(255,391,26,13,[3,3,3,3])}" fill="${ST[0]}"/></g>
+   ${two(243,186,50,42,0,SK,'neck',268)}<ellipse cx="268" cy="224" rx="27" ry="9" fill="${SD[1]}" pointer-events="none"/>
+   ${arm('L',184,1)}${arm('R',352,0)}
+   <g class="shc"${O(268,243)}>${c2(207,243,30,SD,'shoulders')}${c2(329,243,30,[SD[1],'#A90B16'],'shoulders')}</g>
+   <g class="hd"${O(268,190)}>${head}</g></g>
  </g></svg>`;
  return `<div class="box bm"><div class="row between" style="flex-wrap:wrap;margin-bottom:4px"><b style="font-size:calc(21px*var(--fz,1))">Где болит?</b><div class="bmseg"><button class="${back?'':'on'}" data-act="bmfront">Спереди</button><button class="${back?'on':''}" data-act="bmback">Сзади</button></div></div>
  <div class="bubble">${z?esc(BODY_FUN[z]||BODY[z]):'Нажмите, где болит!'}</div>
