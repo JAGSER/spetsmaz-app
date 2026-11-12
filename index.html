@@ -291,6 +291,7 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .m3goals0 img{width:40px;height:40px;object-fit:contain}
 .m3cp{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
 .m3cp b{color:#005bff}
+.m3today{background:linear-gradient(135deg,#e3f0ff,#cfe3ff);border-radius:14px;padding:10px 12px;margin:0 0 12px;font-weight:700;font-size:15px;color:#13406f}
 .btn.m3go{font-size:20px;padding:16px;background:linear-gradient(180deg,#ffd23f,#ff9a1a);color:#5a2a00;box-shadow:0 6px 0 #d46f00,0 12px 20px rgba(0,0,0,.2);animation:m3beat 1.6s infinite}
 
 /* game */
@@ -746,7 +747,7 @@ function couponHTML(c){const exp=c.exp<now();return `<div class="coupon ${c.used
 
 // ================= game: match-3 =================
 const GN=7;
-function viewGame(){const s=st();const t=today();if(s.games.date!==t){s.games.date=t;s.games.left=Store.config.gamesPerDay||3;saveState()}
+function viewGame(){const s=st();const t=today();const gc=s.games.cdate===t?s.coupons.find(c=>c.id===s.games.cid):null;
  const g=App.game;const cps=Store.config.coupons||[];
  if(g&&g.c)return`<div id="m3root"></div>`;
  let h=wheelBox();
@@ -756,13 +757,16 @@ function viewGame(){const s=st();const t=today();if(s.games.date!==t){s.games.da
   <div class="m3goals0"><div><img src="${M3.src(0)}" alt="">× ${M3.GOALN}</div><div><img src="${M3.src(1)}" alt="">× ${M3.GOALN}</div></div>
   <p class="muted" style="margin:0 0 8px;font-size:14px">Соберите лавандовые сиропы и мармелад Блю Кюрасао: бонус +${M3.GOALBONUS} очков</p>
   <div style="text-align:left;margin:8px 0 14px">${cps.map(c=>`<div class="m3cp"><span>от ${c.min} очков</span><b>купон Ozon −${c.percent}%</b></div>`).join('')}</div>
-  <button class="btn wide m3go" data-act="startgame" ${s.games.left>0?'':'disabled'}>${s.games.left>0?`▶ Играть (осталось ${s.games.left})`:'Попытки закончились до завтра'}</button>
+  ${gc?`<div class="m3today">🎟️ Купон Ozon на сегодня уже ваш: <b>−${gc.percent}%</b>. Наберёте больше, и он станет выгоднее. Завтра будет новый.</div>`:''}
+  ${s.games.bm?`<p style="margin:0 0 10px;font-weight:800">🎁 Бонус колеса: +${s.games.bm} ходов в следующей игре</p>`:''}
+  <button class="btn wide m3go" data-act="startgame">${gc?'▶ Играть ещё':'▶ Играть'}</button>
+  ${App.admVis?`<button class="btn ghost wide" data-act="gamereset" style="margin-top:10px">🔄 Сброс игры (админ)</button>`:''}
   ${s.games.best?`<p class="muted">Рекорд: ${s.games.best}</p>`:''}</div>`;return h}
 function newBoard(){const b=[];for(let i=0;i<GN*GN;i++){let v;do{v=Math.floor(Math.random()*6)}while((i%GN>=2&&b[i-1]===v&&b[i-2]===v)||(i>=GN*2&&b[i-GN]===v&&b[i-2*GN]===v));b.push(v)}return b}
 function findMatches(b){const m=new Set();for(let r=0;r<GN;r++)for(let c=0;c<GN;c++){const i=r*GN+c;if(b[i]<0)continue;
  if(c<=GN-3&&b[i]===b[i+1]&&b[i]===b[i+2]){let k=c;while(k<GN&&b[r*GN+k]===b[i]){m.add(r*GN+k);k++}}
  if(r<=GN-3&&b[i]===b[i+GN]&&b[i]===b[i+2*GN]){let k=r;while(k<GN&&b[k*GN+c]===b[i]){m.add(k*GN+c);k++}}}return m}
-function startGame(){const s=st();if(s.games.left<=0)return;s.games.left--;s.games.played=(s.games.played||0)+1;saveState();ut('Игра начата');App.game=Object.assign(M3.newGame(),{mode:mode()});render();scrollTo(0,0)}
+function startGame(){const s=st();s.games.played=(s.games.played||0)+1;const bm=s.games.bm||0;s.games.bm=0;saveState();ut('Игра начата');App.game=Object.assign(M3.newGame(),{mode:mode()});App.game.moves+=bm;render();scrollTo(0,0)}
 function bindBoard(){const m3=$('#m3root');if(m3&&App.game&&App.game.c){M3.mount(m3,App.game);return}const bd=$('#board');if(!bd)return;let sx=0,sy=0,si=-1;
  bd.addEventListener('pointerdown',e=>{const c=e.target.closest('.cell');if(!c)return;si=+c.dataset.c;sx=e.clientX;sy=e.clientY});
  bd.addEventListener('pointerup',e=>{const g=App.game;if(!g||g.busy||si<0)return;const dx=e.clientX-sx,dy=e.clientY-sy;
@@ -777,11 +781,22 @@ async function trySwap(a,b){const g=App.game;g.busy=true;[g.b[a],g.b[b]]=[g.b[b]
   for(let c=0;c<GN;c++){let w=GN-1;for(let r=GN-1;r>=0;r--){const v=g.b[r*GN+c];if(v>=0){g.b[w*GN+c]=v;w--}}for(;w>=0;w--)g.b[w*GN+c]=Math.floor(Math.random()*6)}
   drawBoard();await sleep(200);combo++;m=findMatches(g.b)}
  render();g.busy=false;if(g.moves<=0)endGame()}
-function endGame(){const g=App.game;App.game=null;const s=st();s.games.best=Math.max(s.games.best||0,g.score);const won=[...(Store.config.coupons||[])].reverse().find(c=>g.score>=c.min);let c=null;if(won){c=addCoupon(won.percent,won.code,'game');M3.confetti(200)}saveState();render();
- sheet(`<div style="text-align:center"><div class="m3hero" style="height:120px"><img src="${M3.src(3)}" alt=""><img src="${M3.src(0)}" alt=""><img src="${M3.src(1)}" alt=""></div><h2>${g.score} очков</h2>${won?`<p>Ваш купон Ozon <b>−${won.percent}%</b></p>${couponHTML(c)}<p class="muted" style="font-size:14px">Введите код при оформлении заказа на Ozon</p>`:`<p class="muted">Чуть-чуть не хватило до купона. Попробуйте ещё раз!</p>`}<button class="btn wide" data-act="close">Отлично</button></div>`)}
+function endGame(){const g=App.game;App.game=null;const s=st();const t=today();s.games.best=Math.max(s.games.best||0,g.score);
+ const won=[...(Store.config.coupons||[])].reverse().find(c=>g.score>=c.min);let c=null,st2='none';
+ const prev=s.games.cdate===t?s.coupons.find(x=>x.id===s.games.cid):null;
+ if(won){if(!prev){c=addCoupon(won.percent,won.code,'game');s.games.cdate=t;s.games.cid=c.id;st2='new'}
+  else if(won.percent>prev.percent){prev.percent=won.percent;prev.code=won.code;prev.exp=now()+(Store.config.couponDays||7)*DAY;prev.used=false;prev.copied=false;c=prev;st2='up'}
+  else{c=prev;st2='kept'}}
+ if(st2==='new'||st2==='up')M3.confetti(200);saveState();render();
+ const pics=`<div class="m3hero" style="height:120px"><img src="${M3.src(3)}" alt=""><img src="${M3.src(0)}" alt=""><img src="${M3.src(1)}" alt=""></div>`;
+ const msg=st2==='new'?`<p>Ваш купон Ozon <b>−${c.percent}%</b></p>${couponHTML(c)}<p class="muted" style="font-size:14px">Введите код при оформлении заказа на Ozon</p>`
+  :st2==='up'?`<p>Купон улучшен до <b>−${c.percent}%</b>! 🎉</p>${couponHTML(c)}<p class="muted" style="font-size:14px">Введите код при оформлении заказа на Ozon</p>`
+  :st2==='kept'?`<p>Купон на сегодня уже ваш: <b>−${c.percent}%</b>. Приходите завтра за новым или наберите больше, чтобы его улучшить.</p>`
+  :prev?`<p class="muted">Купон на сегодня уже ваш: −${prev.percent}%. Можно играть на рекорд!</p>`:`<p class="muted">Чуть-чуть не хватило до купона. Попробуйте ещё раз!</p>`;
+ sheet(`<div style="text-align:center">${pics}<h2>${g.score} очков</h2>${msg}<button class="btn wide" data-act="close">Отлично</button></div>`)}
 
 // ================= daily wheel =================
-const PRIZES=[{t:'+1 игра',g:1},{t:'5%',p:5},{t:'+2 игры',g:2},{t:'+1 игра',g:1},{t:'7%',p:7},{t:'+3 игры',g:3},{t:'5%',p:5},{t:'10%',p:10}];
+const PRIZES=[{t:'+3 хода',g:3},{t:'5%',p:5},{t:'+5 ходов',g:5},{t:'+3 хода',g:3},{t:'7%',p:7},{t:'+8 ходов',g:8},{t:'5%',p:5},{t:'10%',p:10}];
 const PRW=[18,14,14,18,10,8,14,4];
 function wheelBox(){const s=st();const t=today();const done=s.wheel.date===t;const yest=new Date(Date.now()-DAY).toISOString().slice(0,10);const streak=done?s.wheel.streak:(s.wheel.date===yest?s.wheel.streak:0);
  return `<div class="box"><div class="row between"><div><b style="font-size:calc(22px*var(--fz,1))">🎡 Бонус дня</b><div class="muted">${done?'Сегодня: '+esc(s.wheel.last)+'. Приходите завтра!':'Крутите колесо раз в день'}</div></div><button class="btn sm" data-act="wheel" ${done?'disabled':''}>Крутить</button></div>
@@ -794,7 +809,7 @@ function openWheel(){const cols=['#d7141a','#ffb000','#1f6fd6','#2fa84f','#ff6fa
   let r=Math.random()*100,k=0;for(;k<PRW.length;k++){if(r<PRW[k])break;r-=PRW[k]}k=Math.min(k,PRIZES.length-1);
   const rot=360*6+(360-(k*seg+seg/2));$('#wheel').style.transform=`rotate(${rot}deg)`;
   setTimeout(()=>{const yest=new Date(Date.now()-DAY).toISOString().slice(0,10);s.wheel.streak=s.wheel.date===yest?s.wheel.streak+1:1;s.wheel.date=t;const p=PRIZES[k];let msg='';
-   if(p.g){s.games.left=(s.games.date===t?s.games.left:Store.config.gamesPerDay||3)+p.g;s.games.date=t;msg=`Вам ${p.t}!`}else{const cp=(Store.config.coupons||[]).find(c=>c.percent>=p.p)||{code:'BONUS'+p.p};addCoupon(p.p,cp.code,'wheel');msg=`Скидка ${p.p}%! Она в кошельке`}
+   if(p.g){s.games.bm=(s.games.bm||0)+p.g;msg=`Вам ${p.t} в следующей игре!`}else{const cp=(Store.config.coupons||[]).find(c=>c.percent>=p.p)||{code:'BONUS'+p.p};addCoupon(p.p,cp.code,'wheel');msg=`Скидка ${p.p}%! Она в кошельке`}
    if(s.wheel.streak>=7){const cp=(Store.config.coupons||[]).find(c=>c.percent>=10)||{code:'BONUS10'};addCoupon(10,cp.code,'wheel');s.wheel.streak=0;msg+=' И подарок за 7 дней: 10%!'}
    s.wheel.last=p.t;saveState();$('#wres').textContent=msg},4100)}}
 
@@ -933,6 +948,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
   else if(a==='cal'){sheet(`<h2>Календарь праздников</h2>${upcomingHolidays().map(holRow).join('')||'<div class="empty">Скоро добавим</div>'}`)}
   else if(a==='pushperm')askPush();
   else if(a==='startgame')startGame();
+  else if(a==='gamereset'){const s=st();s.games.cdate='';s.games.cid='';s.games.best=0;s.games.bm=0;s.wheel.date='';App.game=null;saveState();render();toast('Игра и бонус дня сброшены')}
   else if(a==='wheel')openWheel();
   else if(a==='share')shareApp();
   else if(a==='applyref'){const v=($('#refin').value||'').trim().toUpperCase();if(!v||v===refCode()){toast('Введите код друга');return}if(!/^DRUG[A-Z0-9]{3,}$/.test(v)){toast('Такого кода нет');return}st().ref.used=true;addCoupon(Store.config.referralPercent||10,Store.config.referralCode||'DRUG10','ref');toast('Скидка добавлена в кошелёк');render()}
