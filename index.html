@@ -862,13 +862,16 @@ function closeSheet(){try{speechSynthesis.cancel()}catch(e){}const s=$('#sheet')
 // ================= stories =================
 let SV=null;
 function openStory(id){const list=visiblePosts(mode()).filter(p=>p.story&&(p.slides||[]).length);let pi=list.findIndex(p=>p.id===id);if(pi<0)return;let si=0;
- const d=document.createElement('div');d.className='sv';document.body.appendChild(d);let tm=null;
+ const d=document.createElement('div');d.className='sv';document.body.appendChild(d);let tm=null,ht=null,bar=null,left=5000,t0=0,held=false,skip=false;d.style.webkitTouchCallout='none';d.style.userSelect='none';
  function show(){const p=list[pi];if(!st().seenStories.includes(p.id)){st().seenStories.push(p.id);saveState()}track('view',p.id);const s=p.slides[si];
   d.innerHTML=`<div class="st"><div class="bars">${p.slides.map((_,i)=>`<i><b style="width:${i<si?100:0}%"></b></i>`).join('')}</div><div class="ttl">${esc(p.title)}</div><button class="x">✕</button>
   <div class="media">${mediaHTML(s,true,true)}</div><div class="tapL"></div><div class="tapR"></div><button class="btn go" data-go="${p.id}">Читать пост</button></div>`;
-  d.querySelectorAll('video').forEach(v=>{v.muted=true;v.play().catch(()=>{})});const bar=d.querySelectorAll('.bars b')[si];bar.style.transition='width 5s linear';requestAnimationFrame(()=>requestAnimationFrame(()=>bar.style.width='100%'));
-  clearTimeout(tm);tm=setTimeout(next,5000);
-  d.querySelector('.x').onclick=close;d.querySelector('.tapL').onclick=prev;d.querySelector('.tapR').onclick=next;d.querySelector('.go').onclick=()=>{close();openPost(p.id)}}
+  d.querySelectorAll('video').forEach(v=>{v.muted=true;v.play().catch(()=>{})});bar=d.querySelectorAll('.bars b')[si];left=5000;held=false;skip=false;run();
+  d.querySelector('.x').onclick=close;d.querySelector('.tapL').onclick=()=>{if(skip){skip=false;return}prev()};d.querySelector('.tapR').onclick=()=>{if(skip){skip=false;return}next()};d.querySelector('.go').onclick=()=>{close();openPost(p.id)}}
+ function run(){t0=Date.now();bar.style.transition=`width ${left}ms linear`;requestAnimationFrame(()=>requestAnimationFrame(()=>bar.style.width='100%'));clearTimeout(tm);tm=setTimeout(next,left)}
+ function hold(){if(held)return;clearTimeout(tm);left=Math.max(0,left-(Date.now()-t0));const w=getComputedStyle(bar).width;bar.style.transition='none';bar.style.width=w;held=true}
+ d.addEventListener('pointerdown',e=>{if(e.target.closest('.x,.go'))return;clearTimeout(ht);ht=setTimeout(hold,180)});
+ const up=()=>{clearTimeout(ht);if(held){held=false;skip=true;setTimeout(()=>skip=false,400);run()}};d.addEventListener('pointerup',up);d.addEventListener('pointercancel',up);d.addEventListener('contextmenu',e=>e.preventDefault());
  function next(){const p=list[pi];if(si<p.slides.length-1)si++;else if(pi<list.length-1){pi++;si=0}else return close();show()}
  function prev(){if(si>0)si--;else if(pi>0){pi--;si=0}show()}
  function close(){clearTimeout(tm);d.remove();render()}
