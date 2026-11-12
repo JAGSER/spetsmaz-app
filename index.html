@@ -21,7 +21,7 @@ textarea{min-height:90px;resize:vertical}
 header{position:sticky;top:0;z-index:20;background:var(--bg);padding:8px 14px 6px;transition:background .3s}
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:calc(21px*var(--fz,1));letter-spacing:-.3px}
-.logo .mark{width:40px;height:40px;border-radius:50%;background:transparent;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));display:grid;place-items:center;color:#fff;font-size:calc(19px*var(--fz,1));overflow:hidden}
+.logo .mark{width:34px;height:34px;border-radius:9px;background:var(--acc);display:grid;place-items:center;color:#fff;font-size:calc(19px*var(--fz,1));overflow:hidden}
 .logo .mark img{width:100%;height:100%;object-fit:cover}
 .bell{position:relative;width:40px;height:40px;border-radius:11px;background:var(--card);display:grid;place-items:center;font-size:calc(20px*var(--fz,1))}
 .bell b{position:absolute;top:-4px;right:-4px;background:var(--acc);color:#fff;font-size:calc(14px*var(--fz,1));min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
@@ -443,7 +443,7 @@ function render(){
  const m=mode();document.body.classList.toggle('mood',m==='mood');
  const cfg=Store.config[m]||{};const n=notifications().length;
  const tabs=[['feed',IC.feed,'Лента'],['search',IC.search,'Поиск'],['game',IC.game,'Скидки'],['favs',IC.favs,'Избранное'],['me',IC.me,'Профиль']];if(App.admVis)tabs.push(['admin',IC.admin,'Админ']);applyTheme();
- $('#app').innerHTML=`<header><div class="top"><div class="logo"><div class="mark"><img src="${esc(cfg.logo||'logo-'+m+'.png')}" alt=""></div>${esc(cfg.brand||MODES[m].brand)}</div>
+ $('#app').innerHTML=`<header><div class="top"><div class="logo"><div class="mark">${cfg.logo?`<img src="${esc(cfg.logo)}" alt="">`:MODES[m].em}</div>${esc(cfg.brand||MODES[m].brand)}</div>
   <div class="hdbtns"><button class="bell" data-act="theme" aria-label="Тёмная или светлая тема">${isDark()?IC.sun:IC.moon}</button><button class="bell" data-act="bell" aria-label="Уведомления">${IC.bell}${n?`<b>${n}</b>`:''}</button></div></div>
   <div class="switch"><div class="pill"></div><button class="h" data-mode="health">Здоровье</button><button class="m" data-mode="mood">Настроение</button></div></header>
   <main>${({feed:viewFeed,search:viewSearch,game:viewGame,favs:viewFavs,me:viewMe,admin:viewAdmin})[App.tab]()}</main>
