@@ -188,11 +188,15 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .bm .a-hips .low{--a:translateX(-9px);--b:translateX(9px);animation:wig .55s ease-in-out infinite alternate}
 .bm .a-hips :is(.lgL,.lgR){--a:rotate(-2.5deg);--b:rotate(2.5deg);animation:wig .55s ease-in-out infinite alternate}
 .bm .a-hips .bd{--a:translateX(-5px) rotate(2.5deg);--b:translateX(5px) rotate(-2.5deg);animation:wig .55s ease-in-out infinite alternate}
-/* колени: медленно приседает, колени в стороны */
-.bm .a-knees :is(.low,.bd){animation:squat 1.8s ease-in-out infinite}
-.bm .a-knees .lgL{animation:squatL 1.8s ease-in-out infinite}.bm .a-knees .shL{animation:squatS 1.8s ease-in-out infinite}
-.bm .a-knees .lgR{animation:squatLR 1.8s ease-in-out infinite}.bm .a-knees .shR{animation:squatSR 1.8s ease-in-out infinite}
-.bm .a-knees .hd{--a:translateY(0);--b:translateY(2px);animation:wig .2s steps(2) infinite alternate}
+/* колени: марширует на месте, поднимая колени по очереди */
+@keyframes kneeL{0%,50%,100%{transform:none}25%{transform:translateY(-46px)}}
+@keyframes kneeR{0%,50%,100%{transform:none}75%{transform:translateY(-46px)}}
+@keyframes kbob{0%,50%,100%{transform:none}25%,75%{transform:translateY(-6px)}}
+.bm .a-knees .lgL{animation:kneeL 1.3s ease-in-out infinite}
+.bm .a-knees .lgR{animation:kneeR 1.3s ease-in-out infinite}
+.bm .a-knees .bd{animation:kbob 1.3s ease-in-out infinite}
+.bm .a-knees .uaL{--a:rotate(-12deg);--b:rotate(12deg);animation:wig .65s ease-in-out infinite alternate}
+.bm .a-knees .uaR{--a:rotate(-12deg);--b:rotate(12deg);animation:wig .65s ease-in-out infinite alternate}
 /* руки и локти: трёт локоть другой рукой */
 .bm .a-arms .uaL{--p:rotate(0deg)}.bm .a-arms .faL{--p:rotate(-90deg);--b:rotate(-70deg)}
 .bm .a-arms .uaL{animation:pose .4s ease-out forwards}
@@ -307,7 +311,7 @@ nav button.on svg{transform:scale(1.1)}
 .inst .x{color:var(--mut);font-size:calc(20px*var(--fz,1));width:36px;height:36px}
 .sheet .in{transition:transform .25s;touch-action:pan-y}
 .sheet .grab{width:48px;height:5px;border-radius:3px;background:var(--line);margin:-6px auto 6px}
-.bmgrid{grid-template-columns:54% 1fr!important;align-items:stretch!important}
+.bmgrid{grid-template-columns:54% 1fr!important;align-items:stretch!important;margin-top:2px!important}
 .bmfig{position:relative;min-height:465px}
 .bmfig svg{overflow:visible}
 .bmfig svg{position:absolute;inset:0;width:100%!important;height:100%!important}
@@ -535,29 +539,29 @@ function bodyMapHTML(){const z=App.bodyZone;const back=App.bodyView==='back'||(!
  const SK=['#FBC4A0','#F2B08A'],SH=['#EE1C2B','#D51523'],SV=['#E4192A','#C8121F'],SD=['#CC111E','#B80D19'],ST=['#F9C620','#EFB817'],JN=['#1D56A6','#154A94'],KN=['#2F6EC2','#2763B3'],HR=['#D0D3DB','#BCC1CA'],SHOE='#1E465A';
  const P=k=>k?` class="z${z===k?' on':''}" data-zone="${k}"`:'';
  const rp=(x,y,w,h,[a,b,c,d])=>`M${x+a} ${y}H${x+w-b}Q${x+w} ${y} ${x+w} ${y+b}V${y+h-c}Q${x+w} ${y+h} ${x+w-c} ${y+h}H${x+d}Q${x} ${y+h} ${x} ${y+h-d}V${y+a}Q${x} ${y} ${x+a} ${y}Z`;
- const two=(x,y,w,h,r,c,k,sx)=>{const R=Array.isArray(r)?r:[r,r,r,r];const m=sx??x+w/2;return `<g${P(k)}><path d="${rp(x,y,m-x,h,[R[0],0,0,R[3]])}" fill="${c[0]}"/><path d="${rp(m,y,x+w-m,h,[0,R[1],R[2],0])}" fill="${c[1]}"/></g>`};
- const c2=(cx,cy,r,c,k)=>`<g${P(k)}><circle cx="${cx}" cy="${cy}" r="${r}" fill="${c[0]}"/><path d="M${cx} ${cy-r}A${r} ${r} 0 0 1 ${cx} ${cy+r}Z" fill="${c[1]}"/></g>`;
+ const two=(x,y,w,h,r,c,k,sx)=>{const R=Array.isArray(r)?r:[r,r,r,r];const m=sx??x+w/2;return `<path${P(k)} d="${rp(x,y,w,h,R)}" fill="${c[0]}"/>`};
+ const c2=(cx,cy,r,c,k)=>`<circle${P(k)} cx="${cx}" cy="${cy}" r="${r}" fill="${c[0]}"/>`;
  const O=(x,y)=>` style="transform-origin:${x}px ${y}px"`;
  // ноги: бедро 455-558, голень 558-662
  const leg=(s,x)=>{const cx=x+28.5;return `<g class="lg${s}"${O(cx,455)}><g class="sh${s}"${O(cx,558)}>${two(x,548,57,114,0,JN)}<path${P('feet')} d="${rp(x-8,660,73,8,[3,3,3,3])}" fill="${SHOE}"/></g>${two(x,440,57,122,[0,0,6,6],JN)}${two(x-2,537,61,42,18,KN,'knees')}</g>`};
  // руки: плечо (x,255), локоть (x,345), кисть (x,428)
- const arm=(s,cx,left)=>{const sl=`<path d="${rp(cx-20,236,40,64,[18,18,3,3])}" fill="${left?SV[0]:SV[1]}"/>`;
-  return `<g class="ua${s}"${O(cx,255)}>${two(cx-16,262,32,90,0,SK,'arms')}<g${P('arms')}>${sl}</g><g class="fa${s}"${O(cx,345)}>${two(cx-16,345,32,72,[0,0,4,4],SK,'arms')}<circle${P('arms')} cx="${cx}" cy="345" r="16" fill="${left?SK[0]:SK[1]}"/><g class="hd${s}"${O(cx,412)}>${c2(cx,428,21,SK,'hands')}</g></g></g>`};
+ const arm=(s,cx,left)=>{const sl=`<path d="${rp(cx-20,236,40,64,[18,18,3,3])}" fill="${SV[0]}"/>`;
+  return `<g class="ua${s}"${O(cx,255)}>${two(cx-16,262,32,90,0,SK,'arms')}<g${P('arms')}>${sl}</g><g class="fa${s}"${O(cx,345)}>${two(cx-16,345,32,72,[0,0,4,4],SK,'arms')}<circle${P('arms')} cx="${cx}" cy="345" r="16" fill="${SK[0]}"/><g class="hd${s}"${O(cx,412)}>${c2(cx,428,21,SK,'hands')}</g></g></g>`};
  const brows=hurt?`<path d="M236 99 l20 6 M300 99 l-20 6" stroke="#9EA3AD" stroke-width="6" stroke-linecap="round"/>`:`<path d="M238 104 q9 -7 19 -2 M279 102 q10 -5 19 2" stroke="#9EA3AD" stroke-width="6" fill="none" stroke-linecap="round"/>`;
  const eyes=hurt?`<path d="M240 118 l11 7 l-11 7 M296 118 l-11 7 l11 7" stroke="#2A1A12" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<ellipse class="eye" cx="247" cy="124" rx="4.6" ry="6.2" fill="#2A1A12"/><ellipse class="eye" cx="289" cy="124" rx="4.6" ry="6.2" fill="#2A1A12"/>`;
  const mouth=hurt?`<ellipse cx="268" cy="168" rx="11" ry="12" fill="#8E2424"/>`:`<path d="M240 151 Q268 208 296 151Z" fill="#fff"/>`;
- const must=`<path d="M268 141 Q257 128 242 132 Q228 138 232 153 Q250 161 268 152 Z" fill="${HR[0]}"/><path d="M268 141 Q279 128 294 132 Q308 138 304 153 Q286 161 268 152 Z" fill="${HR[1]}"/>`;
- const face=`<g pointer-events="none">${brows}${eyes}<circle cx="225" cy="145" r="11" fill="#F3816F" opacity=".75"/><circle cx="311" cy="145" r="11" fill="#E87363" opacity=".75"/>${mouth}${must}${hurt?'<path class="drop" d="M322 74 q11 14 3 23 q-12 2 -10 -11z" fill="#7CC4FF"/>':''}</g>`;
- const hair=`<g${P('head')}><path d="M268 58 Q213 58 211 118 Q211 128 214 132 Q218 108 236 100 Q252 94 268 93 Z" fill="${HR[0]}"/><path d="M268 58 Q323 58 325 118 Q325 128 322 132 Q318 108 300 100 Q284 94 268 93 Z" fill="${HR[1]}"/></g>`;
+ const must=`<path d="M268 141 Q257 128 242 132 Q228 138 232 153 Q250 161 268 152 Z" fill="${HR[0]}"/><path d="M268 141 Q279 128 294 132 Q308 138 304 153 Q286 161 268 152 Z" fill="${HR[0]}"/>`;
+ const face=`<g pointer-events="none">${brows}${eyes}<circle cx="225" cy="145" r="11" fill="#F3816F" opacity=".75"/><circle cx="311" cy="145" r="11" fill="#F3816F" opacity=".75"/>${mouth}${must}${hurt?'<path class="drop" d="M322 74 q11 14 3 23 q-12 2 -10 -11z" fill="#7CC4FF"/>':''}</g>`;
+ const hair=`<g${P('head')}><path d="M268 58 Q213 58 211 118 Q211 128 214 132 Q218 108 236 100 Q252 94 268 93 Z" fill="${HR[0]}"/><path d="M268 58 Q323 58 325 118 Q325 128 322 132 Q318 108 300 100 Q284 94 268 93 Z" fill="${HR[0]}"/></g>`;
  const head=back?`${c2(211,140,13,SK)}${c2(325,140,13,SK)}${c2(268,134,59,HR,'head')}`:`${c2(211,140,13,SK)}${c2(325,140,13,SK)}${c2(268,136,58,SK,'head')}${hair}${face}`;
  const torso=back?`${two(200,220,136,172,[30,30,0,0],SH,'back',268)}${two(200,320,136,72,0,SD,'lower',268)}`:`${two(200,220,136,172,[30,30,0,0],SH,'chest',268)}${two(200,322,136,70,0,SH,'belly',268)}<path d="M200 322H336" stroke="rgba(0,0,0,.06)" stroke-width="2" pointer-events="none"/>`;
- const svg=`<svg viewBox="150 50 236 622" preserveAspectRatio="xMidYMax meet" role="img" aria-label="Человек: нажмите, где болит"><ellipse cx="268" cy="667" rx="88" ry="7" fill="rgba(0,0,0,.12)"/>
+ const svg=`<svg viewBox="150 54 236 618" preserveAspectRatio="xMidYMin meet" role="img" aria-label="Человек: нажмите, где болит"><ellipse cx="268" cy="667" rx="88" ry="7" fill="rgba(0,0,0,.12)"/>
  <g class="guy ${z?'a-'+z:'idle'}${back?' back':''}"${O(268,668)}>
   <g class="low"${O(268,455)}>${leg('L',205)}${leg('R',274)}${two(205,400,125,55,[0,0,4,4],JN,'hips',268)}</g>
-  <g class="bd"${O(268,400)}>${torso}${two(205,287,125,11,0,ST,'chest',268)}<g${P('hips')}><path d="${rp(205,389,125,16,[2,2,2,2])}" fill="#2D2D30"/><path d="${rp(255,391,26,13,[3,3,3,3])}" fill="${ST[0]}"/></g>
+  <g class="bd"${O(268,400)}>${torso}${back?'':two(205,287,125,11,0,ST,'chest',268)}<g${P('hips')}><path d="${rp(205,389,125,16,[2,2,2,2])}" fill="#2D2D30"/>${back?'':`<path d="${rp(255,391,26,13,[3,3,3,3])}" fill="${ST[0]}"/>`}</g>
    ${two(243,186,50,42,0,SK,'neck',268)}<ellipse cx="268" cy="224" rx="27" ry="9" fill="${SD[1]}" pointer-events="none"/>
    ${arm('L',184,1)}${arm('R',352,0)}
-   <g class="shc"${O(268,243)}>${c2(207,243,30,SD,'shoulders')}${c2(329,243,30,[SD[1],'#A90B16'],'shoulders')}</g>
+   <g class="shc"${O(268,243)}>${c2(190,248,28,SD,'shoulders')}${c2(346,248,28,SD,'shoulders')}</g>
    <g class="hd"${O(268,190)}>${head}</g></g>
  </g></svg>`;
  return `<div class="box bm"><div class="row between" style="flex-wrap:wrap;margin-bottom:4px"><b style="font-size:calc(21px*var(--fz,1))">Где болит?</b><div class="bmseg"><button class="${back?'':'on'}" data-act="bmfront">Спереди</button><button class="${back?'on':''}" data-act="bmback">Сзади</button></div></div>
