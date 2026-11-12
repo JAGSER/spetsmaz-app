@@ -266,15 +266,15 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 @keyframes m3spin{to{transform:rotate(360deg)}}
 .m3beam{position:absolute;left:0;top:0;right:0;bottom:0;z-index:6;pointer-events:none;border-radius:20px;background:linear-gradient(var(--d,90deg),transparent,#fff 30%,var(--c) 50%,#fff 70%,transparent);box-shadow:0 0 20px #fff,0 0 40px #ffe08a}
 .m3beam.h{bottom:auto}.m3beam.v{right:auto;--d:180deg}
-.m3say{position:absolute;left:50%;top:45%;z-index:20;pointer-events:none;white-space:nowrap;font-weight:900;font-size:40px;letter-spacing:1px;color:#fff;
+.m3say{position:absolute;left:50%;top:45%;z-index:20;pointer-events:none;white-space:normal;width:94%;text-align:center;line-height:1.1;font-weight:900;font-size:clamp(24px,8vw,40px);letter-spacing:.5px;color:#fff;
  text-shadow:-2px -2px 0 #c04208,2px -2px 0 #c04208,-2px 2px 0 #c04208,2px 2px 0 #c04208,0 -2px 0 #c04208,0 2px 0 #c04208,-2px 0 0 #c04208,2px 0 0 #c04208,0 4px 0 #d4520a,0 6px 0 #c04208,0 8px 0 #a83806,0 12px 16px rgba(0,0,0,.45)}
-.m3say.big{font-size:46px}
+.m3say.big{font-size:clamp(26px,9vw,46px)}
 .m3pts{position:absolute;z-index:19;pointer-events:none;font-weight:900;font-size:26px;color:#fff;text-shadow:-2px -2px 0 #1d5fc0,2px -2px 0 #1d5fc0,-2px 2px 0 #1d5fc0,2px 2px 0 #1d5fc0,0 -2px 0 #1d5fc0,0 2px 0 #1d5fc0,-2px 0 0 #1d5fc0,2px 0 0 #1d5fc0,0 4px 0 #1d5fc0,0 7px 10px rgba(0,0,0,.4);}
 .m3fly{position:fixed;left:0;top:0;z-index:9998;pointer-events:none;object-fit:contain;filter:drop-shadow(0 6px 6px rgba(0,0,0,.35))}
 .m3fx{position:fixed;inset:0;width:100vw;height:100vh;z-index:9997;pointer-events:none}
 .m3tip{text-align:center;font-size:13px;margin:0}
-.m3tools{display:flex;justify-content:flex-end;gap:8px;margin-bottom:6px}
-.m3tools button{width:44px;height:44px;border-radius:14px;background:var(--card);font-size:22px;box-shadow:0 3px 0 rgba(0,0,0,.1)}
+.m3tools{display:flex;gap:6px}
+.m3tools button{width:40px;height:40px;border-radius:12px;background:var(--card);font-size:19px;box-shadow:0 3px 0 rgba(0,0,0,.1)}
 .m3.fs{position:fixed;inset:0;z-index:9000;background:var(--bg);overflow:auto;padding:max(10px,env(safe-area-inset-top)) 12px 12px;display:flex;flex-direction:column;justify-content:center}
 .m3.fs .m3stage{width:min(100%,calc(100dvh - 300px),640px)}
 .m3.fs .m3tip{display:none}
@@ -285,7 +285,7 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .m3hero img:nth-child(2){left:calc(50% - 55px);top:0;z-index:2;width:120px;height:145px}
 .m3hero img:nth-child(3){left:calc(50% + 40px);animation-delay:-2s}
 @keyframes m3float{50%{translate:0 -10px;rotate:4deg}}
-.m3h1{margin:4px 0;font-size:30px;font-weight:900;color:#fff;text-shadow:-2px -2px 0 var(--acc),2px -2px 0 var(--acc),-2px 2px 0 var(--acc),2px 2px 0 var(--acc),0 1px 0 var(--acc),0 2px 0 var(--acc),0 3px 0 var(--acc),0 4px 0 color-mix(in srgb,var(--acc) 80%,#000),0 6px 12px rgba(0,0,0,.3)}
+.m3h1{margin:4px 0;font-size:30px;font-weight:900;letter-spacing:-.3px;color:var(--acc);text-shadow:0 2px 0 rgba(255,255,255,.9),0 4px 10px rgba(0,0,0,.12)}
 .m3goals0{display:flex;justify-content:center;gap:10px;margin:10px 0}
 .m3goals0 div{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:14px;padding:6px 10px;font-weight:800}
 .m3goals0 img{width:40px;height:40px;object-fit:contain}
@@ -294,6 +294,53 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .m3today{background:linear-gradient(135deg,#e3f0ff,#cfe3ff);border-radius:14px;padding:10px 12px;margin:0 0 12px;font-weight:700;font-size:15px;color:#13406f}
 .btn.m3go{font-size:20px;padding:16px;background:linear-gradient(180deg,#ffd23f,#ff9a1a);color:#5a2a00;box-shadow:0 6px 0 #d46f00,0 12px 20px rgba(0,0,0,.2);animation:m3beat 1.6s infinite}
 
+/* match-3 v3 */
+body.m3on header{display:none}
+body.m3on,html:has(body.m3on){overflow:hidden;overscroll-behavior:none}
+body.m3on main{padding-top:8px}
+.m3row1{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.m3lv{font-weight:900;font-size:17px;background:var(--card);border-radius:12px;padding:8px 12px;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.m3row1 .m3score b{font-size:26px}
+.m3top{flex-wrap:nowrap}
+.m3top .m3goal{padding:4px 8px;min-width:0}
+.m3top .m3goal img{width:38px;height:38px}
+.m3top .m3goal span{font-size:17px}
+.m3top .m3moves{width:64px;height:64px;flex-basis:64px}.m3top .m3moves b{font-size:24px}
+.m3goal.ice{flex:0 0 auto}
+.m3icei{width:32px;height:32px;border-radius:9px;display:block;background:linear-gradient(135deg,#f4fbff,#a9dcff 55%,#6cc2ff);box-shadow:inset 0 0 0 2px #fff,0 2px 4px rgba(0,0,0,.2)}
+.m3bar{margin:4px 0 18px}
+.m3bar em{color:#e8a000;font-size:12px;top:20px;text-shadow:0 1px 0 #fff}
+.m3c.ice,.m3c.ice2{z-index:3}
+.m3c.ice i{background:linear-gradient(135deg,rgba(240,250,255,.55),rgba(160,215,255,.38) 55%,rgba(110,190,255,.45));backdrop-filter:blur(.6px);box-shadow:inset 0 0 0 2px rgba(255,255,255,.9),inset 0 -4px 8px rgba(40,120,200,.35)}
+.m3c.ice2 i{background:linear-gradient(135deg,rgba(255,255,255,.75),rgba(190,228,255,.6) 40%,rgba(95,179,245,.6));box-shadow:inset 0 0 0 3px #fff,inset 0 -6px 10px rgba(20,90,180,.5),0 0 0 2px rgba(80,170,255,.6)}
+.m3c.ice i::after,.m3c.ice2 i::after{content:'';position:absolute;inset:12% 50% 40% 18%;border-top:2px solid rgba(255,255,255,.95);transform:rotate(-30deg);border-radius:2px}
+.m3c i{position:relative}
+.m3bst{display:flex;gap:10px;justify-content:center;margin-top:4px}
+.m3bst button{display:flex;align-items:center;gap:6px;background:var(--card);border-radius:14px;padding:8px 14px;font-weight:800;font-size:15px;box-shadow:0 3px 0 rgba(0,0,0,.1);position:relative}
+.m3bst button span{font-size:22px}
+.m3bst button small{position:absolute;top:-6px;right:-6px;background:var(--acc);color:#fff;border-radius:10px;min-width:20px;height:20px;font-size:12px;line-height:20px;text-align:center}
+.m3bst button.on{background:#ffe9a8;box-shadow:0 0 0 3px #ffb000,0 3px 0 rgba(0,0,0,.1)}
+.m3bst button:disabled{opacity:.4}
+.m3ham{position:fixed;z-index:9999;font-size:46px;pointer-events:none;transform-origin:80% 80%}
+.m3home .m3p{margin:6px 0;font-size:16px;font-weight:500;color:var(--mut);line-height:1.35}
+.m3stars{display:flex;align-items:baseline;justify-content:center;gap:10px;margin:10px 0 6px}
+.m3stars b{font-size:28px;font-weight:900;color:#f2a900}
+.m3stars span{font-size:16px;font-weight:600}
+.m3sbar{height:10px;border-radius:6px;background:var(--bg);overflow:hidden;margin:0 0 10px}.m3sbar i{display:block;height:100%;background:linear-gradient(90deg,#ffd23f,#ff9a1a)}
+.m3tiers{display:grid;gap:6px;margin:6px 0 12px;text-align:left}
+.m3tiers div{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:12px;padding:8px 12px;font-size:16px;font-weight:600}
+.m3tiers b{color:#f2a900;font-weight:800;min-width:52px}.m3tiers span{flex:1}.m3tiers em{font-style:normal;color:#2fa84f;font-weight:700;font-size:14px}
+.m3tiers .got{opacity:.6}
+.m3map{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 6px}
+.m3map button{background:var(--bg);border-radius:14px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;font-weight:800}
+.m3map button b{font-size:19px}.m3map button i{font-style:normal;font-size:12px;color:#f2a900;min-height:15px}
+.m3map button.cur{background:linear-gradient(180deg,#ffd23f,#ff9a1a);color:#5a2a00;box-shadow:0 3px 0 #d46f00}
+.m3map button:disabled{opacity:.45}
+.m3rt{margin:6px 0}
+.m3rs{display:flex;justify-content:center;gap:10px;font-size:54px;margin:4px 0}
+.m3rs i{font-style:normal;color:#ddd;animation:m3sp .5s cubic-bezier(.3,1.6,.5,1) both}
+.m3rs i.on{color:#ffc400;text-shadow:0 3px 0 #d48a00,0 6px 12px rgba(0,0,0,.25)}
+@keyframes m3sp{from{transform:scale(0) rotate(-120deg)}to{transform:scale(1)}}
 /* game */
 .board{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:var(--card);padding:8px;border-radius:20px;touch-action:none;user-select:none}
 .cell{aspect-ratio:1;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:calc(34px*var(--fz,1));transition:transform .15s,opacity .2s}
@@ -444,7 +491,7 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 <body>
 <div id="app"></div>
 <script src="zonekit.js"></script>
-<script src="game.js?v=2"></script>
+<script src="game.js?v=3"></script>
 <script>
 "use strict";
 // ================= helpers =================
@@ -471,7 +518,7 @@ const enc=encodeURIComponent;const clone=o=>JSON.parse(JSON.stringify(o));
 const DEFAULT_CONFIG={
  health:{brand:'Спецмазь',logo:'',social:{vk:'https://vk.com/spetzmaz',tg:'',yt:'',ok:''}},
  mood:{brand:'Доктор Шустер',logo:'',social:{vk:'https://vk.com/dr.shuster',tg:'',yt:'',ok:''}},
- coupons:[{min:800,percent:5,code:'SKIDKA5'},{min:1600,percent:10,code:'SKIDKA10'},{min:2600,percent:15,code:'SKIDKA15'}],
+ coupons:[{min:12,percent:5,code:'SKIDKA5'},{min:30,percent:10,code:'SKIDKA10'},{min:60,percent:15,code:'SKIDKA15'}],
  couponDays:7, gamesPerDay:3, referralPercent:10, referralCode:'DRUG10',
  holidays:[{date:'2026-12-31',title:'Новый год',tag:'подарок'},{date:'2027-02-14',title:'День влюблённых',tag:'подарок'},{date:'2027-02-23',title:'23 Февраля',tag:'подарок'},{date:'2027-03-08',title:'8 Марта',tag:'подарок'}]
 };
@@ -586,7 +633,7 @@ function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._
 
 // ================= render =================
 function render(){
- const m=mode();document.body.classList.toggle('mood',m==='mood');
+ const m=mode();document.body.classList.toggle('mood',m==='mood');document.body.classList.toggle('m3on',App.tab==='game'&&!!(App.game&&App.game.c));
  const cfg=Store.config[m]||{};const n=notifications().length;
  const tabs=[['feed',IC.feed,'Лента'],['search',IC.search,'Поиск'],['game',IC.game,'Игры'],['favs',IC.favs,'Избранное'],['me',IC.me,'Профиль']];if(App.admVis)tabs.push(['admin',IC.admin,'Админ']);applyTheme();
  $('#app').innerHTML=`<header><div class="top"><div class="logo"><div class="mark">${cfg.logo?`<img src="${esc(cfg.logo)}" alt="">`:MODES[m].em}</div>${esc(cfg.brand||MODES[m].brand)}</div>
@@ -747,26 +794,30 @@ function couponHTML(c){const exp=c.exp<now();return `<div class="coupon ${c.used
 
 // ================= game: match-3 =================
 const GN=7;
-function viewGame(){const s=st();const t=today();const gc=s.games.cdate===t?s.coupons.find(c=>c.id===s.games.cid):null;
- const g=App.game;const cps=Store.config.coupons||[];
+function gTiers(){let c=(Store.config.coupons||[]);if(!c.length||c.some(x=>x.min>300))c=[{min:12,percent:5,code:'SKIDKA5'},{min:30,percent:10,code:'SKIDKA10'},{min:60,percent:15,code:'SKIDKA15'}];return c}
+function gStars(){const lv=st().games.lv||{};return Object.values(lv).reduce((a,b)=>a+b,0)}
+function gNext(){const lv=st().games.lv||{};let n=1;while(lv[n])n++;return n}
+function starTxt(k){return '★'.repeat(k)+'☆'.repeat(3-k)}
+function viewGame(){const s=st();const g=App.game;
  if(g&&g.c)return`<div id="m3root"></div>`;
+ const lv=s.games.lv||{},tot=gStars(),next=gNext(),tiers=gTiers(),cl=s.games.cl||[];const nt=tiers.find(t=>!cl.includes(t.min));
  let h=wheelBox();
- h+=`<div class="box" style="text-align:center"><div class="m3hero"><img src="${M3.src(3)}" alt=""><img src="${M3.src(0)}" alt=""><img src="${M3.src(1)}" alt=""></div>
+ h+=`<div class="box m3home"><div class="m3hero"><img src="${M3.src(3)}" alt=""><img src="${M3.src(0)}" alt=""><img src="${M3.src(1)}" alt=""></div>
   <div class="m3h1">Шустрые три в ряд</div>
-  <p class="muted" style="margin:4px 0">Собирайте сиропы и мармелад Dr.Shuster по 3 в ряд. ${25} ходов. Набрали очки, получили купон на Ozon.</p>
-  <div class="m3goals0"><div><img src="${M3.src(0)}" alt="">× ${M3.GOALN}</div><div><img src="${M3.src(1)}" alt="">× ${M3.GOALN}</div></div>
-  <p class="muted" style="margin:0 0 8px;font-size:14px">Соберите лавандовые сиропы и мармелад Блю Кюрасао: бонус +${M3.GOALBONUS} очков</p>
-  <div style="text-align:left;margin:8px 0 14px">${cps.map(c=>`<div class="m3cp"><span>от ${c.min} очков</span><b>купон Ozon −${c.percent}%</b></div>`).join('')}</div>
-  ${gc?`<div class="m3today">🎟️ Купон Ozon на сегодня уже ваш: <b>−${gc.percent}%</b>. Наберёте больше, и он станет выгоднее. Завтра будет новый.</div>`:''}
-  ${s.games.bm?`<p style="margin:0 0 10px;font-weight:800">🎁 Бонус колеса: +${s.games.bm} ходов в следующей игре</p>`:''}
-  <button class="btn wide m3go" data-act="startgame">${gc?'▶ Играть ещё':'▶ Играть'}</button>
-  ${App.admVis?`<button class="btn ghost wide" data-act="gamereset" style="margin-top:10px">🔄 Сброс игры (админ)</button>`:''}
-  ${s.games.best?`<p class="muted">Рекорд: ${s.games.best}</p>`:''}</div>`;return h}
+  <p class="m3p">Проходите уровни, собирайте звёзды и получайте купоны Ozon на сиропы и мармелад Dr.Shuster.</p>
+  <div class="m3stars"><b>★ ${tot}</b><span>${nt?`до купона −${nt.percent}%: ещё ${Math.max(0,nt.min-tot)} ★`:'все купоны собраны!'}</span></div>
+  ${nt?`<div class="m3sbar"><i style="width:${Math.min(100,tot/nt.min*100)}%"></i></div>`:''}
+  <div class="m3tiers">${tiers.map(t=>`<div class="${cl.includes(t.min)?'got':tot>=t.min?'ready':''}"><b>★ ${t.min}</b><span>купон Ozon −${t.percent}%</span><em>${cl.includes(t.min)?'✓ получен':''}</em></div>`).join('')}</div>
+  ${s.games.bm?`<p class="m3p" style="font-weight:800">🎁 Бонус колеса: +${s.games.bm} ходов на следующий уровень</p>`:''}
+  <button class="btn wide m3go" data-act="startgame" data-lv="${next}">▶ Уровень ${next}</button>
+  <div class="m3map">${Array.from({length:Math.max(next+3,12)},(_,k)=>k+1).map(n=>`<button ${n>next?'disabled':''} data-act="startgame" data-lv="${n}" class="${n===next?'cur':lv[n]?'done':''}"><b>${n}</b><i>${n>next?'🔒':lv[n]?starTxt(lv[n]):''}</i></button>`).join('')}</div>
+  <p class="m3p">Лучший результат уровня можно улучшить, переиграв его. На уровнях с 3-го появляется лёд: его нужно растопить, собирая продукты прямо на нём.</p>
+  ${App.admVis?`<button class="btn ghost wide" data-act="gamereset" style="margin-top:6px">🔄 Сброс игры (админ)</button>`:''}</div>`;return h}
 function newBoard(){const b=[];for(let i=0;i<GN*GN;i++){let v;do{v=Math.floor(Math.random()*6)}while((i%GN>=2&&b[i-1]===v&&b[i-2]===v)||(i>=GN*2&&b[i-GN]===v&&b[i-2*GN]===v));b.push(v)}return b}
 function findMatches(b){const m=new Set();for(let r=0;r<GN;r++)for(let c=0;c<GN;c++){const i=r*GN+c;if(b[i]<0)continue;
  if(c<=GN-3&&b[i]===b[i+1]&&b[i]===b[i+2]){let k=c;while(k<GN&&b[r*GN+k]===b[i]){m.add(r*GN+k);k++}}
  if(r<=GN-3&&b[i]===b[i+GN]&&b[i]===b[i+2*GN]){let k=r;while(k<GN&&b[k*GN+c]===b[i]){m.add(k*GN+c);k++}}}return m}
-function startGame(){const s=st();s.games.played=(s.games.played||0)+1;const bm=s.games.bm||0;s.games.bm=0;saveState();ut('Игра начата');App.game=Object.assign(M3.newGame(),{mode:mode()});App.game.moves+=bm;render();scrollTo(0,0)}
+function startGame(n){const s=st();n=+n||gNext();s.games.played=(s.games.played||0)+1;const bm=s.games.bm||0;s.games.bm=0;saveState();ut('Игра начата',{level:n});App.game=Object.assign(M3.newGame(n,bm),{mode:mode()});render();scrollTo(0,0)}
 function bindBoard(){const m3=$('#m3root');if(m3&&App.game&&App.game.c){M3.mount(m3,App.game);return}const bd=$('#board');if(!bd)return;let sx=0,sy=0,si=-1;
  bd.addEventListener('pointerdown',e=>{const c=e.target.closest('.cell');if(!c)return;si=+c.dataset.c;sx=e.clientX;sy=e.clientY});
  bd.addEventListener('pointerup',e=>{const g=App.game;if(!g||g.busy||si<0)return;const dx=e.clientX-sx,dy=e.clientY-sy;
@@ -781,23 +832,22 @@ async function trySwap(a,b){const g=App.game;g.busy=true;[g.b[a],g.b[b]]=[g.b[b]
   for(let c=0;c<GN;c++){let w=GN-1;for(let r=GN-1;r>=0;r--){const v=g.b[r*GN+c];if(v>=0){g.b[w*GN+c]=v;w--}}for(;w>=0;w--)g.b[w*GN+c]=Math.floor(Math.random()*6)}
   drawBoard();await sleep(200);combo++;m=findMatches(g.b)}
  render();g.busy=false;if(g.moves<=0)endGame()}
-function endGame(){const g=App.game;App.game=null;const s=st();const t=today();s.games.best=Math.max(s.games.best||0,g.score);
- const won=[...(Store.config.coupons||[])].reverse().find(c=>g.score>=c.min);let c=null,st2='none';
- const prev=s.games.cdate===t?s.coupons.find(x=>x.id===s.games.cid):null;
- if(won){if(!prev){c=addCoupon(won.percent,won.code,'game');s.games.cdate=t;s.games.cid=c.id;st2='new'}
-  else if(won.percent>prev.percent){prev.percent=won.percent;prev.code=won.code;prev.exp=now()+(Store.config.couponDays||7)*DAY;prev.used=false;prev.copied=false;c=prev;st2='up'}
-  else{c=prev;st2='kept'}}
- if(st2==='new'||st2==='up')M3.confetti(200);saveState();render();
- const pics=`<div class="m3hero" style="height:120px"><img src="${M3.src(3)}" alt=""><img src="${M3.src(0)}" alt=""><img src="${M3.src(1)}" alt=""></div>`;
- const msg=st2==='new'?`<p>Ваш купон Ozon <b>−${c.percent}%</b></p>${couponHTML(c)}<p class="muted" style="font-size:14px">Введите код при оформлении заказа на Ozon</p>`
-  :st2==='up'?`<p>Купон улучшен до <b>−${c.percent}%</b>! 🎉</p>${couponHTML(c)}<p class="muted" style="font-size:14px">Введите код при оформлении заказа на Ozon</p>`
-  :st2==='kept'?`<p>Купон на сегодня уже ваш: <b>−${c.percent}%</b>. Приходите завтра за новым или наберите больше, чтобы его улучшить.</p>`
-  :prev?`<p class="muted">Купон на сегодня уже ваш: −${prev.percent}%. Можно играть на рекорд!</p>`:`<p class="muted">Чуть-чуть не хватило до купона. Попробуйте ещё раз!</p>`;
- sheet(`<div style="text-align:center">${pics}<h2>${g.score} очков</h2>${msg}<button class="btn wide" data-act="close">Отлично</button></div>`)}
+window.m3End=function(r){App.game=null;const s=st();s.games.lv=s.games.lv||{};s.games.cl=s.games.cl||[];
+ const prev=s.games.lv[r.level]||0;if(r.won&&r.stars>prev)s.games.lv[r.level]=r.stars;
+ const tot=gStars();const got=[];gTiers().forEach(t=>{if(tot>=t.min&&!s.games.cl.includes(t.min)){s.games.cl.push(t.min);got.push(addCoupon(t.percent,t.code,'game'))}});
+ saveState();render();if(got.length)M3.confetti(220);
+ const pics=`<div class="m3hero" style="height:110px"><img src="${M3.src(3)}" alt=""><img src="${M3.src(0)}" alt=""><img src="${M3.src(1)}" alt=""></div>`;
+ const nx=gNext();
+ const body=r.won?`<h2 class="m3rt">Уровень ${r.level} пройден!</h2><div class="m3rs">${[0,1,2].map(k=>`<i class="${k<r.stars?'on':''}" style="animation-delay:${.3+k*.35}s">★</i>`).join('')}</div><p class="m3p">${r.score} очков${r.stars>prev&&prev?' · новый рекорд уровня!':''}</p>
+   ${got.length?got.map(c=>`<p style="font-weight:800">🎉 Новый купон Ozon −${c.percent}%!</p>${couponHTML(c)}`).join('')+'<p class="m3p">Введите код при оформлении заказа на Ozon</p>':`<p class="m3p">Всего звёзд: ★ ${tot}</p>`}
+   <button class="btn wide m3go" data-act="startgame" data-lv="${r.level+1<=nx?r.level+1:nx}">▶ Уровень ${r.level+1<=nx?r.level+1:nx}</button><button class="btn ghost wide" data-act="startgame" data-lv="${r.level}" style="margin-top:8px">↻ Переиграть на 3 звезды</button>`
+  :`<h2 class="m3rt">Почти получилось!</h2><p class="m3p">Не хватило ходов. Собрано: лаванда ${Math.min(r.got[0],r.need)}/${r.need}, Блю Кюрасао ${Math.min(r.got[1],r.need)}/${r.need}${r.ice?`, осталось льда: ${r.ice}`:''}.</p><button class="btn wide m3go" data-act="startgame" data-lv="${r.level}">↻ Ещё раз</button>`;
+ sheet(`<div style="text-align:center">${pics}${body}<button class="btn ghost wide" data-act="close" style="margin-top:8px">Закрыть</button></div>`);
+ if(r.won)[0,1,2].forEach(k=>{if(k<r.stars)setTimeout(()=>M3.star(k),300+k*350)})};
 
 // ================= daily wheel =================
 const PRIZES=[{t:'+3 хода',g:3},{t:'5%',p:5},{t:'+5 ходов',g:5},{t:'+3 хода',g:3},{t:'7%',p:7},{t:'+8 ходов',g:8},{t:'5%',p:5},{t:'10%',p:10}];
-const PRW=[18,14,14,18,10,8,14,4];
+const PRW=[24,5,22,24,3,16,5,1];
 function wheelBox(){const s=st();const t=today();const done=s.wheel.date===t;const yest=new Date(Date.now()-DAY).toISOString().slice(0,10);const streak=done?s.wheel.streak:(s.wheel.date===yest?s.wheel.streak:0);
  return `<div class="box"><div class="row between"><div><b style="font-size:calc(22px*var(--fz,1))">🎡 Бонус дня</b><div class="muted">${done?'Сегодня: '+esc(s.wheel.last)+'. Приходите завтра!':'Крутите колесо раз в день'}</div></div><button class="btn sm" data-act="wheel" ${done?'disabled':''}>Крутить</button></div>
  <div class="streak">${[1,2,3,4,5,6,7].map(i=>`<i class="${i<=streak?'on':''}">${i===7?'🎁':i}</i>`).join('')}</div><p class="muted" style="text-align:center;margin:0">7 дней подряд: скидка 10% в подарок</p></div>`}
@@ -809,7 +859,7 @@ function openWheel(){const cols=['#d7141a','#ffb000','#1f6fd6','#2fa84f','#ff6fa
   let r=Math.random()*100,k=0;for(;k<PRW.length;k++){if(r<PRW[k])break;r-=PRW[k]}k=Math.min(k,PRIZES.length-1);
   const rot=360*6+(360-(k*seg+seg/2));$('#wheel').style.transform=`rotate(${rot}deg)`;
   setTimeout(()=>{const yest=new Date(Date.now()-DAY).toISOString().slice(0,10);s.wheel.streak=s.wheel.date===yest?s.wheel.streak+1:1;s.wheel.date=t;const p=PRIZES[k];let msg='';
-   if(p.g){s.games.bm=(s.games.bm||0)+p.g;msg=`Вам ${p.t} в следующей игре!`}else{const cp=(Store.config.coupons||[]).find(c=>c.percent>=p.p)||{code:'BONUS'+p.p};addCoupon(p.p,cp.code,'wheel');msg=`Скидка ${p.p}%! Она в кошельке`}
+   if(p.g){s.games.bm=(s.games.bm||0)+p.g;msg=`Вам ${p.t} на следующий уровень!`}else{const cp=(Store.config.coupons||[]).find(c=>c.percent>=p.p)||{code:'BONUS'+p.p};addCoupon(p.p,cp.code,'wheel');msg=`Скидка ${p.p}%! Она в кошельке`}
    if(s.wheel.streak>=7){const cp=(Store.config.coupons||[]).find(c=>c.percent>=10)||{code:'BONUS10'};addCoupon(10,cp.code,'wheel');s.wheel.streak=0;msg+=' И подарок за 7 дней: 10%!'}
    s.wheel.last=p.t;saveState();$('#wres').textContent=msg},4100)}}
 
@@ -854,7 +904,7 @@ function adminSettings(){const c=Store.config;const f=(m,k)=>esc(((c[m]||{}).soc
  return `<div class="box">${['health','mood'].map(m=>`<h4>${MODES[m].t}</h4><div class="field"><label>Название</label><input data-cf="${m}.brand" value="${esc((c[m]||{}).brand||'')}"></div>
  <div class="field"><label>Ссылка на логотип (картинка)</label><input data-cf="${m}.logo" value="${esc((c[m]||{}).logo||'')}" placeholder="https://"></div>
  <div class="grid2">${['vk','tg','yt','ok'].map(k=>`<div class="field"><label>${({vk:'ВКонтакте',tg:'Telegram',yt:'YouTube',ok:'Одноклассники'})[k]}</label><input data-cf="${m}.social.${k}" value="${f(m,k)}" placeholder="https://"></div>`).join('')}</div>`).join('')}
- <h4>Скидки за игру</h4><div class="field"><label>Каждая строка: очки;процент;промокод</label><textarea id="cf-coupons">${(c.coupons||[]).map(x=>`${x.min};${x.percent};${x.code}`).join('\n')}</textarea></div>
+ <h4>Скидки за игру</h4><div class="field"><label>Купоны за звёзды в игре. Каждая строка: звёзды;процент;промокод</label><textarea id="cf-coupons">${(c.coupons||[]).map(x=>`${x.min};${x.percent};${x.code}`).join('\n')}</textarea></div>
  <div class="grid2"><div class="field"><label>Игр в день</label><input type="number" id="cf-gpd" value="${c.gamesPerDay||3}"></div><div class="field"><label>Скидка действует, дней</label><input type="number" id="cf-days" value="${c.couponDays||7}"></div></div>
  <div class="grid2"><div class="field"><label>Скидка за друга, %</label><input type="number" id="cf-refp" value="${c.referralPercent||10}"></div><div class="field"><label>Промокод за друга</label><input id="cf-refc" value="${esc(c.referralCode||'')}"></div></div>
  <h4>Календарь праздников (Настроение)</h4><div class="field"><label>Каждая строка: ГГГГ-ММ-ДД;название;тег постов</label><textarea id="cf-hol">${(c.holidays||[]).map(h=>`${h.date};${h.title};${h.tag||''}`).join('\n')}</textarea></div>
@@ -947,8 +997,8 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
   else if(a==='bodymap'){sheet(bodyMapHTML())}
   else if(a==='cal'){sheet(`<h2>Календарь праздников</h2>${upcomingHolidays().map(holRow).join('')||'<div class="empty">Скоро добавим</div>'}`)}
   else if(a==='pushperm')askPush();
-  else if(a==='startgame')startGame();
-  else if(a==='gamereset'){const s=st();s.games.cdate='';s.games.cid='';s.games.best=0;s.games.bm=0;s.wheel.date='';App.game=null;saveState();render();toast('Игра и бонус дня сброшены')}
+  else if(a==='startgame'){closeSheet();startGame(d.lv)}
+  else if(a==='gamereset'){const s=st();s.games.lv={};s.games.cl=[];s.games.best=0;s.games.bm=0;s.wheel.date='';s.coupons=s.coupons.filter(c=>c.src!=='game');App.game=null;saveState();render();toast('Игра и бонус дня сброшены')}
   else if(a==='wheel')openWheel();
   else if(a==='share')shareApp();
   else if(a==='applyref'){const v=($('#refin').value||'').trim().toUpperCase();if(!v||v===refCode()){toast('Введите код друга');return}if(!/^DRUG[A-Z0-9]{3,}$/.test(v)){toast('Такого кода нет');return}st().ref.used=true;addCoupon(Store.config.referralPercent||10,Store.config.referralCode||'DRUG10','ref');toast('Скидка добавлена в кошелёк');render()}
