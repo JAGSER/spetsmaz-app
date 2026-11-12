@@ -135,7 +135,7 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 /* body map */
 
 
-.bm{text-align:center}.bm .bubble{font-size:calc(17px*var(--fz,1));padding:8px 14px;margin-top:-6px}
+.shelves .chip small{opacity:.6;font-weight:600;margin-left:2px} .bm{text-align:center}.bm .bubble{font-size:calc(17px*var(--fz,1));padding:8px 14px;margin-top:-6px}
 
 .bm .z{cursor:pointer}
 .bm .z:hover{filter:brightness(1.06)}
@@ -522,6 +522,21 @@ async function copy(t){try{await navigator.clipboard.writeText(t);toast('Ско�
 const MP={wb:'WB',ozon:'Ozon',ym:'Я.Маркет'};
 const BODY={head:'Голова',neck:'Шея',shoulders:'Плечи',chest:'Грудь, дыхание',belly:'Живот',back:'Спина',lower:'Поясница',arms:'Руки и локти',hands:'Кисти, пальцы',hips:'Бёдра, таз',knees:'Колени',feet:'Стопы'};
 const BODY_BACK=['back','lower'];
+const SHELVES=[['tea','🍯','К чаю и кофе'],['health','🍋','Для здоровья'],['care','🧴','Уход за собой'],['herbs','🌿','Травы и традиции'],['choose','🔎','Как выбрать'],['gift','🎁','Подарки']];
+const GIFTS=[['friend','Коллеге, другу'],['mom','Маме, любимой'],['parents','Родителям'],['ny','К Новому году']];
+function shelfOf(p){const t=(p.title||'').toLowerCase(),g=(p.tags||[]).join(' ').toLowerCase(),a=t+' | '+g;
+ if(/крем|мазь|мази|кож|руки|рук |кисти|морщин|маск/.test(t)||/уход за|красота/.test(g)&&!/сироп|мармелад/.test(t))return'care';
+ if(/как выбрать|как читать|читай состав|признаки|состав|буква е|экстракт|означают|осадок|цвет после|помутнел|рассчитать|прочитать|бад и|отличается|разница|покрывают|стоить|одно и то же|натуральное равно|этикет|как хранить|как правильно|зачем в одном/.test(t))return'choose';
+ if(/спас|истори|появил|валют|королев|травян|растени|трав|специ|глинтвейн|варень|долголет|британск|изначально|первые|детства|путешеств|аптечк|символом|главной зимней|тыква/.test(t))return'herbs';
+ if(/иммунитет|памят|мозг|витамин|магний|антиоксид|коллаген|шапк|лечит|расторопш|бальзам|годжи|заморозк|энерги|гликемическ|простуд|масло для/.test(a)&&!/рецепт|десерт|панкейк/.test(t))return'health';
+ return'tea'}
+function giftFits(p,w){const s=shelfOf(p),t=((p.title||'')+' '+(p.tags||[]).join(' ')).toLowerCase();
+ if(w==='friend')return s==='tea';if(w==='mom')return s==='care'||s==='tea'&&/без сахара|десерт|сладк|мармелад/.test(t);if(w==='parents')return s==='health';
+ if(w==='ny')return /напит|чаепит|специ|глинтвейн|имбир|коктейл|горяч|сироп|чай/.test(t)&&s!=='choose';return['tea','care','health'].includes(s)}
+function shelfHTML(ps){const c={};ps.forEach(p=>{const k=shelfOf(p);c[k]=(c[k]||0)+1});const on=App.shelf;
+ let h=`<div class="box shelves"><b style="font-size:calc(19px*var(--fz,1));display:block;margin-bottom:10px">🐼 Полки Шустера</b><div class="chips">${SHELVES.map(([k,e,t])=>`<button class="chip ${on===k?'on':''}" data-shelf="${k}">${e} ${t}${k!=='gift'&&c[k]?` <small>${c[k]}</small>`:''}</button>`).join('')}</div>`;
+ if(on==='gift')h+=`<div style="margin-top:12px"><b style="display:block;margin-bottom:8px">Кому дарим?</b><div class="chips">${GIFTS.map(([k,t])=>`<button class="chip ${App.giftTo===k?'on':''}" data-gift="${k}">${t}</button>`).join('')}</div></div>`;
+ return h+'</div>'}
 const BODY_FUN={head:'Ой, голова трещит!',neck:'Шею не повернуть!',shoulders:'Плечи, будто мешки таскал!',chest:'Кхе-кхе, дышать тяжко!',belly:'Живот бурчит, как трактор!',back:'Спину заклинило!',lower:'Поясница стреляет!',arms:'Локти скрипят, как дверь!',hands:'Пальцы не слушаются!',hips:'Бёдра ноют после дачи!',knees:'Колени хрустят, как сухарики!',feet:'Ноги гудят!'};
 const MODES={health:{t:'Здоровье',brand:'Спецмазь',em:'🛡️'},mood:{t:'Настроение',brand:'Доктор Шустер',em:'🐼'}};
 const TILES={health:['🧴','❤️','💪','🌿','⭐','🛡️'],mood:['🍬','🍭','🍫','🍩','🧁','🍪']};
@@ -556,7 +571,7 @@ function cleanFolder(n){let t=n.replace(/^\+/,'').replace(/\s*\((карусел�
 function cleanFile(n){return n.replace(/\.[^.]+$/,'').replace(/^\d+[\s._-]*/,'').trim()}
 const isCar=n=>/карус|карсуел/i.test(n||'');
 async function crawl(){const posts=[];
- async function walk(path,mode,names){const items=await listAll(path);const files=items.filter(isMedia).sort(natural);const dirs=items.filter(x=>x.type==='dir'&&!/редизайн/i.test(x.name));
+ async function walk(path,mode,names){const items=await listAll(path);const files=items.filter(isMedia).sort(natural);const dirs=items.filter(x=>x.type==='dir'&&!/редизайн|креатив/i.test(x.name));
   const name=names[names.length-1],parent=names[names.length-2]||'';const month=names.slice().reverse().find(n=>MONTHS.test(n));
   const label=cleanFolder(month||name);
   if(files.length){
@@ -603,12 +618,12 @@ function applyFS(){const z=[1,1.12,1.25][(Store.state&&Store.state.fs)||0]||1;do
 async function doInstall(){ut('Установка нажата');if(DEFERRED){DEFERRED.prompt();try{await DEFERRED.userChoice}catch(e){}DEFERRED=null;return}
  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);sheet(`<h2>Установить приложение</h2>${ios?'<p class="muted" style="font-size:calc(19px*var(--fz,1))">1. Нажмите кнопку «Поделиться» внизу Safari (квадрат со стрелкой).<br><br>2. Выберите «На экран Домой».<br><br>3. Нажмите «Добавить».</p>':'<p class="muted" style="font-size:calc(19px*var(--fz,1))">1. Нажмите меню браузера ⋮ в правом верхнем углу.<br><br>2. Выберите «Установить приложение» или «Добавить на главный экран».<br><br>3. Подтвердите.</p>'}`)}
 // ================= app state =================
-const App={admVis:LS.get('sm_admvis',false),adminOn:LS.get('sm_admvis',false)&&LS.get('sm_admon',false),tab:'feed',q:'',qAll:false,bodyZone:'',game:null,adminTab:'posts',edit:null};
+const App={admVis:LS.get('sm_admvis',false),adminOn:LS.get('sm_admvis',false)&&LS.get('sm_admon',false),tab:'feed',q:'',qAll:false,bodyZone:'',shelf:'',giftTo:'',game:null,adminTab:'posts',edit:null};
 const st=()=>Store.state;
 const mode=()=>st().mode||'health';
 const now=()=>Date.now();
 function visiblePosts(m){return Store.posts.filter(p=>(!m||p.mode===m)&&(Store.isAdmin||!p.hidden)&&(Store.isAdmin||!p.publishAt||p.publishAt<=now())).sort((a,b)=>(b.publishAt||0)-(a.publishAt||0))}
-function setMode(m){if(st().mode&&st().mode!==m)ut('Раздел',{mode:m});const prev=st().mode;const changed=prev&&prev!==m;App.scr=App.scr||{};if(changed)App.scr[prev]=scrollY;st().mode=m;document.body.classList.toggle('mood',m==='mood');saveState();App.bodyZone='';render();syncBar();if(changed){const sy=App.scr[m]||0;scrollTo(0,sy);requestAnimationFrame(()=>scrollTo(0,sy));const dir=m==='mood'?1:-1;const mn=document.querySelector('main');if(mn)mn.animate([{opacity:0,transform:`translateX(${dir*60}px)`},{opacity:1,transform:'none'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});const mk=document.querySelector('.logo .mark');if(mk)mk.animate([{transform:'rotateY(90deg) scale(.6)'},{transform:'none'}],{duration:450,easing:'cubic-bezier(.3,1.6,.5,1)'});const pl=document.querySelector('.switch .pill');if(pl)pl.animate([{left:dir>0?'3px':'50%',background:dir>0?'#d7141a':'#1E9E58'},{left:dir>0?'50%':'3px',background:dir>0?'#1E9E58':'#d7141a'}],{duration:420,easing:'cubic-bezier(.3,1.3,.5,1)'});const lg=document.querySelector('.logo');if(lg)lg.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:350})}}
+function setMode(m){if(st().mode&&st().mode!==m)ut('Раздел',{mode:m});const prev=st().mode;const changed=prev&&prev!==m;App.scr=App.scr||{};if(changed)App.scr[prev]=scrollY;st().mode=m;document.body.classList.toggle('mood',m==='mood');saveState();App.bodyZone='';App.shelf='';render();syncBar();if(changed){const sy=App.scr[m]||0;scrollTo(0,sy);requestAnimationFrame(()=>scrollTo(0,sy));const dir=m==='mood'?1:-1;const mn=document.querySelector('main');if(mn)mn.animate([{opacity:0,transform:`translateX(${dir*60}px)`},{opacity:1,transform:'none'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});const mk=document.querySelector('.logo .mark');if(mk)mk.animate([{transform:'rotateY(90deg) scale(.6)'},{transform:'none'}],{duration:450,easing:'cubic-bezier(.3,1.6,.5,1)'});const pl=document.querySelector('.switch .pill');if(pl)pl.animate([{left:dir>0?'3px':'50%',background:dir>0?'#d7141a':'#1E9E58'},{left:dir>0?'50%':'3px',background:dir>0?'#1E9E58':'#d7141a'}],{duration:420,easing:'cubic-bezier(.3,1.3,.5,1)'});const lg=document.querySelector('.logo');if(lg)lg.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:350})}}
 function ut(n,d){try{window.umami&&umami.track(n,d)}catch(e){}}
 function track(kind,id,extra){const P=Store.posts.find(x=>x.id===id);if(kind==='view')ut('Пост открыт',{title:P?P.title:id,mode:P?P.mode:''});else if(kind==='click')ut('Маркетплейс',{mp:MP[extra]||extra,title:P?P.title:id});const s=st();if(kind==='view'){s.views[id]=(s.views[id]||0)+1}else if(kind==='click'){s.clicks[id]=s.clicks[id]||{};s.clicks[id][extra]=(s.clicks[id][extra]||0)+1}saveState()}
 
@@ -671,8 +686,9 @@ function highlight(s,q){const t=esc(s);if(!q)return t;const words=q.trim().split
 function viewFeed(){const m=mode();const ps=visiblePosts(m);const stories=ps.filter(p=>p.story&&(p.slides||[]).length);
  let h='';if(!isStandalone()&&!st().instHide)h+=`<div class="inst"><div><b>📲 Установите приложение</b><div class="muted" style="font-size:calc(14px*var(--fz,1))">Значок на экране телефона</div></div><div class="row"><button class="btn sm" data-act="install">Установить</button><button class="x" data-act="insthide" aria-label="Скрыть">✕</button></div></div>`;
  if(stories.length)h+=`<div class="stories">${stories.map(p=>`<div class="story ${st().seenStories.includes(p.id)?'seen':''}" data-story="${p.id}"><div class="ring"><img src="${esc(p.slides[0].type==='image'?p.slides[0].src:p.slides[0].poster)}"></div><span>${esc(p.title)}</span></div>`).join('')}</div>`;
- if(m==='health')h+=bodyMapHTML();else h+=holidaysHTML(true);
+ if(m==='health')h+=bodyMapHTML();else h+=holidaysHTML(true)+shelfHTML(ps);
  let list=ps;if(m==='health'&&App.bodyZone)list=ps.filter(p=>(p.zones||[]).includes(App.bodyZone));
+ if(m==='mood'&&App.shelf){list=App.shelf==='gift'?ps.filter(p=>giftFits(p,App.giftTo)):ps.filter(p=>shelfOf(p)===App.shelf);const sh=SHELVES.find(x=>x[0]===App.shelf);h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">${sh[1]} ${App.shelf==='gift'&&App.giftTo?'Подарок: '+GIFTS.find(x=>x[0]===App.giftTo)[1].toLowerCase():sh[2]}</b><button class="btn sm ghost" data-act="clearshelf">Все посты</button></div>`}
  if(App.bodyZone)h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">Про «${BODY[App.bodyZone]}»</b><button class="btn sm ghost" data-act="clearzone">Все посты</button></div>`;
  h+=list.length?list.slice(0,App.feedN||12).map(p=>cardHTML(p)).join('')+(list.length>(App.feedN||12)?`<button class="btn ghost wide" data-act="more" style="margin-bottom:16px">Показать ещё</button>`:''):(Store.loading?'<div class="skel"></div><div class="skel"></div>':Store.err?`<div class="empty">${esc(Store.err)}</div>`:`<div class="empty">Пока нет постов${App.bodyZone?' про эту зону':''}</div>`);
  return h}
@@ -833,11 +849,12 @@ function notifications(){const s=st();const out=[];const m=mode();
  const t=today();upcomingHolidays().filter(h=>s.holRem.includes(h.date)&&(new Date(h.date)-new Date(t))/DAY<=3).forEach(h=>out.push({ic:'🎉',t:`Скоро ${h.title}: выберите подарок`,tag:h.tag}));
  if(s.wheel.date!==t)out.push({ic:'🎡',t:'Ежедневный бонус ждёт',tab:'game'});
  return out}
+function openGifts(){closeSheet();App.tab='feed';App.shelf='gift';if(mode()!=='mood')setMode('mood');else render();requestAnimationFrame(()=>{const e=document.querySelector('.shelves');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})})}
 function openBell(){const ns=notifications();
  sheet(`<h2>Уведомления</h2>${ns.length?ns.map((n,i)=>`<div class="prod" data-ni="${i}" style="cursor:pointer"><div class="row"><span style="font-size:calc(22px*var(--fz,1))">${n.ic}</span><b style="font-size:calc(14px*var(--fz,1))">${esc(n.t)}</b></div><span>›</span></div>`).join(''):'<div class="empty">Пока ничего нового</div>'}
  <button class="btn ghost wide" data-act="pushperm" style="margin-top:10px">Получать уведомления на телефон</button>
  <p class="muted" style="text-align:center">Темы уведомлений настраиваются в профиле</p>`,()=>{st().lastSeen=now();saveState();render()});
- $('#sheet').addEventListener('click',e=>{const el=e.target.closest('[data-ni]');if(!el)return;const n=ns[+el.dataset.ni];closeSheet();if(n.post)openPost(n.post);else if(n.tab){App.tab=n.tab;render()}else if(n.tag){App.tab='search';App.q=n.tag;render()}})}
+ $('#sheet').addEventListener('click',e=>{const el=e.target.closest('[data-ni]');if(!el)return;const n=ns[+el.dataset.ni];closeSheet();if(n.post)openPost(n.post);else if(n.tab){App.tab=n.tab;render()}else if(n.tag==='подарок')openGifts();else if(n.tag){App.tab='search';App.q=n.tag;render()}})}
 async function askPush(){try{if(!('Notification'in window))throw 0;const r=await Notification.requestPermission();if(r==='granted'){st().push=true;saveState();toast('Уведомления включены');try{new Notification('Готово',{body:'Будем сообщать о новых постах и скидках'})}catch(e){}}else toast('Разрешите уведомления в настройках браузера')}catch(e){toast('Установите приложение на экран телефона, чтобы получать уведомления')}}
 
 // ================= coupons =================
@@ -1012,7 +1029,7 @@ async function doSavePost(){syncEditorFields();const e=App.edit;if(!Store.token)
  document.addEventListener('pointerup',e=>{if(e.pointerType==='mouse')end(e.clientX,e.clientY)},true);
  function end(x,y){if(sx==null)return;const dx=x-sx,dy=Math.abs(y-sy);sx=null;if(dx<-innerWidth*0.35&&dy<70){App.admVis=!App.admVis;LS.set('sm_admvis',App.admVis);if(!App.admVis){App.adminOn=false;LS.set('sm_admon',false);if(App.tab==='admin')App.tab='feed'}else Store.isAdmin=true;closeSheet();render();toast(App.admVis?'Кнопка «Админ» включена':'Кнопка «Админ» скрыта')}}})();
 document.addEventListener('click',ev=>{const t=ev.target.closest('[data-zsl]');if(!t)return;App.zp.i=+t.dataset.zsl;mountPostZK()});
-document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-tab],[data-mode],[data-act],[data-fav],[data-open],[data-story],[data-zone],[data-tagq],[data-rem],[data-qall],[data-mp],[data-copyc],[data-usec],[data-topic],[data-share],[data-atab],[data-editp],[data-es],[data-zdel],[data-emode],[data-ebz],[data-prdel]');if(!t)return;const d=t.dataset;
+document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-tab],[data-mode],[data-act],[data-fav],[data-open],[data-story],[data-zone],[data-shelf],[data-gift],[data-tagq],[data-rem],[data-qall],[data-mp],[data-copyc],[data-usec],[data-topic],[data-share],[data-atab],[data-editp],[data-es],[data-zdel],[data-emode],[data-ebz],[data-prdel]');if(!t)return;const d=t.dataset;
  if(d.tab==='admin'){App.adminOn=!App.adminOn;LS.set('sm_admon',App.adminOn);if(App.tab==='admin')App.tab='feed';closeSheet();render();toast(App.adminOn?'Режим админа: кнопки правки на карточках и в постах':'Режим админа выключен')}
  else if(d.tab){App.tab=d.tab;closeSheet();render();scrollTo(0,0);const mn=document.querySelector('main');if(mn){mn.classList.remove('tabin');void mn.offsetWidth;mn.classList.add('tabin')}}
  else if(d.mode){if(d.mode!==mode())setMode(d.mode)}
@@ -1020,7 +1037,10 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
  else if(d.open){openPost(d.open)}
  else if(d.story){openStory(d.story)}
  else if(d.zone){App.bodyZone=App.bodyZone===d.zone?'':d.zone;if(BODY_BACK.includes(App.bodyZone))App.bodyView='back';else if(App.bodyZone&&!['head','neck','shoulders','arms','hands','hips','knees','feet'].includes(App.bodyZone))App.bodyView='front';render()}
- else if(d.tagq){ev.preventDefault();closeSheet();App.tab='search';App.q=d.tagq;render();scrollTo(0,0)}
+ else if(d.tagq==='подарок'){ev.preventDefault();openGifts()}
+  else if(d.shelf){App.shelf=App.shelf===d.shelf?'':d.shelf;if(App.shelf!=='gift')App.giftTo='';App.feedN=12;render()}
+  else if(d.gift){App.giftTo=App.giftTo===d.gift?'':d.gift;App.feedN=12;render()}
+  else if(d.tagq){ev.preventDefault();closeSheet();App.tab='search';App.q=d.tagq;render();scrollTo(0,0)}
  else if(d.rem){const r=st().holRem;const i=r.indexOf(d.rem);if(i>=0)r.splice(i,1);else{r.push(d.rem);toast('Напомним за 3 дня')}saveState();if($('#sheet'))$('#sheet').querySelectorAll(`[data-rem="${d.rem}"]`).forEach(b=>{b.textContent=i<0?'🔔 Напомню':'Напомнить';b.classList.toggle('ghost',i>=0)});render()}
  else if(d.qall!==undefined){App.qAll=d.qall==='1';render()}
  else if(d.mp){track('click',d.pid,d.mp)}
@@ -1048,6 +1068,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
   else if(a==='insthide'){st().instHide=true;saveState();render()}
   else if(a==='nosoc'){ev.preventDefault();toast('Ссылка скоро появится')}
   else if(a==='clearzone'){App.bodyZone='';render()}
+   else if(a==='clearshelf'){App.shelf='';App.giftTo='';render()}
   else if(a==='bmfront'||a==='bmback'){App.bodyView=a==='bmback'?'back':'front';render()}
   else if(a==='bodymap'){sheet(bodyMapHTML())}
   else if(a==='cal'){sheet(`<h2>Календарь праздников</h2>${upcomingHolidays().map(holRow).join('')||'<div class="empty">Скоро добавим</div>'}`)}
