@@ -5,7 +5,7 @@ const r4=v=>Math.round(v*10000)/10000;
 const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
 const fmt=t=>{t=Math.max(0,t||0);const m=Math.floor(t/60),s=(t%60).toFixed(1);return m+':'+(s<10?'0':'')+s};
 function visRect(z){const s=Math.max(1,Math.min(8,1/z.w,1/z.h));const cx=z.x+z.w/2,cy=z.y+z.h/2;return{x:cl(cx-0.5/s,0,1-1/s),y:cl(cy-0.5/s,0,1-1/s),w:1/s,h:1/s,s}}
-function hintPos(z){return{x:z.hx!=null?z.hx:z.x+z.w-0.03,y:z.hy!=null?z.hy:z.y+0.03}}
+function hintPos(z){return{x:z.x+z.w-0.03,y:z.y+0.03}}
 const CSS=`
 .zk{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%}
 .zk-bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%}
@@ -71,9 +71,9 @@ function mount(root,o){css();
   <div class="zk-fr ${c?'cam':''}" ${o.frameStyle?`style="${o.frameStyle}"`:''}><div class="zk-md">${m.type==='image'?`<img src="${esc(m.full||m.src)}" alt="">`:`<video src="${esc(m.src)}" poster="${esc(m.poster||'')}" muted loop playsinline autoplay></video>`}</div>
    ${c?`<div class="zk-camlab"></div><div class="zk-camui"><button data-zka="zin">+</button><button data-zka="zout">−</button></div>`:'<div class="zk-ov"></div>'}</div>
   ${isVid?`<div class="zk-vc"><button class="zk-b sm" data-zka="vplay">⏸</button><input type="range" min="0" max="1000" value="0"><span>0:00.0</span></div>`:''}
-  ${c?`<div class="zk-bar">${c.i<0?`<button class="zk-b ok" data-zka="camsave">💾 Сохранить эту зону</button>`:`<button class="zk-b ok" data-zka="camsave">✓ Сохранить зону ${c.i+1}</button><button class="zk-b" data-zka="camsavenew">＋ Сохранить как новую</button>`}<button class="zk-b" data-zka="camcancel">Отмена</button></div>
-   <div class="zk-help">Приблизьте и сдвиньте картинку так, как человек должен её увидеть: пальцем двигать, щипком или кнопками +/− менять увеличение. Потом нажмите «Сохранить».</div>`:
-   `<div class="zk-help">Приблизьте картинку кнопкой «🔍» и сохраните вид как зону, или нарисуйте зону пальцем прямо на картинке. Зону можно двигать и тянуть за жёлтые ручки. Белый плюсик можно перетащить: там его увидит человек.</div>`}
+  ${c?`<div class="zk-bar">${c.i<0?`<button class="zk-b ok" data-zka="camsave">💾 Сохранить эту зону</button>`:`<button class="zk-b ok" data-zka="camsave">✓ Сохранить зону ${c.i+1}</button><button class="zk-b" data-zka="camsavenew">＋ Сохранить как новую</button>`}<button class="zk-b" data-zka="camcancel">Готово</button></div>
+   <div class="zk-help">Приблизьте и сдвиньте картинку так, как человек должен её увидеть: пальцем двигать, щипком или кнопками +/− менять увеличение. Потом нажмите «Сохранить», можно сразу двигать дальше и сохранять следующую зону.</div>`:
+   `<div class="zk-help">Приблизьте картинку кнопкой «🔍» и сохраните вид как зону, или нарисуйте зону пальцем прямо на картинке. Зону можно двигать и тянуть за жёлтые ручки.</div>`}
   ${K.listEl?'':'<div class="zk-list"></div>'}`;
   fr=root.querySelector('.zk-fr');ov=root.querySelector('.zk-ov');md=root.querySelector('.zk-md');vid=md.querySelector('video');
   if(vid)bindVid();
@@ -85,14 +85,14 @@ function mount(root,o){css();
   r.addEventListener('input',()=>{sk=true;if(vid.duration)vid.currentTime=r.value/1000*vid.duration});r.addEventListener('change',()=>sk=false)}
 
  // ----- рисование -----
- function drawOv(){if(!ov)return;const zs=K.zones;
+ function updBar(){const b=root.querySelector('[data-zka="camnew"]');if(b)b.textContent=K.sel>=0&&K.zones[K.sel]?'🔍 Приблизить зону '+(K.sel+1):'🔍 Приблизить и сохранить вид'}
+ function drawOv(){updBar();if(!ov)return;const zs=K.zones;
   ov.innerHTML=zs.map((z,i)=>`<div class="zk-zr ${i===K.sel?'sel':''}" data-z="${i}" style="left:${z.x*100}%;top:${z.y*100}%;width:${z.w*100}%;height:${z.h*100}%"><span class="n">${i+1}${z.label?'. '+esc(z.label):''}</span>${['nw','ne','sw','se','n','s','w','e'].map(h=>`<i class="zk-h ${h}" data-h="${h}"></i>`).join('')}</div>`).join('')+
   zs.map((z,i)=>{if(i===K.sel)return'';const v=visRect(z);return `<div class="zk-vis o" style="left:${v.x*100}%;top:${v.y*100}%;width:${v.w*100}%;height:${v.h*100}%"></div>`}).join('')+
-  (K.sel>=0&&zs[K.sel]?(()=>{const v=visRect(zs[K.sel]);return `<div class="zk-vis" style="left:${v.x*100}%;top:${v.y*100}%;width:${v.w*100}%;height:${v.h*100}%"><b>Будет видно ×${v.s.toFixed(1)}</b></div>`})():'')+
-  zs.map((z,i)=>{const h=hintPos(z);return `<div class="zk-pl ${i===K.sel?'sel':''}" data-pl="${i}" style="left:${h.x*100}%;top:${h.y*100}%">+</div>`}).join('')}
+  (K.sel>=0&&zs[K.sel]?(()=>{const v=visRect(zs[K.sel]);return `<div class="zk-vis" style="left:${v.x*100}%;top:${v.y*100}%;width:${v.w*100}%;height:${v.h*100}%"><b>Будет видно ×${v.s.toFixed(1)}</b></div>`})():'')}
  function bindDraw(){let act=null;
   const pos=e=>{const r=ov.getBoundingClientRect();return{x:cl((e.clientX-r.left)/r.width,0,1),y:cl((e.clientY-r.top)/r.height,0,1)}};
-  ov.addEventListener('pointerdown',e=>{e.preventDefault();const p=pos(e);const zs=K.zones;const pl=e.target.closest('.zk-pl');const h=e.target.dataset.h;const zEl=e.target.closest('.zk-zr');snap();
+  ov.addEventListener('pointerdown',e=>{e.preventDefault();const p=pos(e);const zs=K.zones;const pl=null;const h=e.target.dataset.h;const zEl=e.target.closest('.zk-zr');snap();
    if(pl){const i=+pl.dataset.pl;K.sel=i;act={type:'pl',i,p0:p,h0:hintPos(zs[i])}}
    else if(zEl){const i=+zEl.dataset.z;K.sel=i;act={type:h||'move',i,p0:p,z0:Object.assign({},zs[i])}}
    else{act={type:'new',p0:p};K.sel=-1}
@@ -139,18 +139,18 @@ function mount(root,o){css();
     <div class="zk-row"><button class="zk-b sm" data-zka="up" data-zi="${i}" ${i?'':'disabled'}>↑</button><button class="zk-b sm" data-zka="down" data-zi="${i}" ${i<zs.length-1?'':'disabled'}>↓</button><button class="zk-b sm" data-zka="dup" data-zi="${i}" title="Копия">⧉</button></div></div></div>
    ${isVid?`<div class="zk-row zk-sm">С <input type="number" step="0.1" min="0" data-zt1="${i}" value="${z.t1==null?'':z.t1}" placeholder="нач."> по <input type="number" step="0.1" min="0" data-zt2="${i}" value="${z.t2==null?'':z.t2}" placeholder="конец"> сек</div>
     <div class="zk-row"><button class="zk-b sm" data-zka="now1" data-zi="${i}">⏱ Начало = сейчас</button><button class="zk-b sm" data-zka="now2" data-zi="${i}">⏱ Конец = сейчас</button></div>`:''}
-   <div class="zk-row"><button class="zk-b sm" data-zka="camedit" data-zi="${i}">🔍 Изменить приближением</button><button class="zk-b sm" data-zka="fit" data-zi="${i}">📱 Под экран</button><button class="zk-b sm" data-zka="plreset" data-zi="${i}">+ в центр</button><button class="zk-b sm red" data-zka="del" data-zi="${i}">🗑</button></div></div>`}).join('')}`;
+   <div class="zk-row"><button class="zk-b sm" data-zka="camedit" data-zi="${i}">🔍 Изменить приближением</button><button class="zk-b sm" data-zka="fit" data-zi="${i}">📱 Под экран</button><button class="zk-b sm red" data-zka="del" data-zi="${i}">🗑</button></div></div>`}).join('')}`;
   L.querySelectorAll('.zk-prev').forEach(el=>{const z=zs[+el.dataset.zi];if(z)setPrev(el,z)})}
 
  // ----- кнопки -----
  function onClick(e){const b=e.target.closest('[data-zka]');const card=e.target.closest('[data-zcard]');
   if(!b){if(card&&!e.target.closest('input')&&!K.cam){K.sel=+card.dataset.zcard;drawOv();renderList()}return}
   e.preventDefault();e.stopPropagation();const a=b.dataset.zka,i=+b.dataset.zi,zs=K.zones;
-  if(a==='camnew'){K.cam={i:-1,x:0,y:0,s:1};render()}
+  if(a==='camnew'){if(K.sel>=0&&zs[K.sel]){const v=visRect(zs[K.sel]);K.cam={i:K.sel,x:v.x,y:v.y,s:v.s}}else K.cam={i:-1,x:0,y:0,s:1};render()}
   else if(a==='camedit'){const v=visRect(zs[i]);K.cam={i,x:v.x,y:v.y,s:v.s};K.sel=i;render();fr.scrollIntoView({block:'center',behavior:'smooth'})}
   else if(a==='zin')K.zoom&&K.zoom(1.25);
   else if(a==='zout')K.zoom&&K.zoom(0.8);
-  else if(a==='camsave'||a==='camsavenew'){snap();const nz=camZone();if(K.cam.i>=0&&a==='camsave'){const z=zs[K.cam.i];const old=hintPos(z);Object.assign(z,nz);if(z.hx!=null){z.hx=r4(cl(old.x,nz.x+.02,nz.x+nz.w-.02));z.hy=r4(cl(old.y,nz.y+.02,nz.y+nz.h-.02))}K.sel=K.cam.i}else{zs.push(Object.assign(nz,{label:'',hx:r4(nz.x+nz.w/2),hy:r4(nz.y+nz.h/2)}));K.sel=zs.length-1}K.cam=null;render();changed();o.onSaved&&o.onSaved()}
+  else if(a==='camsave'||a==='camsavenew'){snap();const nz=camZone();if(K.cam.i>=0&&a==='camsave'){const z=zs[K.cam.i];Object.assign(z,nz);delete z.hx;delete z.hy;K.sel=K.cam.i}else{zs.push(Object.assign(nz,{label:''}));K.sel=zs.length-1}const n=K.sel+1;K.cam.i=-1;render();changed();const l=root.querySelector('.zk-camlab');if(l){l.textContent='✓ Зона '+n+' сохранена';l.style.background='#1E9E58';setTimeout(()=>{if(l.isConnected){l.style.background='';K.zoom&&K.zoom(1)}},1400)}o.onSaved&&o.onSaved()}
   else if(a==='camcancel'){K.cam=null;render()}
   else if(a==='undo'){if(!K.hist.length)return;K.zones=JSON.parse(K.hist.pop());K.sel=-1;render();changed()}
   else if(a==='sel'){K.sel=i;if(!K.cam){drawOv();renderList()}}
