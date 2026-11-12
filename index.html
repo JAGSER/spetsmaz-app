@@ -135,7 +135,7 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 /* body map */
 
 
-.shelves .chip small{opacity:.6;font-weight:600;margin-left:2px} .bm{text-align:center}.bm .bubble{font-size:calc(17px*var(--fz,1));padding:8px 14px;margin-top:-6px}
+.gset{margin-bottom:14px} .gprods{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap} .gp{flex:1 1 120px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;background:var(--bg);border-radius:14px;padding:10px} .gp img{height:110px;object-fit:contain} .gp span{font-weight:700;font-size:calc(15px*var(--fz,1));line-height:1.25;flex:1} .shelves .chip small{opacity:.6;font-weight:600;margin-left:2px} .bm{text-align:center}.bm .bubble{font-size:calc(17px*var(--fz,1));padding:8px 14px;margin-top:-6px}
 
 .bm .z{cursor:pointer}
 .bm .z:hover{filter:brightness(1.06)}
@@ -523,7 +523,11 @@ const MP={wb:'WB',ozon:'Ozon',ym:'Я.Маркет'};
 const BODY={head:'Голова',neck:'Шея',shoulders:'Плечи',chest:'Грудь, дыхание',belly:'Живот',back:'Спина',lower:'Поясница',arms:'Руки и локти',hands:'Кисти, пальцы',hips:'Бёдра, таз',knees:'Колени',feet:'Стопы'};
 const BODY_BACK=['back','lower'];
 const SHELVES=[['tea','🍯','К чаю и кофе'],['health','🍋','Для здоровья'],['care','🧴','Уход за собой'],['herbs','🌿','Травы и традиции'],['choose','🔎','Как выбрать'],['gift','🎁','Подарки']];
-const GIFTS=[['friend','Коллеге, другу'],['mom','Маме, любимой'],['parents','Родителям'],['ny','К Новому году']];
+const GIFTS=[['friend','Коллеге, другу'],['mom','Маме, любимой'],['parents','Родителям'],['kids','Детям'],['ny','К Новому году']];
+const SH_PROD=[['Сироп «Альпийская лаванда»','сироп Dr.Shuster альпийская лаванда'],['Мармелад «Блю Кюрасао»','мармелад Dr.Shuster блю кюрасао'],['Сироп «Клубничный мармелад»','сироп Dr.Shuster клубничный мармелад'],['Сироп «Солнечный абрикос»','сироп Dr.Shuster солнечный абрикос'],['Мармелад «Мятный»','мармелад Dr.Shuster мятный'],['Сироп «Шоколадный»','сироп Dr.Shuster шоколадный']];
+const GIFT_SETS={friend:['Набор к чаю',[4,3],'Мятный мармелад и абрикосовый сироп в чай: приятно и к месту в офисе'],mom:['Нежный набор',[0,1,2],'Лавандовый сироп для кофе и мармелад: красиво и необычно'],parents:['Набор для чаепития',[3,2,4],'Сиропы с витамином C в чай и мармелад к нему'],kids:['Сладкий набор',[5,2,1],'Шоколадный и клубничный сироп для молока и яркий мармелад'],ny:['Новогодний набор',[5,0,1],'Шоколадный и лавандовый сироп для горячих напитков и мармелад к столу']};
+function giftSetsHTML(){const ks=App.giftTo?[App.giftTo]:Object.keys(GIFT_SETS);return ks.map(k=>{const [t,ids,d]=GIFT_SETS[k];const who=GIFTS.find(x=>x[0]===k)[1];
+ return `<div class="box gset"><b style="font-size:calc(19px*var(--fz,1))">🎁 ${t}</b><div class="muted">${esc(who)}: ${esc(d)}</div><div class="gprods">${ids.map(i=>`<div class="gp"><img src="game/t${i}.png" alt=""><span>${esc(SH_PROD[i][0])}</span><a class="btn sm" href="https://www.ozon.ru/search/?text=${enc(SH_PROD[i][1])}" target="_blank" rel="noopener" data-mp="ozon" data-pid="gift-${i}">Ozon</a></div>`).join('')}</div></div>`}).join('')}
 function shelfOf(p){const t=(p.title||'').toLowerCase(),g=(p.tags||[]).join(' ').toLowerCase(),a=t+' | '+g;
  if(/крем|мазь|мази|кож|руки|рук |кисти|морщин|маск/.test(t)||/уход за|красота/.test(g)&&!/сироп|мармелад/.test(t))return'care';
  if(/как выбрать|как читать|читай состав|признаки|состав|буква е|экстракт|означают|осадок|цвет после|помутнел|рассчитать|прочитать|бад и|отличается|разница|покрывают|стоить|одно и то же|натуральное равно|этикет|как хранить|как правильно|зачем в одном/.test(t))return'choose';
@@ -688,8 +692,9 @@ function viewFeed(){const m=mode();const ps=visiblePosts(m);const stories=ps.fil
  if(stories.length)h+=`<div class="stories">${stories.map(p=>`<div class="story ${st().seenStories.includes(p.id)?'seen':''}" data-story="${p.id}"><div class="ring"><img src="${esc(p.slides[0].type==='image'?p.slides[0].src:p.slides[0].poster)}"></div><span>${esc(p.title)}</span></div>`).join('')}</div>`;
  if(m==='health')h+=bodyMapHTML();else h+=holidaysHTML(true)+shelfHTML(ps);
  let list=ps;if(m==='health'&&App.bodyZone)list=ps.filter(p=>(p.zones||[]).includes(App.bodyZone));
- if(m==='mood'&&App.shelf){list=App.shelf==='gift'?ps.filter(p=>giftFits(p,App.giftTo)):ps.filter(p=>shelfOf(p)===App.shelf);const sh=SHELVES.find(x=>x[0]===App.shelf);h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">${sh[1]} ${App.shelf==='gift'&&App.giftTo?'Подарок: '+GIFTS.find(x=>x[0]===App.giftTo)[1].toLowerCase():sh[2]}</b><button class="btn sm ghost" data-act="clearshelf">Все посты</button></div>`}
+ if(m==='mood'&&App.shelf){list=App.shelf==='gift'?[]:ps.filter(p=>shelfOf(p)===App.shelf);const sh=SHELVES.find(x=>x[0]===App.shelf);h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">${sh[1]} ${App.shelf==='gift'&&App.giftTo?'Подарок: '+GIFTS.find(x=>x[0]===App.giftTo)[1].toLowerCase():sh[2]}</b><button class="btn sm ghost" data-act="clearshelf">Все посты</button></div>`}
  if(App.bodyZone)h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">Про «${BODY[App.bodyZone]}»</b><button class="btn sm ghost" data-act="clearzone">Все посты</button></div>`;
+ if(m==='mood'&&App.shelf==='gift'){h+=giftSetsHTML();return h}
  h+=list.length?list.slice(0,App.feedN||12).map(p=>cardHTML(p)).join('')+(list.length>(App.feedN||12)?`<button class="btn ghost wide" data-act="more" style="margin-bottom:16px">Показать ещё</button>`:''):(Store.loading?'<div class="skel"></div><div class="skel"></div>':Store.err?`<div class="empty">${esc(Store.err)}</div>`:`<div class="empty">Пока нет постов${App.bodyZone?' про эту зону':''}</div>`);
  return h}
 function bodyMapHTML(){const z=App.bodyZone;const back=App.bodyView==='back'||(!App.bodyView&&BODY_BACK.includes(z));const hurt=!!z;
