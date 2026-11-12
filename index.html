@@ -223,6 +223,70 @@ mark{background:#ffe27a;border-radius:3px;padding:0 1px}
 .bmlist{display:flex;flex-direction:column;gap:6px}
 .bmlist button{text-align:left;padding:9px 12px;border-radius:12px;background:var(--bg);font-size:calc(16px*var(--fz,1));font-weight:700;line-height:1.15}
 .bmlist button.on{background:var(--acc);color:#fff}
+
+/* match-3 v2 */
+.m3{--gw:min(100%,470px);user-select:none;-webkit-user-select:none}
+.m3top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.m3goal{flex:1;display:flex;align-items:center;gap:6px;background:var(--card);border-radius:18px;padding:6px 10px;box-shadow:0 4px 0 rgba(0,0,0,.08),0 8px 18px rgba(0,0,0,.08);transition:transform .2s}
+.m3goal img{width:46px;height:46px;object-fit:contain;filter:drop-shadow(0 3px 3px rgba(0,0,0,.3))}
+.m3goal span{font-weight:900;font-size:20px}
+.m3goal.done{background:linear-gradient(135deg,#d7ffd0,#9be58a)}.m3goal.done span{color:#1b7a12}
+.m3moves{width:74px;height:74px;flex:0 0 74px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;background:radial-gradient(circle at 35% 30%,#fff6,transparent 45%),var(--acc);box-shadow:0 5px 0 rgba(0,0,0,.18),0 10px 22px rgba(0,0,0,.2),inset 0 -6px 10px rgba(0,0,0,.18)}
+.m3moves b{font-size:28px;line-height:1;font-weight:900;text-shadow:0 2px 0 rgba(0,0,0,.2)}.m3moves small{font-size:11px;font-weight:700;opacity:.9}
+.m3moves.low{animation:m3beat .8s infinite}@keyframes m3beat{50%{transform:scale(1.1)}}
+.m3score{display:flex;align-items:baseline;justify-content:center;gap:8px}.m3score span{font-weight:700;opacity:.6}.m3score b{font-size:32px;font-weight:900;letter-spacing:.5px}
+.m3bar{position:relative;height:14px;border-radius:9px;background:var(--card);box-shadow:inset 0 2px 4px rgba(0,0,0,.15);margin:4px 0 22px}
+.m3bar i{position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:linear-gradient(90deg,#ffd23f,#ff8a3a,#ff4b5c);transition:width .5s cubic-bezier(.3,1.4,.5,1);box-shadow:0 0 12px #ffb02e}
+.m3bar u{position:absolute;top:-4px;width:4px;height:22px;margin-left:-2px;border-radius:2px;background:#bbb;text-decoration:none}
+.m3bar u.on{background:#2fb344;box-shadow:0 0 8px #2fb344}
+.m3bar em{position:absolute;top:22px;left:50%;transform:translateX(-50%);font-style:normal;font-size:11px;font-weight:800;white-space:nowrap;color:#005bff}
+.m3next{text-align:center;margin:0 0 6px;font-size:14px}
+.m3stage{position:relative;perspective:1000px;perspective-origin:50% 20%;padding:8px 0 22px;width:var(--gw);margin:0 auto}
+.m3board{position:relative;width:100%;aspect-ratio:1;border-radius:24px;transform:rotateX(12deg);transform-style:preserve-3d;transition:transform .35s ease-out;overflow:hidden;touch-action:none;
+ background:radial-gradient(circle at 30% 15%,rgba(255,255,255,.55),transparent 55%),linear-gradient(160deg,color-mix(in srgb,var(--acc) 35%,#fff),color-mix(in srgb,var(--acc) 70%,#000 5%));
+ box-shadow:0 10px 0 color-mix(in srgb,var(--acc) 55%,#000),0 26px 40px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.6)}
+.m3c{position:absolute;padding:3px}.m3c i{display:block;width:100%;height:100%;border-radius:12px;background:rgba(255,255,255,.42);box-shadow:inset 0 3px 6px rgba(0,0,0,.12),inset 0 -2px 0 rgba(255,255,255,.5)}
+.m3t{position:absolute;left:0;top:0;will-change:transform;z-index:2}
+.m3t .in{position:absolute;inset:0;display:grid;place-items:center;animation:m3bob 3s ease-in-out infinite;transition:transform .15s}
+.m3t img{position:relative;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 5px 3px rgba(0,0,0,.35));pointer-events:none}.m3t img.bt{transform:scale(1.1)}.m3t img.mr{transform:scale(.9)}
+.m3t .pl{position:absolute;inset:12%;border-radius:50%;background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.95) 0,rgba(255,255,255,.35) 18%,transparent 40%),radial-gradient(circle at 50% 55%,var(--c) 0,color-mix(in srgb,var(--c) 70%,#000) 100%);box-shadow:0 4px 0 color-mix(in srgb,var(--c) 55%,#000),0 8px 12px rgba(0,0,0,.25),inset 0 -5px 8px rgba(0,0,0,.25)}
+@keyframes m3bob{50%{transform:translateY(-2px) rotate(1.5deg)}}
+.m3t.lift .in,.m3t.sel .in{transform:scale(1.18) translateY(-4px);animation:none}
+.m3t.sel .in{filter:drop-shadow(0 0 8px #fff) drop-shadow(0 0 14px var(--c,#fff))}
+.m3t.hint .in{animation:m3hint .9s ease-in-out infinite}@keyframes m3hint{0%,100%{transform:scale(1)}50%{transform:scale(1.2) rotate(-8deg);filter:brightness(1.4)}}
+.m3t .sp-h::after,.m3t .sp-v::after{content:'';position:absolute;border-radius:6px;background:linear-gradient(90deg,transparent,#fff,transparent);box-shadow:0 0 10px #fff,0 0 18px var(--c);animation:m3glint 1.2s linear infinite;mix-blend-mode:screen}
+.m3t .sp-h::after{left:-6%;right:-6%;top:42%;height:16%}
+.m3t .sp-v::after{top:-6%;bottom:-6%;left:42%;width:16%;background:linear-gradient(180deg,transparent,#fff,transparent)}
+@keyframes m3glint{50%{opacity:.35}}
+.m3t .sp-b::before{content:'';position:absolute;inset:-6%;border-radius:50%;background:radial-gradient(circle,#ffe58a 0,#ffb02e55 45%,transparent 70%);animation:m3aura 1s ease-in-out infinite}
+@keyframes m3aura{50%{transform:scale(1.15);opacity:.6}}
+.m3t .orb{inset:10%;border-radius:50%;background:conic-gradient(#ff4b5c,#ffd23f,#6fd24f,#25a9ff,#a66bff,#ff4b5c);animation:m3spin 2.4s linear infinite;box-shadow:0 0 14px #fff,0 0 26px #b7a4ff}
+.m3t .orb i{position:absolute;inset:14%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#fff8 25%,#0000 60%)}
+.m3t .orb b{position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 -6px 10px rgba(0,0,0,.35)}
+@keyframes m3spin{to{transform:rotate(360deg)}}
+.m3beam{position:absolute;left:0;top:0;right:0;bottom:0;z-index:6;pointer-events:none;border-radius:20px;background:linear-gradient(var(--d,90deg),transparent,#fff 30%,var(--c) 50%,#fff 70%,transparent);box-shadow:0 0 20px #fff,0 0 40px #ffe08a}
+.m3beam.h{bottom:auto}.m3beam.v{right:auto;--d:180deg}
+.m3say{position:absolute;left:50%;top:45%;z-index:20;pointer-events:none;white-space:nowrap;font-weight:900;font-size:40px;letter-spacing:1px;color:#fff;
+ text-shadow:0 1px 0 #ff9f1a,0 2px 0 #ff8c1a,0 3px 0 #f57a12,0 4px 0 #e8650c,0 5px 0 #d4520a,0 6px 0 #c04208,0 8px 14px rgba(0,0,0,.45);-webkit-text-stroke:1.5px #c04208}
+.m3say.big{font-size:46px}
+.m3pts{position:absolute;z-index:19;pointer-events:none;font-weight:900;font-size:26px;color:#fff;text-shadow:0 2px 0 #2b7de9,0 3px 0 #1d5fc0,0 5px 10px rgba(0,0,0,.4);-webkit-text-stroke:1px #1d5fc0}
+.m3fly{position:fixed;left:0;top:0;z-index:9998;pointer-events:none;object-fit:contain;filter:drop-shadow(0 6px 6px rgba(0,0,0,.35))}
+.m3fx{position:fixed;inset:0;width:100vw;height:100vh;z-index:9997;pointer-events:none}
+.m3tip{text-align:center;font-size:13px;margin:0}
+.m3hero{position:relative;height:150px;perspective:600px;margin:4px 0 6px}
+.m3hero img{position:absolute;top:10px;width:110px;height:130px;object-fit:contain;filter:drop-shadow(0 10px 8px rgba(0,0,0,.3));animation:m3float 3.4s ease-in-out infinite}
+.m3hero img:nth-child(1){left:calc(50% - 150px);transform:rotateY(25deg);animation-delay:-1s}
+.m3hero img:nth-child(2){left:calc(50% - 55px);top:0;z-index:2;width:120px;height:145px}
+.m3hero img:nth-child(3){left:calc(50% + 40px);animation-delay:-2s}
+@keyframes m3float{50%{translate:0 -10px;rotate:4deg}}
+.m3h1{margin:4px 0;font-size:30px;font-weight:900;color:#fff;text-shadow:0 1px 0 var(--acc),0 2px 0 var(--acc),0 3px 0 var(--acc),0 4px 0 color-mix(in srgb,var(--acc) 80%,#000),0 6px 12px rgba(0,0,0,.3);-webkit-text-stroke:1px color-mix(in srgb,var(--acc) 70%,#000)}
+.m3goals0{display:flex;justify-content:center;gap:10px;margin:10px 0}
+.m3goals0 div{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:14px;padding:6px 10px;font-weight:800}
+.m3goals0 img{width:40px;height:40px;object-fit:contain}
+.m3cp{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.m3cp b{color:#005bff}
+.btn.m3go{font-size:20px;padding:16px;background:linear-gradient(180deg,#ffd23f,#ff9a1a);color:#5a2a00;box-shadow:0 6px 0 #d46f00,0 12px 20px rgba(0,0,0,.2);animation:m3beat 1.6s infinite}
+
 /* game */
 .board{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:var(--card);padding:8px;border-radius:20px;touch-action:none;user-select:none}
 .cell{aspect-ratio:1;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:calc(34px*var(--fz,1));transition:transform .15s,opacity .2s}
@@ -373,6 +437,7 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 <body>
 <div id="app"></div>
 <script src="zonekit.js"></script>
+<script src="game.js?v=1"></script>
 <script>
 "use strict";
 // ================= helpers =================
@@ -516,7 +581,7 @@ function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._
 function render(){
  const m=mode();document.body.classList.toggle('mood',m==='mood');
  const cfg=Store.config[m]||{};const n=notifications().length;
- const tabs=[['feed',IC.feed,'Лента'],['search',IC.search,'Поиск'],['game',IC.game,'Скидки'],['favs',IC.favs,'Избранное'],['me',IC.me,'Профиль']];if(App.admVis)tabs.push(['admin',IC.admin,'Админ']);applyTheme();
+ const tabs=[['feed',IC.feed,'Лента'],['search',IC.search,'Поиск'],['game',IC.game,'Игры'],['favs',IC.favs,'Избранное'],['me',IC.me,'Профиль']];if(App.admVis)tabs.push(['admin',IC.admin,'Админ']);applyTheme();
  $('#app').innerHTML=`<header><div class="top"><div class="logo"><div class="mark">${cfg.logo?`<img src="${esc(cfg.logo)}" alt="">`:MODES[m].em}</div>${esc(cfg.brand||MODES[m].brand)}</div>
   <div class="hdbtns"><button class="bell" data-act="theme" aria-label="Тёмная или светлая тема">${isDark()?IC.sun:IC.moon}</button><button class="bell" data-act="bell" aria-label="Уведомления">${IC.bell}${n?`<b>${n}</b>`:''}</button></div></div>
   <div class="switch"><div class="pill"></div><button class="h" data-mode="health">Здоровье</button><button class="m" data-mode="mood">Настроение</button></div></header>
@@ -676,23 +741,23 @@ function couponHTML(c){const exp=c.exp<now();return `<div class="coupon ${c.used
 // ================= game: match-3 =================
 const GN=7;
 function viewGame(){const s=st();const t=today();if(s.games.date!==t){s.games.date=t;s.games.left=Store.config.gamesPerDay||3;saveState()}
- const g=App.game;const cps=Store.config.coupons||[];const max=cps.length?cps[cps.length-1].min:1000;
+ const g=App.game;const cps=Store.config.coupons||[];
+ if(g&&g.c)return`<div id="m3root"></div>`;
  let h=wheelBox();
- if(!g){h+=`<div class="box" style="text-align:center"><div style="font-size:calc(54px*var(--fz,1))">${TILES[mode()].slice(0,3).join('')}</div><h2 style="margin:6px 0">Три в ряд за скидку</h2>
-  <p class="muted">Собирайте по 3 и больше одинаковых. 20 ходов. Набрали очки, получили промокод на маркетплейс.</p>
-  <div style="text-align:left;margin:12px 0">${cps.map(c=>`<div class="row between" style="padding:6px 0;border-bottom:1px solid var(--line)"><span>от ${c.min} очков</span><b>скидка ${c.percent}%</b></div>`).join('')}</div>
-  <button class="btn wide" data-act="startgame" ${s.games.left>0?'':'disabled'}>${s.games.left>0?`Играть (осталось ${s.games.left})`:'Попытки закончились до завтра'}</button>
+ h+=`<div class="box" style="text-align:center"><div class="m3hero"><img src="${M3.src(3)}" alt=""><img src="${M3.src(0)}" alt=""><img src="${M3.src(1)}" alt=""></div>
+  <div class="m3h1">Шустрые три в ряд</div>
+  <p class="muted" style="margin:4px 0">Собирайте сиропы и мармелад Dr.Shuster по 3 в ряд. ${25} ходов. Набрали очки, получили купон на Ozon.</p>
+  <div class="m3goals0"><div><img src="${M3.src(0)}" alt="">× ${M3.GOALN}</div><div><img src="${M3.src(1)}" alt="">× ${M3.GOALN}</div></div>
+  <p class="muted" style="margin:0 0 8px;font-size:14px">Соберите лавандовые сиропы и мармелад Блю Кюрасао: бонус +${M3.GOALBONUS} очков</p>
+  <div style="text-align:left;margin:8px 0 14px">${cps.map(c=>`<div class="m3cp"><span>от ${c.min} очков</span><b>купон Ozon −${c.percent}%</b></div>`).join('')}</div>
+  <button class="btn wide m3go" data-act="startgame" ${s.games.left>0?'':'disabled'}>${s.games.left>0?`▶ Играть (осталось ${s.games.left})`:'Попытки закончились до завтра'}</button>
   ${s.games.best?`<p class="muted">Рекорд: ${s.games.best}</p>`:''}</div>`;return h}
- const nextC=cps.find(c=>g.score<c.min);
- h+=`<div class="gstat"><div><b>${g.score}</b><span class="muted">очки</span></div><div><b>${g.moves}</b><span class="muted">ходы</span></div></div>
- <div class="prog"><i style="width:${Math.min(100,g.score/max*100)}%"></i></div><p class="muted" style="margin:0 0 10px">${nextC?`До скидки ${nextC.percent}%: ${nextC.min-g.score} очков`:'Максимальная скидка ваша! 🎉'}</p>
- <div class="board" id="board">${g.b.map((v,i)=>`<div class="cell" data-c="${i}">${TILES[g.mode][v]}</div>`).join('')}</div>`;return h}
 function newBoard(){const b=[];for(let i=0;i<GN*GN;i++){let v;do{v=Math.floor(Math.random()*6)}while((i%GN>=2&&b[i-1]===v&&b[i-2]===v)||(i>=GN*2&&b[i-GN]===v&&b[i-2*GN]===v));b.push(v)}return b}
 function findMatches(b){const m=new Set();for(let r=0;r<GN;r++)for(let c=0;c<GN;c++){const i=r*GN+c;if(b[i]<0)continue;
  if(c<=GN-3&&b[i]===b[i+1]&&b[i]===b[i+2]){let k=c;while(k<GN&&b[r*GN+k]===b[i]){m.add(r*GN+k);k++}}
  if(r<=GN-3&&b[i]===b[i+GN]&&b[i]===b[i+2*GN]){let k=r;while(k<GN&&b[k*GN+c]===b[i]){m.add(k*GN+c);k++}}}return m}
-function startGame(){const s=st();if(s.games.left<=0)return;s.games.left--;s.games.played=(s.games.played||0)+1;saveState();ut('Игра начата');App.game={b:newBoard(),score:0,moves:20,sel:-1,busy:false,mode:mode()};render()}
-function bindBoard(){const bd=$('#board');if(!bd)return;let sx=0,sy=0,si=-1;
+function startGame(){const s=st();if(s.games.left<=0)return;s.games.left--;s.games.played=(s.games.played||0)+1;saveState();ut('Игра начата');App.game=Object.assign(M3.newGame(),{mode:mode()});render();scrollTo(0,0)}
+function bindBoard(){const m3=$('#m3root');if(m3&&App.game&&App.game.c){M3.mount(m3,App.game);return}const bd=$('#board');if(!bd)return;let sx=0,sy=0,si=-1;
  bd.addEventListener('pointerdown',e=>{const c=e.target.closest('.cell');if(!c)return;si=+c.dataset.c;sx=e.clientX;sy=e.clientY});
  bd.addEventListener('pointerup',e=>{const g=App.game;if(!g||g.busy||si<0)return;const dx=e.clientX-sx,dy=e.clientY-sy;
   if(Math.hypot(dx,dy)>18){const r=Math.floor(si/GN),c=si%GN;let j=-1;if(Math.abs(dx)>Math.abs(dy)){if(dx>0&&c<GN-1)j=si+1;if(dx<0&&c>0)j=si-1}else{if(dy>0&&r<GN-1)j=si+GN;if(dy<0&&r>0)j=si-GN}if(j>=0)trySwap(si,j);si=-1;return}
@@ -706,8 +771,8 @@ async function trySwap(a,b){const g=App.game;g.busy=true;[g.b[a],g.b[b]]=[g.b[b]
   for(let c=0;c<GN;c++){let w=GN-1;for(let r=GN-1;r>=0;r--){const v=g.b[r*GN+c];if(v>=0){g.b[w*GN+c]=v;w--}}for(;w>=0;w--)g.b[w*GN+c]=Math.floor(Math.random()*6)}
   drawBoard();await sleep(200);combo++;m=findMatches(g.b)}
  render();g.busy=false;if(g.moves<=0)endGame()}
-function endGame(){const g=App.game;App.game=null;const s=st();s.games.best=Math.max(s.games.best||0,g.score);const won=[...(Store.config.coupons||[])].reverse().find(c=>g.score>=c.min);let c=null;if(won)c=addCoupon(won.percent,won.code,'game');saveState();render();
- sheet(`<div style="text-align:center"><div style="font-size:calc(60px*var(--fz,1))">${won?'🎉':'🙂'}</div><h2>${g.score} очков</h2>${won?`<p>Ваша скидка <b>${won.percent}%</b> на маркетплейсе</p>${couponHTML(c)}`:`<p class="muted">Чуть-чуть не хватило до скидки. Попробуйте ещё раз!</p>`}<button class="btn wide" data-act="close">Отлично</button></div>`)}
+function endGame(){const g=App.game;App.game=null;const s=st();s.games.best=Math.max(s.games.best||0,g.score);const won=[...(Store.config.coupons||[])].reverse().find(c=>g.score>=c.min);let c=null;if(won){c=addCoupon(won.percent,won.code,'game');M3.confetti(200)}saveState();render();
+ sheet(`<div style="text-align:center"><div class="m3hero" style="height:120px"><img src="${M3.src(3)}" alt=""><img src="${M3.src(0)}" alt=""><img src="${M3.src(1)}" alt=""></div><h2>${g.score} очков</h2>${won?`<p>Ваш купон Ozon <b>−${won.percent}%</b></p>${couponHTML(c)}<p class="muted" style="font-size:14px">Введите код при оформлении заказа на Ozon</p>`:`<p class="muted">Чуть-чуть не хватило до купона. Попробуйте ещё раз!</p>`}<button class="btn wide" data-act="close">Отлично</button></div>`)}
 
 // ================= daily wheel =================
 const PRIZES=[{t:'+1 игра',g:1},{t:'5%',p:5},{t:'+2 игры',g:2},{t:'+1 игра',g:1},{t:'7%',p:7},{t:'+3 игры',g:3},{t:'5%',p:5},{t:'10%',p:10}];
