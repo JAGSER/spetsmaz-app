@@ -525,6 +525,8 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 .shint{color:#e9cfa4;font-weight:700;padding:30px 6px;font-size:calc(15px*var(--fz,1))}
 .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin:4px 2px 8px}.plaque.sm{font-size:calc(13px*var(--fz,1));padding:5px 10px}.plaque.on{background:linear-gradient(180deg,#d6f7e1,#8fdcab);box-shadow:0 2px 0 #4f9d6b,0 5px 10px rgba(0,0,0,.4)}
 .prodhd{display:flex;gap:14px;align-items:center}.prodhd img{height:120px;object-fit:contain;filter:drop-shadow(2px 4px 4px rgba(0,0,0,.3))}.prodhd b{font-size:calc(19px*var(--fz,1))}
+
+.madeby{text-align:center;color:var(--muted,#888);font-size:calc(14px*var(--fz,1));margin:22px 0 10px}.madeby a{color:var(--acc);font-weight:700;text-decoration:none}
 </style>
 </head>
 <body>
@@ -994,7 +996,7 @@ function viewMe(){const s=st();const m=mode();const cfg=Store.config;const activ
  <div class="box"><b style="font-size:calc(22px*var(--fz,1))">🔔 Уведомления</b><p class="muted">О каких темах сообщать (если ничего не выбрать, то обо всех):</p>${tagCloud(visiblePosts(null),'topic')}
   <button class="btn ghost wide" data-act="pushperm" style="margin-top:12px">Получать на телефон</button></div>
  <div class="box"><b style="font-size:calc(22px*var(--fz,1))">Мы в соцсетях</b><div class="social" style="margin-top:12px;grid-template-columns:repeat(${SOC.length},minmax(0,1fr))">${SOC.map(x=>soc[x[0]]?`<a href="${esc(soc[x[0]])}" target="_blank" rel="noopener">${SOCIC[x[0]]}${x[1]}</a>`:`<a href="#" class="off" data-act="nosoc">${SOCIC[x[0]]}${x[1]}</a>`).join('')}</div></div>
- <div class="box"><b style="font-size:calc(22px*var(--fz,1))">📲 Приложение на телефон</b><p class="muted">Значок появится на экране, как у обычного приложения.</p><button class="btn wide" data-act="install">Установить приложение</button></div>${adminLink()}`}
+ <div class="box"><b style="font-size:calc(22px*var(--fz,1))">📲 Приложение на телефон</b><p class="muted">Значок появится на экране, как у обычного приложения.</p><button class="btn wide" data-act="install">Установить приложение</button></div>${adminLink()}<div class="madeby">Сделано в Visualon · <a href="https://visualon.ru" target="_blank" rel="noopener">visualon.ru</a></div>`}
 function shareApp(){const t=`Полезные советы и скидки Спецмазь и Доктор Шустер. Мой код на скидку: ${refCode()}\n${location.href.split('#')[0]}`;
  if(navigator.share){navigator.share({text:t}).catch(()=>copy(t))}else copy(t)}
 
