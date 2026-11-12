@@ -717,7 +717,7 @@ function highlight(s,q){const t=esc(s);if(!q)return t;const words=q.trim().split
 function viewFeed(){const m=mode();const ps=visiblePosts(m);const stories=ps.filter(p=>p.story&&(p.slides||[]).length);
  let h='';if(!isStandalone()&&!st().instHide)h+=`<div class="inst"><div><b>📲 Установите приложение</b><div class="muted" style="font-size:calc(14px*var(--fz,1))">Значок на экране телефона</div></div><div class="row"><button class="btn sm" data-act="install">Установить</button><button class="x" data-act="insthide" aria-label="Скрыть">✕</button></div></div>`;
  if(stories.length)h+=`<div class="stories">${stories.map(p=>`<div class="story ${st().seenStories.includes(p.id)?'seen':''}" data-story="${p.id}"><div class="ring"><img src="${esc(p.slides[0].type==='image'?p.slides[0].src:p.slides[0].poster)}"></div><span>${esc(p.title)}</span></div>`).join('')}</div>`;
- if(m==='health')h+=bodyMapHTML();else h+=holidaysHTML(true)+shelfHTML(ps);
+ if(m==='health')h+=bodyMapHTML();else h+=shelfHTML(ps);
  let list=ps;if(m==='health'&&App.bodyZone)list=ps.filter(p=>(p.zones||[]).includes(App.bodyZone));
  if(m==='mood'&&App.shelf){list=App.shelf==='gift'?[]:ps.filter(p=>shelfOf(p)===App.shelf);const sh=SHELVES.find(x=>x[0]===App.shelf);h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">${sh[1]} ${App.shelf==='gift'&&App.giftTo?'Подарок: '+GIFTS.find(x=>x[0]===App.giftTo)[1].toLowerCase():sh[2]}</b><button class="btn sm ghost" data-act="clearshelf">Все посты</button></div>`}
  if(App.bodyZone)h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">Про «${BODY[App.bodyZone]}»</b><button class="btn sm ghost" data-act="clearzone">Все посты</button></div>`;
