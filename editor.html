@@ -146,7 +146,7 @@ const natural=(a,b)=>a.name.localeCompare(b.name,'ru',{numeric:true});
 function hid(s){let h=5381;for(const c of s)h=((h*33)^c.charCodeAt(0))>>>0;return 'y'+h.toString(36)}
 const isVid=f=>f.media_type==='video'||/\.(mp4|webm|mov)$/i.test(f.name);
 const isMedia=f=>f.type==='file'&&(isVid(f)||f.media_type==='image'||/\.(png|jpe?g|webp|gif)$/i.test(f.name));
-function slideOf(f){return isVid(f)?{src:f.file,poster:f.preview||'',type:'video',path:f.path}:{src:f.preview||f.file,full:f.file,type:'image',path:f.path}}
+function slideOf(f){return isVid(f)?{src:f.file,poster:f.preview||'',type:'video',path:f.path,md5:f.md5||''}:{src:f.preview||f.file,full:f.file,type:'image',path:f.path,md5:f.md5||''}}
 const MONTHS=/(январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр)/i;
 function cleanFolder(n){let t=n.replace(/^\+/,'').replace(/\s*\((карусель|карсуель)\)/ig,'').replace(/^(Спецмазь|Шустер)\s*/i,'').replace(/(Карусель|Карсуель)\s*/i,'').trim()||n;const m=t.match(/^(20\d\d)\s+(.+)$/);return m?m[2]+' '+m[1]:t}
 function cleanFile(n){return n.replace(/\.[^.]+$/,'').replace(/^\d+[\s._-]*/,'').trim()}
@@ -174,19 +174,20 @@ const r4=v=>Math.round(v*10000)/10000;
 async function load(){
  try{E.auto=await (await fetch('titles.json',{cache:'no-cache'})).json()}catch(e){E.auto={}}
  try{E.autoZ=await (await fetch('zones.json',{cache:'no-cache'})).json()}catch(e){E.autoZ={}}
- try{const r=await crawl();E.posts=r.posts.map(p=>Object.assign(p,{title:(E.auto[p.id]&&E.auto[p.id].title)||p.title}));E.meta=r.meta;
+ try{const r=await crawl();E.posts=r.posts.map(p=>Object.assign(p,{title:((E.auto[p.id]||(p.slides[0]&&p.slides[0].md5&&E.auto['m:'+p.slides[0].md5]))||{}).title||p.title}));E.meta=r.meta;
   const fs=new Set();r.posts.forEach(p=>{if(p.kind==='single'){const d=p.dpath.slice(0,p.dpath.lastIndexOf('/'));if(d)fs.add(d)}});E.folders=[...fs].sort((a,b)=>a.localeCompare(b,'ru'));
  }catch(e){$('#list').innerHTML='<div class="empty">Не удалось загрузить посты с Диска. Проверьте интернет и обновите страницу.</div>';return}
  drawList();const h=decodeURIComponent(location.hash.slice(1));if(h){const p=E.posts.find(x=>x.id===h);if(p){setMode(p.mode);openPost(p)}}
 }
-function zc(p){const sz=((E.meta.posts[p.id]||{}).slideZones)||{};return p.slides.reduce((a,s)=>a+((sz[s.path]!==undefined?sz[s.path]:(E.autoZ||{})[s.path])||[]).length,0)}
+function zonesOf(p,s){const sz=((E.meta.posts[p.id]||{}).slideZones)||{},zm=E.meta.zm||{},A=E.autoZ||{};if(sz[s.path]!==undefined)return sz[s.path]||[];if(s.md5&&zm[s.md5]!==undefined)return zm[s.md5]||[];return A[s.path]||(s.md5&&A['m:'+s.md5])||[]}
+function zc(p){return p.slides.reduce((a,s)=>a+zonesOf(p,s).length,0)}
 function drawList(){const q=E.q.toLowerCase();const ps=E.posts.filter(p=>p.mode===E.m&&(!q||(p.title+' '+p.group).toLowerCase().includes(q))).sort((a,b)=>b.created-a.created);
  $('#list').innerHTML=ps.length?ps.map(p=>{const s=p.slides[0];const n=zc(p);return `<div class="it ${E.cur&&E.cur.id===p.id?'on':''}" data-id="${p.id}"><img src="${esc(s.type==='image'?s.src:s.poster)}" loading="lazy" alt=""><div><div class="t">${esc(p.title)}</div><div class="s">${s.type==='video'?'🎬 Видео · ':''}${p.kind==='carousel'?'Карусель, '+p.slides.length+' шт · ':''}${esc(p.group)}${n?`<span class="zb">${n}</span>`:''}</div></div></div>`}).join(''):'<div class="empty">Ничего не найдено</div>'}
 function setMode(m){E.m=m;document.body.classList.toggle('mood',m==='mood');document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));drawList()}
 
 function confirmLeave(){return !E.dirty||confirm('Есть несохранённые зоны. Перейти без сохранения?')}
 function openPost(p){if(E.cur&&E.cur!==p&&!confirmLeave())return;E.cur=p;E.si=0;E.sel=-1;E.test=false;E.cam=null;E.hist=[];E.dirty=false;
- const sz=p.local?{}:((E.meta.posts[p.id]||{}).slideZones)||{};E.zones={};p.slides.forEach((s,i)=>{E.zones[i]=JSON.parse(JSON.stringify((sz[s.path]!==undefined?sz[s.path]:(E.autoZ||{})[s.path])||[]))});
+ const sz=p.local?{}:((E.meta.posts[p.id]||{}).slideZones)||{};E.zones={};p.slides.forEach((s,i)=>{E.zones[i]=JSON.parse(JSON.stringify(zonesOf(p,s)))});
  if(!p.local)history.replaceState(null,'','#'+p.id);drawList();drawMain();drawSide()}
 const Z=()=>E.zones[E.si]||(E.zones[E.si]=[]);
 const slide=()=>E.cur.slides[E.si];
@@ -289,12 +290,12 @@ async function putFile(path,body,overwrite){const h={Authorization:'OAuth '+E.to
 async function freshMeta(){const root=await listAll('/');const mf=root.find(x=>x.name==='_app.json');let meta={posts:{},config:{}};
  if(mf){meta=await (await fetch(mf.file+(mf.file.includes('?')?'&':'?')+'nc='+Date.now())).json();meta.posts=meta.posts||{};meta.config=meta.config||{}}return meta}
 function clean(zs){return zs.map(z=>{const o={x:z.x,y:z.y,w:z.w,h:z.h,label:(z.label||'').trim()};if(z.hx!=null){o.hx=z.hx;o.hy=z.hy}if(z.t1!=null&&z.t1!=='')o.t1=+z.t1;if(z.t2!=null&&z.t2!=='')o.t2=+z.t2;return o})}
-async function saveMeta2(id,pairs){const meta=await freshMeta();const P=meta.posts[id]=meta.posts[id]||{};P.slideZones=P.slideZones||{};
- pairs.forEach(([path,zs])=>{P.slideZones[path]=clean(zs)});
+async function saveMeta2(id,pairs,md5s){const meta=await freshMeta();const P=meta.posts[id]=meta.posts[id]||{};P.slideZones=P.slideZones||{};
+ pairs.forEach(([path,zs],k)=>{P.slideZones[path]=clean(zs);const m5=(md5s||[])[k];if(m5){meta.zm=meta.zm||{};meta.zm[m5]=clean(zs)}});
  await putFile('/_app.json',new Blob([JSON.stringify(meta)],{type:'application/json'}),true);E.meta=meta;
  const c=LS.get('sm_cache',null);if(c){c.meta=meta;LS.set('sm_cache',c)}}
 async function doSave(){if(!E.token){toast('Сначала подключите Диск, внизу справа');return}const p=E.cur;toast('Сохраняю…');
- try{await saveMeta2(p.id,p.slides.map((s,i)=>[s.path,E.zones[i]||[]]));E.dirty=false;drawSide();drawList();toast('Сохранено. В приложении уже работает')}
+ try{await saveMeta2(p.id,p.slides.map((s,i)=>[s.path,E.zones[i]||[]]),p.slides.map(s=>s.md5));E.dirty=false;drawSide();drawList();toast('Сохранено. В приложении уже работает')}
  catch(e){toast(e&&e.code==='notoken'?'Токен не подошёл, подключите Диск заново':'Не удалось сохранить, попробуйте ещё раз');drawSide()}}
 async function doUpload(){if(!E.token){toast('Сначала подключите Диск, внизу справа');return}const p=E.cur,f=p.slides[0].file;const folder=$('#fold').value;
  const name=f.name.replace(/[\\/:*?"<>|]/g,'_');const path=folder+'/'+name;toast('Загружаю файл на Диск…');
