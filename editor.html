@@ -248,7 +248,7 @@ function bindTest(preset){const fr=$('#fr'),m=$('#md'),lab=$('#zl');let zoom=nul
  E.zoomZone=z=>{unzoom();setTimeout(()=>zoomZone(z),30)};
  fr.addEventListener('pointerdown',e=>{dX=e.clientX;dY=e.clientY;dT=Date.now();moved=0;if(zoom){drag={tx:zoom.tx,ty:zoom.ty};fr.setPointerCapture(e.pointerId)}});
  fr.addEventListener('pointermove',e=>{const dx=e.clientX-dX,dy=e.clientY-dY;moved=Math.max(moved,Math.hypot(dx,dy));if(zoom&&drag){zoom.tx=drag.tx+dx;zoom.ty=drag.ty+dy;clampT();setT(false)}});
- fr.addEventListener('pointerup',e=>{drag=null;if(zoom)m.style.transition='';if(moved>10||Date.now()-dT>600)return;if(zoom){unzoom();return}
+ fr.addEventListener('pointerup',e=>{drag=null;if(zoom)m.style.transition='';const sdx=e.clientX-dX,sdy=e.clientY-dY;if(zoom&&Math.abs(sdx)>40&&Math.abs(sdx)>1.5*Math.abs(sdy)&&Date.now()-dT<450&&list().length){nav(sdx<0?1:-1);return}if(moved>10||Date.now()-dT>600)return;if(zoom){unzoom();return}
   const r=fr.getBoundingClientRect();const nx=(e.clientX-r.left)/r.width,ny=(e.clientY-r.top)/r.height;
   const near=Z().filter(zoneOn).map(z=>{const h=ZoneKit.hintPos(z);return [z,Math.hypot((h.x-nx)*r.width,(h.y-ny)*r.height)]}).filter(a=>a[1]<28).sort((a,b)=>a[1]-b[1]).map(a=>a[0]);const zs=near.length?near:Z().filter(z=>zoneOn(z)&&nx>=z.x&&nx<=z.x+z.w&&ny>=z.y&&ny<=z.y+z.h).sort((a,b)=>a.w*a.h-b.w*b.h);
   if(zs.length)zoomZone(zs[0]);else{zoomAt(nx,ny,2.5,'🔍 Двигайте пальцем');fr.classList.toggle('hasz',list().length>0)}});
