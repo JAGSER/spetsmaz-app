@@ -425,11 +425,11 @@ td.n,th.n{text-align:right}
 
 body{--bg:#FBE6E3}
 body.mood{--bg:#E2F4E8}
-body.dark{--bg:#211416;--card:#2E1E20;--ink:#F4EEEC;--ink2:#E2D6D4;--mut:#B8A6A3;--line:#3E2C2E;--soft:rgba(215,20,26,.22);--acc2:#FF7A7F;--nav:rgba(33,20,22,.96)}
-body.dark.mood{--bg:#0F1E16;--card:#1A2E22;--line:#284A36;--soft:rgba(30,158,88,.25);--acc2:#6FD69B;--nav:rgba(15,30,22,.96)}
+body.dark{--bg:#1B1213;--card:#281A1C;--ink:#F7EEEE;--ink2:#E6D8D9;--mut:#C2A9AB;--line:#3A2628;--acc:#E5383D;--soft:rgba(229,56,61,.2);--acc2:#FF8A8E;--nav:rgba(32,21,22,.96)}
+body.dark.mood{--bg:#0F1913;--card:#18261D;--ink:#EEF6F1;--ink2:#D6E6DC;--mut:#A2BCAD;--line:#25392C;--acc:#2BB36A;--soft:rgba(43,179,106,.2);--acc2:#7EDCA6;--nav:rgba(18,30,23,.96)}
 body.dark,body.dark input,body.dark textarea{color:var(--ink)}
-body.dark .zed,body.dark .slider{background:#3a2a2c}
-body.dark .story .ring>*{background:#3a2a2c}
+body.dark .zed,body.dark .slider{background:#3a2628}body.dark.mood .zed,body.dark.mood .slider{background:#25392C}
+body.dark .story .ring>*{background:#3a2628}body.dark.mood .story .ring>*{background:#25392C}
 body.dark .bubble{background:var(--card);border-color:var(--ink)}
 body.dark .toast{background:#fff;color:#1d1b1a}
 .ico{width:24px;height:24px;display:block}
@@ -717,7 +717,7 @@ function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._
 
 // ================= render =================
 function render(){
- const m=mode();document.body.classList.toggle('mood',m==='mood');{const dk=document.body.classList.contains('dark'),tc=m==='mood'?(dk?'#0F1E16':'#E2F4E8'):(dk?'#211416':'#FBE6E3');const mt=document.querySelector('meta[name=theme-color]');if(mt&&mt.content!==tc)mt.content=tc}document.body.classList.toggle('m3on',App.tab==='game'&&!!(App.game&&App.game.c));
+ const m=mode();document.body.classList.toggle('mood',m==='mood');{const dk=document.body.classList.contains('dark'),tc=m==='mood'?(dk?'#0F1913':'#E2F4E8'):(dk?'#1B1213':'#FBE6E3');const mt=document.querySelector('meta[name=theme-color]');if(mt&&mt.content!==tc)mt.content=tc}document.body.classList.toggle('m3on',App.tab==='game'&&!!(App.game&&App.game.c));
  const cfg=Store.config[m]||{};const n=notifications().length;
  const tabs=[['feed',IC.feed,'Лента'],['search',IC.search,'Поиск'],['game',IC.game,'Игры'],['favs',IC.favs,'Избранное'],['me',IC.me,'Профиль']];if(App.admVis)tabs.push(['admin',IC.admin,'Админ']);applyTheme();
  $('#app').innerHTML=`<header><div class="top"><div class="logo"><div class="mark">${cfg.logo?`<img src="${esc(cfg.logo)}" alt="">`:MODES[m].em}</div>${esc(cfg.brand||MODES[m].brand)}</div>
