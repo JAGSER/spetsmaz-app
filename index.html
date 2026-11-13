@@ -783,8 +783,16 @@ function bodyMapHTML(){const z=App.bodyZone;const back=App.bodyView==='back'||(!
  ${z?recoHTML(z):''}</div>`}
 function recoHTML(z){const p=visiblePosts('health').find(p=>(p.zones||[]).includes(z)&&(p.products||[]).length);if(!p)return'';const pr=p.products[0];
  return `<div class="prod" style="margin:12px 0 0;background:var(--soft)"><div><b>Подойдёт: ${esc(pr.name)}</b>${mpRow(pr,p.id)}</div></div>`}
-function upcomingHolidays(){const t=today();return (Store.config.holidays||[]).filter(h=>h.date>=t).sort((a,b)=>a.date.localeCompare(b.date))}
-function holidaysHTML(short){const hs=upcomingHolidays().slice(0,short?2:20);if(!hs.length)return'';
+const HOL_FIX=[['01-07','Рождество Христово','подарок'],['01-14','Старый Новый год',''],['01-25','Татьянин день, День студента','подарок'],['02-14','День всех влюблённых','подарок'],['02-23','День защитника Отечества','подарок'],['03-08','Международный женский день','подарок'],['03-20','Международный день счастья',''],['04-01','День смеха',''],['04-07','Всемирный день здоровья',''],['05-01','Праздник Весны и Труда',''],['05-09','День Победы',''],['05-15','Международный день семьи','подарок'],['06-01','День защиты детей','подарок'],['06-12','День России',''],['07-08','День семьи, любви и верности','подарок'],['08-14','Медовый Спас',''],['08-19','Яблочный Спас',''],['09-01','День знаний','подарок'],['10-01','День пожилых людей','подарок'],['10-05','День учителя','подарок'],['11-04','День народного единства',''],['12-31','Новый год','подарок']];
+function nthSun(y,m,n){const d=new Date(y,m,1);const first=(7-d.getDay())%7+1;return new Date(y,m,first+7*(n-1))}
+function lastSun(y,m){const d=new Date(y,m+1,0);d.setDate(d.getDate()-d.getDay());return d}
+function orthEaster(y){const a=y%4,b=y%7,c=y%19,d=(19*c+15)%30,e=(2*a+4*b-d+34)%7;const mo=Math.floor((d+e+114)/31),da=(d+e+114)%31+1;const j=new Date(y,mo-1,da);j.setDate(j.getDate()+13);return j}
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function genHolidays(){const t=today(),y=+t.slice(0,4),L=[];for(const yy of [y,y+1]){HOL_FIX.forEach(([md,ti,tg])=>L.push({date:yy+'-'+md,title:ti,tag:tg}));
+ L.push({date:ymd(lastSun(yy,10)),title:'День матери',tag:'подарок'},{date:ymd(nthSun(yy,9,3)),title:'День отца',tag:'подарок'},{date:ymd(orthEaster(yy)),title:'Пасха',tag:'подарок'})}
+ return L}
+function upcomingHolidays(){const t=today(),lim=ymd(new Date(Date.now()+366*DAY)),seen=new Set(),out=[];genHolidays().concat(Store.config.holidays||[]).forEach(h=>{const k=h.date;if(h.date<t||h.date>lim||seen.has(k))return;seen.add(k);out.push(h)});return out.sort((a,b)=>a.date.localeCompare(b.date))}
+function holidaysHTML(short){const hs=upcomingHolidays().slice(0,short?2:40);if(!hs.length)return'';
  return `<div class="box"><div class="holhead"><b style="font-size:calc(21px*var(--fz,1))">🎉 Скоро праздник</b>${short?`<button class="btn sm ghost" data-act="cal">Календарь</button>`:''}</div><div style="margin-top:10px">${hs.map(holRow).join('')}</div></div>`}
 function holRow(h){const d=new Date(h.date+'T00:00');const days=Math.ceil((d-new Date(today()+'T00:00'))/DAY);const on=st().holRem.includes(h.date);
  return `<div class="hol" style="background:var(--bg)"><div class="d">${d.getDate()}<small>${d.toLocaleString('ru',{month:'short'})}</small></div><div style="flex:1"><b>${esc(h.title)}</b><div class="muted">${days===0?'Сегодня':'через '+days+' дн.'}${h.tag?` · <a href="#" data-tagq="${esc(h.tag)}" style="color:var(--acc)">идеи подарков</a>`:''}</div></div><button class="btn sm ${on?'':'ghost'}" data-rem="${h.date}">${on?'🔔 Напомню':'Напомнить'}</button></div>`}
