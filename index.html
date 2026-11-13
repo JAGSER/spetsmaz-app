@@ -1187,5 +1187,10 @@ const pump=()=>{while(act<MAX){const c=[...document.querySelectorAll('video.anim
 const io=new IntersectionObserver(es=>{es.forEach(e=>{const v=e.target;if(e.isIntersecting){vis.add(v);if(v.dataset.st&&v.classList.contains('ok'))v.play().catch(()=>{});else if(!v.dataset.st&&done.has(v.dataset.asrc))start(v,false)}else{vis.delete(v);if(v.classList.contains('ok'))v.pause()}});pump()},{rootMargin:'250px 250px'});
 const scan=()=>{document.querySelectorAll('video.anim[data-asrc]:not([data-io])').forEach(v=>{v.dataset.io=1;io.observe(v)});pump()};
 new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});scan()})()</script>
+<script>(()=>{let base=null;const h=t=>{let x=0;for(let i=0;i<t.length;i++)x=(x*31+t.charCodeAt(i))|0;return x};
+const get=()=>fetch(location.pathname+'?vc='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():null).then(t=>t?h(t):null).catch(()=>null);
+get().then(v=>base=v);
+const chk=async()=>{if(base==null||document.visibilityState!=='visible')return;const v=await get();if(v!=null&&v!==base){if(document.querySelector('#sheet,.story-v,.sv'))return;location.reload()}};
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')chk()});setInterval(chk,10*60*1000)})()</script>
 </body>
 </html>
