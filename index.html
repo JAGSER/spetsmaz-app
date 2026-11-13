@@ -999,7 +999,7 @@ function viewMe(){const s=st();const m=mode();const cfg=Store.config;const activ
  <div class="box"><b style="font-size:calc(22px*var(--fz,1))">🔔 Уведомления</b><p class="muted">О каких темах сообщать (если ничего не выбрать, то обо всех):</p>${tagCloud(visiblePosts(null),'topic')}
   <button class="btn ghost wide" data-act="pushperm" style="margin-top:12px">Получать на телефон</button></div>
  <div class="box"><b style="font-size:calc(22px*var(--fz,1))">Мы в соцсетях</b><div class="social" style="margin-top:12px;grid-template-columns:repeat(${SOC.length},minmax(0,1fr))">${SOC.map(x=>soc[x[0]]?`<a href="${esc(soc[x[0]])}" target="_blank" rel="noopener">${SOCIC[x[0]]}${x[1]}</a>`:`<a href="#" class="off" data-act="nosoc">${SOCIC[x[0]]}${x[1]}</a>`).join('')}</div></div>
- <div class="box"><b style="font-size:calc(22px*var(--fz,1))">📲 Приложение на телефон</b><p class="muted">Значок появится на экране, как у обычного приложения.</p><button class="btn wide" data-act="install">Установить приложение</button></div>${adminLink()}<div class="madeby">Сделано в Visualon · <a href="https://visualon.ru" target="_blank" rel="noopener">visualon.ru</a></div>`}
+ <div class="box"><b style="font-size:calc(22px*var(--fz,1))">📲 Приложение на телефон</b><p class="muted">Значок появится на экране, как у обычного приложения.</p><button class="btn wide" data-act="install">Установить приложение</button></div>${adminLink()}<div class="madeby">Сделано в <a href="https://visualon.ru" target="_blank" rel="noopener">visualon.ru</a></div>`}
 function shareApp(){const t=`Полезные советы и скидки Спецмазь и Доктор Шустер. Мой код на скидку: ${refCode()}\n${location.href.split('#')[0]}`;
  if(navigator.share){navigator.share({text:t}).catch(()=>copy(t))}else copy(t)}
 
