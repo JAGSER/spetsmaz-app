@@ -755,15 +755,16 @@ function bodyMapHTML(){const z=App.bodyZone;const back=App.bodyView==='back'||(!
  const hair=`<g${P('head')}><path d="M268 58 Q213 58 211 118 Q211 128 214 132 Q218 108 236 100 Q252 94 268 93 Z" fill="${HR[0]}"/><path d="M268 58 Q323 58 325 118 Q325 128 322 132 Q318 108 300 100 Q284 94 268 93 Z" fill="${HR[0]}"/></g>`;
  const head=back?`${c2(211,140,13,SK)}${c2(325,140,13,SK)}${c2(268,134,59,HR,'head')}`:`${c2(211,140,13,SK)}${c2(325,140,13,SK)}${c2(268,136,58,SK,'head')}${hair}${face}`;
  const torso=back?`${two(200,220,136,172,[30,30,0,0],SH,'back',268)}${two(200,320,136,72,0,SD,'lower',268)}`:`${two(200,220,136,172,[30,30,0,0],SH,'chest',268)}${two(200,322,136,70,0,SH,'belly',268)}<path d="M200 322H336" stroke="rgba(0,0,0,.06)" stroke-width="2" pointer-events="none"/>`;
- const arms=arm('L',184,1)+arm('R',352,0);const armsFront=!back||z==='back'||z==='lower';
+ const arms=arm('L',184,1)+arm('R',352,0);const overHead=back&&(z==='head'||z==='neck');const behindLegs=back&&z==='knees';const armsFront=!back||['back','lower','hips'].includes(z);
+ const LOW=`<g class="low"${O(268,455)}>${leg('L',205)}${leg('R',273)}${two(205,400,125,55,[0,0,4,4],JN,'hips',268)}</g>`;
  const svg=`<svg viewBox="150 54 236 618" preserveAspectRatio="xMidYMin meet" role="img" aria-label="Человек: нажмите, где болит"><ellipse cx="268" cy="667" rx="88" ry="7" fill="rgba(0,0,0,.12)"/>
  <g class="guy ${z?'a-'+z:'idle'}${back?' back':''}"${O(268,668)}>
-  <g class="low"${O(268,455)}>${leg('L',205)}${leg('R',274)}${two(205,400,125,55,[0,0,4,4],JN,'hips',268)}</g>
-  <g class="bd"${O(268,400)}>${armsFront?'':arms}${torso}${back?'':two(205,287,125,11,0,ST,'chest',268)}<g${P('hips')}><path d="${rp(205,389,125,16,[2,2,2,2])}" fill="#2D2D30"/>${back?'':`<path d="${rp(255,391,26,13,[3,3,3,3])}" fill="${ST[0]}"/>`}</g>
+  ${behindLegs?'':LOW}
+  <g class="bd"${O(268,400)}>${armsFront||overHead?'':arms}${torso}${back?'':two(205,287,125,11,0,ST,'chest',268)}<g${P('hips')}><path d="${rp(205,389,125,16,[2,2,2,2])}" fill="#2D2D30"/>${back?'':`<path d="${rp(255,391,26,13,[3,3,3,3])}" fill="${ST[0]}"/>`}</g>
    <ellipse cx="268" cy="222" rx="30" ry="15" fill="#B30D19" pointer-events="none"/>${two(243,186,50,38,0,SK,'neck',268)}
    ${armsFront?arms:''}
    <g class="shc"${O(268,243)}>${c2(190,248,28,SD,'shoulders')}${c2(346,248,28,SD,'shoulders')}</g>
-   <g class="hd"${O(268,190)}>${head}</g></g>
+   <g class="hd"${O(268,190)}>${head}</g>${overHead?arms:''}</g>${behindLegs?LOW:''}
  </g></svg>`;
  return `<div class="box bm"><div class="row between" style="flex-wrap:wrap;margin-bottom:4px"><b style="font-size:calc(21px*var(--fz,1))">Где болит?</b><div class="bmseg"><button class="${back?'':'on'}" data-act="bmfront">Спереди</button><button class="${back?'on':''}" data-act="bmback">Сзади</button></div></div>
  <div class="bubble">${z?esc(BODY_FUN[z]||BODY[z]):'Нажмите, где болит!'}</div>
