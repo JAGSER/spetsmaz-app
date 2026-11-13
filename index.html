@@ -586,7 +586,7 @@ const API='https://cloud-api.yandex.net/v1/disk';
 const enc=encodeURIComponent;const clone=o=>JSON.parse(JSON.stringify(o));
 const DEFAULT_CONFIG={
  health:{brand:'Спецмазь',logo:'',social:{vk:'https://vk.com/spetzmaz',tg:'',yt:'',ok:''}},
- mood:{brand:'Доктор Шустер',logo:'',social:{vk:'https://vk.com/dr.shuster',tg:'https://t.me/DrShuster',yt:'',ok:'https://ok.ru/group/58463642845366'}},
+ mood:{brand:'Доктор Шустер',logo:'',social:{vk:'https://vk.com/dr.shuster',vk2:'https://vk.ru/dr.shuster',tg:'https://t.me/DrShuster',yt:'',ok:'https://ok.ru/group/58463642845366'}},
  coupons:[{min:12,percent:5,code:'SKIDKA5'},{min:30,percent:10,code:'SKIDKA10'},{min:60,percent:15,code:'SKIDKA15'}],
  couponDays:7, gamesPerDay:3, referralPercent:10, referralCode:'DRUG10',
  holidays:[{date:'2026-12-31',title:'Новый год',tag:'подарок'},{date:'2027-02-14',title:'День влюблённых',tag:'подарок'},{date:'2027-02-23',title:'23 Февраля',tag:'подарок'},{date:'2027-03-08',title:'8 Марта',tag:'подарок'}]
@@ -988,7 +988,7 @@ function refCode(){const s=st();if(!s.ref.code){s.ref.code=('DRUG'+(Store.uid||u
 function adminLink(){return App.admVis?`<div class="box"><b style="font-size:calc(20px*var(--fz,1))">⚙ Админ</b><p class="muted">Статистика, настройки, список всех постов.</p><button class="btn ghost wide" data-act="openadmin">Открыть админ-панель</button></div>`:''}
 function fillSoc(){['health','mood'].forEach(m=>{const d=(DEFAULT_CONFIG[m]||{}).social||{},c=Store.config[m];if(!c)return;c.social=Object.assign({},c.social||{});for(const k in d)if(!c.social[k])c.social[k]=d[k]})}
 function viewMe(){const s=st();const m=mode();const cfg=Store.config;const active=s.coupons.filter(c=>!c.used&&c.exp>now());const allTags=[...new Set(visiblePosts(null).flatMap(p=>p.tags||[]))];
- const soc=(cfg[m]||{}).social||{};const SOC=[['vk','ВКонтакте'],['tg','Telegram'],['ok','Одноклассники']].concat(soc.yt?[['yt','YouTube']]:[]);
+ const soc=(cfg[m]||{}).social||{};const SOC=[['vk','ВКонтакте']].concat(soc.vk2?[['vk2','vk.ru']]:[],[['tg','Telegram'],['ok','Одноклассники']],soc.yt?[['yt','YouTube']]:[]);
  return `<h2>Профиль</h2>
  <div class="box"><b style="font-size:calc(22px*var(--fz,1))">🔠 Размер текста</b><div class="seg fsz" style="margin:12px 0 0">${['Обычный','Крупный','Очень крупный'].map((n,i)=>`<button class="${(s.fs||0)===i?'on':''}" data-act="fs${i}">${n}</button>`).join('')}</div></div>
  <div class="box"><div class="row between"><b style="font-size:calc(22px*var(--fz,1))">🎟️ Мои скидки</b><span class="muted">${active.length} активн.</span></div><div style="margin-top:10px">${s.coupons.length?s.coupons.slice(0,30).map(couponHTML).join(''):'<p class="muted">Скидки из игры и бонуса дня будут здесь. Код вводится при оформлении заказа на маркетплейсе.</p>'}</div></div>
@@ -998,7 +998,7 @@ function viewMe(){const s=st();const m=mode();const cfg=Store.config;const activ
  ${m==='mood'?holidaysHTML(false):''}
  <div class="box"><b style="font-size:calc(22px*var(--fz,1))">🔔 Уведомления</b><p class="muted">О каких темах сообщать (если ничего не выбрать, то обо всех):</p>${tagCloud(visiblePosts(null),'topic')}
   <button class="btn ghost wide" data-act="pushperm" style="margin-top:12px">Получать на телефон</button></div>
- <div class="box"><b style="font-size:calc(22px*var(--fz,1))">Мы в соцсетях</b><div class="social" style="margin-top:12px;grid-template-columns:repeat(${SOC.length},minmax(0,1fr))">${SOC.map(x=>soc[x[0]]?`<a href="${esc(soc[x[0]])}" target="_blank" rel="noopener">${SOCIC[x[0]]}${x[1]}</a>`:`<a href="#" class="off" data-act="nosoc">${SOCIC[x[0]]}${x[1]}</a>`).join('')}</div></div>
+ <div class="box"><b style="font-size:calc(22px*var(--fz,1))">Мы в соцсетях</b><div class="social" style="margin-top:12px;grid-template-columns:repeat(${SOC.length},minmax(0,1fr))">${SOC.map(x=>soc[x[0]]?`<a href="${esc(soc[x[0]])}" target="_blank" rel="noopener">${SOCIC[x[0]]||SOCIC.vk}${x[1]}</a>`:`<a href="#" class="off" data-act="nosoc">${SOCIC[x[0]]||SOCIC.vk}${x[1]}</a>`).join('')}</div></div>
  <div class="box"><b style="font-size:calc(22px*var(--fz,1))">📲 Приложение на телефон</b><p class="muted">Значок появится на экране, как у обычного приложения.</p><button class="btn wide" data-act="install">Установить приложение</button></div>${adminLink()}<div class="madeby">Сделано в <a href="https://visualon.ru" target="_blank" rel="noopener">visualon.ru</a></div>`}
 function shareApp(){const t=`Полезные советы и скидки Спецмазь и Доктор Шустер. Мой код на скидку: ${refCode()}\n${location.href.split('#')[0]}`;
  if(navigator.share){navigator.share({text:t}).catch(()=>copy(t))}else copy(t)}
