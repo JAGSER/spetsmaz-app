@@ -954,7 +954,7 @@ window.m3End=function(r){App.game=null;const s=st();s.games.lv=s.games.lv||{};s.
  const prev=s.games.lv[r.level]||0;if(r.won&&r.stars>prev)s.games.lv[r.level]=r.stars;
  const tot=gStars();const got=[];gTiers().forEach(t=>{if(tot>=t.min&&!s.games.cl.includes(t.min)){s.games.cl.push(t.min);got.push(addCoupon(t.percent,t.code,'game'))}});
  saveState();render();if(got.length)M3.confetti(220);
- const pics=`<div class="m3hero" style="height:110px"><img src="${M3.src(3)}" alt=""><img src="${M3.src(0)}" alt=""><img src="${M3.src(1)}" alt=""></div>`;
+ const pics=`<div class="m3hero" style="height:160px"><img src="${M3.src(3)}" alt=""><img src="${M3.src(0)}" alt=""><img src="${M3.src(1)}" alt=""></div>`;
  const nx=gNext();
  const body=r.won?`<h2 class="m3rt">Уровень ${r.level} пройден!</h2><div class="m3rs">${[0,1,2].map(k=>`<i class="${k<r.stars?'on':''}" style="animation-delay:${.3+k*.35}s">★</i>`).join('')}</div><p class="m3p">${r.score} очков${r.stars>prev&&prev?' · новый рекорд уровня!':''}</p>
    ${got.length?got.map(c=>`<p style="font-weight:800">🎉 Новый купон Ozon −${c.percent}%!</p>${couponHTML(c)}`).join('')+'<p class="m3p">Введите код при оформлении заказа на Ozon</p>':`<p class="m3p">Всего звёзд: ★ ${tot}</p>`}
