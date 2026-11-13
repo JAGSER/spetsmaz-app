@@ -537,6 +537,7 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 .prodhd{display:flex;gap:14px;align-items:center}.prodhd img{height:120px;object-fit:contain;filter:drop-shadow(2px 4px 4px rgba(0,0,0,.3))}.prodhd b{font-size:calc(19px*var(--fz,1))}
 
 .madeby a span{display:inline-block;opacity:0;transform:translateY(-40px) rotate(-30deg)}.madeby.on a span{animation:mbdrop .6s cubic-bezier(.3,1.7,.5,1) forwards,mbwave 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.06s),calc(1s + var(--i)*.08s)}@keyframes mbdrop{to{opacity:1;transform:none}}@keyframes mbwave{0%,100%{transform:none}50%{transform:translateY(-7px);color:#ff7a1a}}
+.ered{display:flex;gap:6px;margin-bottom:6px;align-items:center}.ered input,.ered select{min-width:0;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:14px}.ehd{display:flex;gap:6px;font-size:12px;color:var(--mut);margin:6px 0 4px}
 .holmore summary{list-style:none;cursor:pointer;text-align:center;font-weight:800;color:var(--acc);padding:10px;border-radius:12px;background:var(--soft);margin-top:6px}.holmore summary::-webkit-details-marker{display:none}.holmore[open] summary{margin-bottom:6px}
 .madeby{text-align:center;color:var(--muted,#888);font-size:calc(14px*var(--fz,1));margin:22px 0 10px}.madeby a{color:var(--acc);font-weight:700;text-decoration:none}
 </style>
@@ -600,6 +601,8 @@ const DEFAULT_CONFIG={
  mood:{brand:'Доктор Шустер',logo:'',social:{vk:'https://vk.com/dr.shuster',tg:'https://t.me/DrShuster',yt:'',ok:''}},
  coupons:[{min:12,percent:5,code:'SKIDKA5'},{min:30,percent:10,code:'SKIDKA10'},{min:60,percent:15,code:'SKIDKA15'}],
  couponDays:7, gamesPerDay:3, referralPercent:10, referralCode:'DRUG10',
+ wheelPrizes:[{t:'+3 хода',type:'moves',v:3,w:24},{t:'5%',type:'disc',v:5,w:5},{t:'+5 ходов',type:'moves',v:5,w:22},{t:'+3 хода',type:'moves',v:3,w:24},{t:'7%',type:'disc',v:7,w:3},{t:'+8 ходов',type:'moves',v:8,w:16},{t:'5%',type:'disc',v:5,w:5},{t:'10%',type:'disc',v:10,w:1}],
+ wheelCodes:[], streakDays:7, streakPercent:10, streakCode:'',
  holidays:[{date:'2026-12-31',title:'Новый год',tag:'подарок'},{date:'2027-02-14',title:'День влюблённых',tag:'подарок'},{date:'2027-02-23',title:'23 Февраля',tag:'подарок'},{date:'2027-03-08',title:'8 Марта',tag:'подарок'}]
 };
 
@@ -931,7 +934,8 @@ function openBell(){const ns=notifications();
 async function askPush(){try{if(!('Notification'in window))throw 0;const r=await Notification.requestPermission();if(r==='granted'){st().push=true;saveState();toast('Уведомления включены');try{new Notification('Готово',{body:'Будем сообщать о новых постах и скидках'})}catch(e){}}else toast('Разрешите уведомления в настройках браузера')}catch(e){toast('Установите приложение на экран телефона, чтобы получать уведомления')}}
 
 // ================= coupons =================
-function addCoupon(percent,code,src){ut('Скидка получена',{percent,src});const c={id:uid(),percent,code,src,mode:mode(),exp:now()+(Store.config.couponDays||7)*DAY,used:false};st().coupons.unshift(c);saveState();return c}
+function pickCode(code,key){const L=String(code||'').split(/[\s,;]+/).filter(Boolean);if(L.length<2)return L[0]||code;let h=0;const k=(Store.uid||st().ref.code||'u')+'|'+key;for(let i=0;i<k.length;i++)h=(h*31+k.charCodeAt(i))|0;return L[Math.abs(h)%L.length]}
+function addCoupon(percent,code,src){code=pickCode(code,src+percent);ut('Скидка получена',{percent,src});const c={id:uid(),percent,code,src,mode:mode(),exp:now()+(Store.config.couponDays||7)*DAY,used:false};st().coupons.unshift(c);saveState();return c}
 function couponHTML(c){const exp=c.exp<now();return `<div class="coupon ${c.used||exp?'used':''}"><div class="pc">${c.percent}%</div><div class="ci"><div class="row between"><span class="code">${esc(c.code)}</span>${c.used||exp?'':`<button class="btn sm" data-copyc="${c.id}">Копировать</button>`}</div>
  <div class="muted" style="margin-top:6px">${c.used?'Использован':exp?'Срок истёк':'До '+new Date(c.exp).toLocaleDateString('ru')} · ${({game:'за игру',wheel:'бонус дня',ref:'за друга'})[c.src]||''}</div>
  ${c.used||exp?'':`<button class="muted" data-usec="${c.id}" style="margin-top:4px;text-decoration:underline">Отметить использованным</button>`}</div></div>`}
@@ -991,15 +995,17 @@ window.m3End=function(r){App.game=null;const s=st();s.games.lv=s.games.lv||{};s.
  if(r.won)[0,1,2].forEach(k=>{if(k<r.stars)setTimeout(()=>M3.star(k),300+k*350)})};
 
 // ================= daily wheel =================
-const PRIZES=[{t:'+3 хода',g:3},{t:'5%',p:5},{t:'+5 ходов',g:5},{t:'+3 хода',g:3},{t:'7%',p:7},{t:'+8 ходов',g:8},{t:'5%',p:5},{t:'10%',p:10}];
-const PRW=[24,5,22,24,3,16,5,1];
+let PRIZES=[{t:'+3 хода',g:3},{t:'5%',p:5},{t:'+5 ходов',g:5},{t:'+3 хода',g:3},{t:'7%',p:7},{t:'+8 ходов',g:8},{t:'5%',p:5},{t:'10%',p:10}];
+let PRW=[24,5,22,24,3,16,5,1];
+function syncWheel(){const w=(Store.config||{}).wheelPrizes;if(Array.isArray(w)&&w.length>=2){PRIZES=w.map(x=>x.type==='moves'?{t:x.t,g:+x.v}:{t:x.t,p:+x.v});const tot=w.reduce((a,x)=>a+(+x.w||0),0)||1;PRW=w.map(x=>(+x.w||0)*100/tot)}}
+function wheelCode(p){const wc=((Store.config||{}).wheelCodes||[]).find(c=>+c.percent===+p);if(wc&&wc.code)return wc.code;const cp=(Store.config.coupons||[]).find(c=>c.percent>=p);return cp?cp.code:'BONUS'+p}
 function wheelBox(){const s=st();const t=today();const done=s.wheel.date===t;const yest=new Date(Date.now()-DAY).toISOString().slice(0,10);const streak=done?s.wheel.streak:(s.wheel.date===yest?s.wheel.streak:0);
  return `<div class="box"><div class="row between"><div><b style="font-size:calc(22px*var(--fz,1))">🎡 Бонус дня</b><div class="muted">${done?'Сегодня: '+esc(s.wheel.last)+'. Приходите завтра!':'Крутите колесо раз в день'}</div></div><button class="btn sm" data-act="wheel" ${done?'disabled':''}>Крутить</button></div>
- <div class="streak">${[1,2,3,4,5,6,7].map(i=>`<i class="${i<=streak?'on':''}">${i===7?'🎁':i}</i>`).join('')}</div><p class="muted" style="text-align:center;margin:0">7 дней подряд: скидка 10% в подарок</p></div>`}
+ <div class="streak">${Array.from({length:+Store.config.streakDays||7},(_,k)=>k+1).map((i,_,A)=>`<i class="${i<=streak?'on':''}">${i===A.length?'🎁':i}</i>`).join('')}</div><p class="muted" style="text-align:center;margin:0">${Store.config.streakDays||7} дней подряд: скидка ${Store.config.streakPercent||10}% в подарок</p></div>`}
 let WAC=null;function wac(){try{WAC=WAC||new (window.AudioContext||window.webkitAudioContext)();if(WAC.state==='suspended')WAC.resume()}catch(e){}return WAC}
 function wTone(f,d,type='sine',v=.18,t0=0,f2){const a=wac();if(!a)return;const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.02)}
 const wSnd={tick(){wTone(1500,.045,'square',.07);wTone(900,.03,'triangle',.06)},start(){wTone(300,.35,'sawtooth',.06,0,900);wTone(600,.25,'triangle',.08,.05,1400)},win(){[523,659,784,1047].forEach((f,i)=>wTone(f,.22,'triangle',.16,i*.11));wTone(1568,.5,'sine',.12,.46);[0,1,2,3,4,5].forEach(i=>wTone(2200+Math.random()*1800,.08,'sine',.05,.55+i*.07))}};
-function openWheel(){const N=PRIZES.length,seg=360/N,C=150,R=132;const cols=['#e53935','#fff','#1E9E58','#fff'],txc=['#fff','#e53935','#fff','#1E9E58'];
+function openWheel(){syncWheel();const N=PRIZES.length,seg=360/N,C=150,R=132;const cols=['#e53935','#fff','#1E9E58','#fff'],txc=['#fff','#e53935','#fff','#1E9E58'];
  const pt=(a,r)=>{a=(a-90)*Math.PI/180;return [C+r*Math.cos(a),C+r*Math.sin(a)]};let sv=`<svg id="wheel" class="wheel" viewBox="0 0 300 300"><circle cx="${C}" cy="${C}" r="${R+12}" fill="#ffca28" stroke="#e0a800" stroke-width="2"/>`;
  PRIZES.forEach((p,i)=>{const [x0,y0]=pt(i*seg,R),[x1,y1]=pt((i+1)*seg,R);sv+=`<path class="wsg" data-i="${i}" d="M${C},${C} L${x0},${y0} A${R},${R} 0 0 1 ${x1},${y1} Z" fill="${cols[i%4]}" stroke="rgba(0,0,0,.08)" stroke-width="1"/>`;const am=i*seg+seg/2,[tx,ty]=pt(am,R*.64);sv+=`<text transform="translate(${tx},${ty}) rotate(${am})" text-anchor="middle" dominant-baseline="middle" font-weight="900" font-size="${p.t.length>4?15:19}" fill="${txc[i%4]}">${p.t}</text>`});
  sv+=`<path d="M${C-R+10},${C-10} A${R-10},${R-10} 0 0 1 ${C+R-10},${C-10} Q${C},${C-40} ${C-R+10},${C-10}Z" fill="rgba(255,255,255,.22)"/><g class="wbulbs">${Array.from({length:24},(_,i)=>{const [x,y]=pt(i*15,R+6);return `<circle cx="${x}" cy="${y}" r="4.2" fill="#c98a00"/>`}).join('')}</g></svg>`;
@@ -1009,8 +1015,8 @@ function openWheel(){const N=PRIZES.length,seg=360/N,C=150,R=132;const cols=['#e
   let r=Math.random()*100,k=0;for(;k<PRW.length;k++){if(r<PRW[k])break;r-=PRW[k]}k=Math.min(k,PRIZES.length-1);
   const rot=360*6+(360-(k*seg+seg/2));$('#wheel').style.transform=`rotate(${rot}deg)`;const ww=$('.wheelw'),ptr=$('.wptr'),wh=$('#wheel');ww.classList.add('spin');const t0=performance.now();let last=-1;const tk=()=>{if(performance.now()-t0>5000)return;const m=getComputedStyle(wh).transform;if(m&&m!=='none'){const [a,b]=m.slice(7,-1).split(',').map(Number);const n=Math.floor(((Math.atan2(b,a)*180/Math.PI)+360)%360/seg);if(n!==last){last=n;ptr.classList.remove('tick');void ptr.offsetWidth;ptr.classList.add('tick');wSnd.tick()}}requestAnimationFrame(tk)};tk();
   setTimeout(()=>{const yest=new Date(Date.now()-DAY).toISOString().slice(0,10);s.wheel.streak=s.wheel.date===yest?s.wheel.streak+1:1;s.wheel.date=t;const p=PRIZES[k];let msg='';
-   if(p.g){s.games.bm=(s.games.bm||0)+p.g;msg=`Вам ${p.t} на следующий уровень!`}else{const cp=(Store.config.coupons||[]).find(c=>c.percent>=p.p)||{code:'BONUS'+p.p};addCoupon(p.p,cp.code,'wheel');msg=`Скидка ${p.p}%! Она в кошельке`}
-   if(s.wheel.streak>=7){const cp=(Store.config.coupons||[]).find(c=>c.percent>=10)||{code:'BONUS10'};addCoupon(10,cp.code,'wheel');s.wheel.streak=0;msg+=' И подарок за 7 дней: 10%!'}
+   if(p.g){s.games.bm=(s.games.bm||0)+p.g;msg=`Вам ${p.t} на следующий уровень!`}else{addCoupon(p.p,wheelCode(p.p),'wheel');msg=`Скидка ${p.p}%! Она в кошельке`}
+   {const SD=+Store.config.streakDays||7,SP=+Store.config.streakPercent||10;if(s.wheel.streak>=SD){addCoupon(SP,Store.config.streakCode||wheelCode(SP),'wheel');s.wheel.streak=0;msg+=` И подарок за ${SD} дней: ${SP}%!`}}
    s.wheel.last=p.t;saveState();$('#wres').textContent=msg;ww.classList.remove('spin');const sg=document.querySelector(`.wsg[data-i="${k}"]`);sg&&sg.classList.add('wwin');wConfetti();wSnd.win()},5100)}}
 function wConfetti(){const c=document.querySelector('.wcf');if(!c)return;const st=c.parentNode;const W=c.width=st.clientWidth*2,H=c.height=st.clientHeight*2,x=c.getContext('2d');const col=['#e53935','#ffca28','#1E9E58','#2fb4ff','#ff6fa5','#fff3b0'];let P=[];for(let i=0;i<140;i++){const a=Math.random()*Math.PI*2,v=6+Math.random()*12;P.push({x:W/2,y:H*.45,vx:Math.cos(a)*v,vy:Math.sin(a)*v-7,r:Math.random()*7+5,c:col[i%6],rot:Math.random()*6,l:150})}const f=()=>{x.clearRect(0,0,W,H);P=P.filter(p=>p.l-->0);for(const p of P){p.vx*=.985;p.vy+=.33;p.x+=p.vx;p.y+=p.vy;x.save();x.translate(p.x,p.y);x.rotate(p.rot+=.12);x.globalAlpha=Math.min(1,p.l/40);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore()}if(P.length)requestAnimationFrame(f);else x.clearRect(0,0,W,H)};f()}
 
@@ -1052,18 +1058,31 @@ function adminStatsLocal(){const S=[{views:st().views,clicks:st().clicks,favs:st
  <div class="box" style="padding:10px;overflow-x:auto"><table><tr><th>Пост</th><th class="n">👁</th><th class="n">♥</th><th class="n">WB</th><th class="n">Ozon</th><th class="n">ЯМ</th></tr>
  ${rows.map(r=>`<tr><td>${esc(r.p.title)}</td><td class="n">${r.v}</td><td class="n">${r.f}</td><td class="n">${r.c.wb||0}</td><td class="n">${r.c.ozon||0}</td><td class="n">${r.c.ym||0}</td></tr>`).join('')}</table></div>
  <p class="muted">Пока видна статистика этого устройства. Общую статистику по всем покупателям можно подключить через Umami.</p>`}
+function rowsEd(id,cols,data){const row0=()=>row(Object.fromEntries(cols.map(c=>[c.k,c.type==='sel'?c.opts[0][0]:''])));setTimeout(()=>{window['__row_'+id]=row0},0);const row=d=>`<div class="ered">${cols.map(c=>c.type==='sel'?`<select data-k="${c.k}" style="flex:${c.f||1}">${c.opts.map(o=>`<option value="${o[0]}" ${String(d[c.k])===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select>`:`<input data-k="${c.k}" ${c.type==='n'?'type="number"':''} placeholder="${c.ph||''}" value="${esc(d[c.k]==null?'':String(d[c.k]))}" style="flex:${c.f||1}">`).join('')}<button class="btn sm ghost" onclick="this.parentNode.remove()">✕</button></div>`;
+ return `<div class="ehd">${cols.map(c=>`<span style="flex:${c.f||1}">${c.l}</span>`).join('')}<span style="width:40px"></span></div><div id="${id}">${data.map(row).join('')}</div><button class="btn sm ghost" onclick="document.getElementById('${id}').insertAdjacentHTML('beforeend',window.__row_${id}())">+ Добавить</button>`}
+function readRows(id){return [...document.querySelectorAll('#'+id+' .ered')].map(r=>Object.fromEntries([...r.querySelectorAll('[data-k]')].map(i=>[i.dataset.k,i.value.trim()])))}
 function adminSettings(){const c=Store.config;const f=(m,k)=>esc(((c[m]||{}).social||{})[k]||'');
- return `<div class="box">${['health','mood'].map(m=>`<h4>${MODES[m].t}</h4><div class="field"><label>Название</label><input data-cf="${m}.brand" value="${esc((c[m]||{}).brand||'')}"></div>
+ return `<div class="box"><h4>🎟 Промокоды за звёзды в игре</h4><p class="muted">Сколько звёзд нужно, какая скидка и какой промокод Ozon выдать. Можно вписать несколько кодов через запятую: каждый покупатель получит один из них.</p>
+ ${rowsEd('ed-coupons',[{k:'min',l:'Звёзд',type:'n',f:1},{k:'percent',l:'Скидка, %',type:'n',f:1},{k:'code',l:'Промокод(ы)',f:3,ph:'SHUSTER5'}],c.coupons||[])}</div>
+ <div class="box"><h4>🎡 Колесо «Бонус дня»</h4><p class="muted">Сектора колеса по порядку. Шанс: чем больше число, тем чаще выпадает.</p>
+ ${rowsEd('ed-wheel',[{k:'t',l:'Надпись',f:2,ph:'+3 хода'},{k:'type',l:'Приз',type:'sel',opts:[['moves','Ходы'],['disc','Скидка %']],f:2},{k:'v',l:'Сколько',type:'n',f:1},{k:'w',l:'Шанс',type:'n',f:1}],c.wheelPrizes||[])}
+ <p class="muted" style="margin-top:10px">Промокоды для скидок с колеса. Если для процента код не указан, берётся код из игры.</p>
+ ${rowsEd('ed-wcodes',[{k:'percent',l:'Скидка, %',type:'n',f:1},{k:'code',l:'Промокод(ы)',f:3}],c.wheelCodes||[])}
+ <div class="grid2" style="margin-top:10px"><div class="field"><label>Подарок за серию, дней подряд</label><input type="number" id="cf-sdays" value="${c.streakDays||7}"></div><div class="field"><label>Скидка за серию, %</label><input type="number" id="cf-sp" value="${c.streakPercent||10}"></div></div>
+ <div class="field"><label>Промокод за серию</label><input id="cf-sc" value="${esc(c.streakCode||'')}" placeholder="если пусто, берётся код для этого процента"></div></div>
+ <div class="box"><h4>⚙ Общие правила</h4><div class="grid2"><div class="field"><label>Игр в день</label><input type="number" id="cf-gpd" value="${c.gamesPerDay||3}"></div><div class="field"><label>Промокод действует, дней</label><input type="number" id="cf-days" value="${c.couponDays||7}"></div></div>
+ <div class="grid2"><div class="field"><label>Скидка за друга, %</label><input type="number" id="cf-refp" value="${c.referralPercent||10}"></div><div class="field"><label>Промокод за друга</label><input id="cf-refc" value="${esc(c.referralCode||'')}"></div></div></div>
+ <div class="box">${['health','mood'].map(m=>`<h4>${MODES[m].t}</h4><div class="field"><label>Название</label><input data-cf="${m}.brand" value="${esc((c[m]||{}).brand||'')}"></div>
  <div class="field"><label>Ссылка на логотип (картинка)</label><input data-cf="${m}.logo" value="${esc((c[m]||{}).logo||'')}" placeholder="https://"></div>
- <div class="grid2">${['vk','tg','yt','ok'].map(k=>`<div class="field"><label>${({vk:'ВКонтакте',tg:'Telegram',yt:'YouTube',ok:'Одноклассники'})[k]}</label><input data-cf="${m}.social.${k}" value="${f(m,k)}" placeholder="https://"></div>`).join('')}</div>`).join('')}
- <h4>Скидки за игру</h4><div class="field"><label>Купоны за звёзды в игре. Каждая строка: звёзды;процент;промокод</label><textarea id="cf-coupons">${(c.coupons||[]).map(x=>`${x.min};${x.percent};${x.code}`).join('\n')}</textarea></div>
- <div class="grid2"><div class="field"><label>Игр в день</label><input type="number" id="cf-gpd" value="${c.gamesPerDay||3}"></div><div class="field"><label>Скидка действует, дней</label><input type="number" id="cf-days" value="${c.couponDays||7}"></div></div>
- <div class="grid2"><div class="field"><label>Скидка за друга, %</label><input type="number" id="cf-refp" value="${c.referralPercent||10}"></div><div class="field"><label>Промокод за друга</label><input id="cf-refc" value="${esc(c.referralCode||'')}"></div></div>
- <h4>Календарь праздников (Настроение)</h4><div class="field"><label>Каждая строка: ГГГГ-ММ-ДД;название;тег постов</label><textarea id="cf-hol">${(c.holidays||[]).map(h=>`${h.date};${h.title};${h.tag||''}`).join('\n')}</textarea></div>
- <button class="btn wide" data-act="savecfg">Сохранить настройки</button></div>`}
+ <div class="grid2">${['vk','tg','yt','ok'].map(k=>`<div class="field"><label>${({vk:'ВКонтакте',tg:'Telegram',yt:'YouTube',ok:'Одноклассники'})[k]}</label><input data-cf="${m}.social.${k}" value="${f(m,k)}" placeholder="https://"></div>`).join('')}</div>`).join('')}</div>
+ <div class="box"><h4>🎉 Свои праздники</h4><p class="muted">Основные праздники года приложение добавляет само. Здесь можно добавить свои, например акции. Каждая строка: ГГГГ-ММ-ДД;название;тег постов</p><div class="field"><textarea id="cf-hol">${(c.holidays||[]).map(h=>`${h.date};${h.title};${h.tag||''}`).join('\n')}</textarea></div></div>
+ <button class="btn wide" data-act="savecfg">Сохранить настройки</button>`}
 async function doSaveCfg(){const c=JSON.parse(JSON.stringify(Store.config));
  document.querySelectorAll('[data-cf]').forEach(i=>{const p=i.dataset.cf.split('.');let o=c;for(let k=0;k<p.length-1;k++){o[p[k]]=o[p[k]]||{};o=o[p[k]]}o[p[p.length-1]]=i.value.trim()});
- c.coupons=$('#cf-coupons').value.split('\n').map(l=>l.split(';').map(x=>x.trim())).filter(a=>a.length>=3&&+a[0]>0).map(a=>({min:+a[0],percent:+a[1],code:a[2]})).sort((a,b)=>a.min-b.min);
+ c.coupons=readRows('ed-coupons').filter(a=>+a.min>0&&+a.percent>0&&a.code).map(a=>({min:+a.min,percent:+a.percent,code:a.code})).sort((a,b)=>a.min-b.min);
+ const wp=readRows('ed-wheel').filter(a=>a.t&&+a.v>0).map(a=>({t:a.t,type:a.type,v:+a.v,w:+a.w||1}));if(wp.length>=2)c.wheelPrizes=wp;
+ c.wheelCodes=readRows('ed-wcodes').filter(a=>+a.percent>0&&a.code).map(a=>({percent:+a.percent,code:a.code}));
+ c.streakDays=+$('#cf-sdays').value||7;c.streakPercent=+$('#cf-sp').value||10;c.streakCode=$('#cf-sc').value.trim();
  c.holidays=$('#cf-hol').value.split('\n').map(l=>l.split(';').map(x=>x.trim())).filter(a=>/^\d{4}-\d\d-\d\d$/.test(a[0])).map(a=>({date:a[0],title:a[1]||'Праздник',tag:a[2]||''}));
  c.gamesPerDay=+$('#cf-gpd').value||3;c.couponDays=+$('#cf-days').value||7;c.referralPercent=+$('#cf-refp').value||10;c.referralCode=$('#cf-refc').value.trim();
  try{await saveConfig(c);toast('Сохранено на Диск')}catch(e){toast(e&&e.code==='notoken'?'Сначала подключите Диск в разделе «Админ»':'Не удалось сохранить')}render()}
