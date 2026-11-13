@@ -746,7 +746,7 @@ function viewFeed(){const m=mode();const ps=visiblePosts(m);const stories=ps.fil
  let list=ps;if(m==='health'&&App.bodyZone)list=ps.filter(p=>(p.zones||[]).includes(App.bodyZone));
  if(m==='mood'&&App.shelf){list=App.shelf==='gift'?[]:ps.filter(p=>shelfOf(p)===App.shelf);const sh=SHELVES.find(x=>x[0]===App.shelf);h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">${sh[1]} ${App.shelf==='gift'&&App.giftTo?'Подарок: '+GIFTS.find(x=>x[0]===App.giftTo)[1].toLowerCase():sh[2]}</b><button class="btn sm ghost" data-act="clearshelf">Все посты</button></div>`}
  if(m==='mood'&&App.prod!=null&&App.prod>=0){const i=App.prod;list=prodPosts(ps,i);h+=`<div class="box prodhd"><img src="game/t${i}.png" alt=""><div style="flex:1"><b>${esc(SH_PROD[i][0])}</b><div class="muted">Рецепты и советы: ${list.length}</div><div class="row" style="margin-top:8px"><a class="btn sm" href="https://www.ozon.ru/search/?text=${enc(SH_PROD[i][1])}" target="_blank" rel="noopener" data-mp="ozon" data-pid="prod-${i}">Купить на Ozon</a><button class="btn sm ghost" data-prod="-1">Все посты</button></div></div></div>`}
- if(App.bodyZone)h+=`<div class="row between" style="margin:0 0 12px"><b style="font-size:calc(20px*var(--fz,1))">Про «${BODY[App.bodyZone]}»</b><button class="btn sm ghost" data-act="clearzone">Все посты</button></div>`;
+ if(App.bodyZone)h+=`<div class="row between" id="zonehd" style="margin:0 0 12px;scroll-margin-top:calc(var(--hdh,110px) + 60px)"><b style="font-size:calc(20px*var(--fz,1))">Про «${BODY[App.bodyZone]}»</b><button class="btn sm ghost" data-act="clearzone">Все посты</button></div>`;
  if(m==='mood'&&App.shelf==='gift'){h+=giftSetsHTML();return h}
  h+=list.length?list.slice(0,App.feedN||12).map(p=>cardHTML(p)).join('')+(list.length>(App.feedN||12)?`<button class="btn ghost wide" data-act="more" style="margin-bottom:16px">Показать ещё</button>`:''):(Store.loading?'<div class="skel"></div><div class="skel"></div>':Store.err?`<div class="empty">${esc(Store.err)}</div>`:`<div class="empty">Пока нет постов${App.bodyZone?' про эту зону':''}</div>`);
  return h}
@@ -1137,7 +1137,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
  else if(d.fav){const f=st().favs;const i=f.indexOf(d.fav);if(i>=0)f.splice(i,1);else{f.push(d.fav);flyHeart(t)}saveState();document.querySelectorAll(`[data-fav="${d.fav}"]`).forEach(b=>{b.classList.toggle('on',i<0)});if(App.tab==='favs'&&!$('#sheet'))render()}
  else if(d.open){openPost(d.open)}
  else if(d.story){openStory(d.story)}
- else if(d.zone){App.bodyZone=App.bodyZone===d.zone?'':d.zone;if(BODY_BACK.includes(App.bodyZone))App.bodyView='back';else if(App.bodyZone&&!['head','neck','shoulders','arms','hands','hips','knees','feet'].includes(App.bodyZone))App.bodyView='front';render()}
+ else if(d.zone){App.bodyZone=App.bodyZone===d.zone?'':d.zone;if(BODY_BACK.includes(App.bodyZone))App.bodyView='back';else if(App.bodyZone&&!['head','neck','shoulders','arms','hands','hips','knees','feet'].includes(App.bodyZone))App.bodyView='front';render();if(App.bodyZone)setTimeout(()=>{const t=$('#zonehd');if(t)t.scrollIntoView({behavior:'smooth',block:'start'})},450)}
  else if(d.tagq==='подарок'){ev.preventDefault();openGifts()}
   else if(d.shelf){App.prod=null;App.shelf=App.shelf===d.shelf?'':d.shelf;if(App.shelf!=='gift')App.giftTo='';App.feedN=12;render()}
   else if(d.gift){App.giftTo=App.giftTo===d.gift?'':d.gift;App.feedN=12;render()}
@@ -1222,5 +1222,18 @@ const get=()=>fetch(location.pathname+'?vc='+Date.now(),{cache:'no-store'}).then
 get().then(v=>base=v);
 const chk=async()=>{if(base==null||document.visibilityState!=='visible')return;const v=await get();if(v!=null&&v!==base){if(document.querySelector('#sheet,.story-v,.sv'))return;location.reload()}};
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')chk()});setInterval(chk,10*60*1000)})()</script>
+<style>
+#backpick{position:fixed;left:50%;top:calc(var(--hdh,110px) + 8px);transform:translate(-50%,-14px);opacity:0;pointer-events:none;z-index:25;background:var(--acc);color:#fff;border:0;border-radius:22px;padding:10px 18px;font:800 15px/1 inherit;font-family:inherit;box-shadow:0 6px 18px rgba(0,0,0,.25);transition:opacity .25s,transform .25s;white-space:nowrap}
+#backpick.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+</style>
+<button id="backpick" type="button">↑ Вернуться к выбору</button>
+<script>
+(function(){const b=document.getElementById('backpick');
+ function hh(){const h=document.querySelector('header');const v=h&&getComputedStyle(h).display!=='none'?h.getBoundingClientRect().bottom:0;document.documentElement.style.setProperty('--hdh',Math.max(0,v)+'px');return v}
+ function upd(){const bm=document.querySelector('.box.bm');const on=!!(App.bodyZone&&App.tab==='feed'&&bm&&bm.getBoundingClientRect().bottom<hh()+120);b.classList.toggle('on',on)}
+ addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);new MutationObserver(()=>requestAnimationFrame(upd)).observe(document.getElementById('app'),{childList:true});
+ b.addEventListener('click',()=>{const bm=document.querySelector('.box.bm');if(bm)scrollTo({top:Math.max(0,bm.getBoundingClientRect().top+scrollY-hh()-8),behavior:'smooth'})});hh();
+})();
+</script>
 </body>
 </html>
