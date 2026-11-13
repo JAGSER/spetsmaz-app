@@ -87,7 +87,7 @@ main{padding:4px 16px}
 /* nav */
 html,body{overflow-x:clip}
 main{overflow-x:clip}
-nav{transform:translateZ(0);touch-action:pan-y;position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;background:var(--nav);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav{user-select:none;-webkit-user-select:none;transform:translateZ(0);touch-action:pan-y;position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;background:var(--nav);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 nav .in{display:flex;width:100%;max-width:480px}
 nav button{flex:1;padding:5px 0 6px;font-size:calc(12px*var(--fz,1));font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
 nav button span{font-size:calc(22px*var(--fz,1));filter:grayscale(1);opacity:.6}
@@ -1121,12 +1121,14 @@ async function doSavePost(){syncEditorFields();const e=App.edit;if(!Store.token)
  toast('Сохраняю…');try{await saveMeta();applyMeta();App.edit=null;closeSheet();toast('Сохранено на Диск');render()}catch(err){Store.meta.posts[e.id]=prev;toast(err&&err.code==='notoken'?'Подключите Диск заново в разделе «Админ»':'Не удалось сохранить на Диск')}}
 
 // ================= events =================
-(()=>{let sx=null,sy=0;const start=(x,y,t)=>{if(t.closest&&t.closest('nav')&&x>innerWidth*0.6){sx=x;sy=y}else sx=null};
+(()=>{let sx=null,sy=0,nw=innerWidth;const start=(x,y,t)=>{const n=t.closest&&t.closest('nav');const r=n&&(n.querySelector('.in')||n).getBoundingClientRect();if(r&&x>r.left+r.width*0.6){sx=x;sy=y;nw=r.width}else sx=null};
+ document.addEventListener('dragstart',e=>{if(e.target.closest&&e.target.closest('nav'))e.preventDefault()},true);
+ document.addEventListener('pointercancel',()=>{sx=null},true);
  document.addEventListener('touchstart',e=>{const t=e.touches[0];start(t.clientX,t.clientY,e.target)},{passive:true,capture:true});
  document.addEventListener('touchend',e=>{const t=e.changedTouches[0];end(t.clientX,t.clientY)},{passive:true,capture:true});
  document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')start(e.clientX,e.clientY,e.target)},true);
  document.addEventListener('pointerup',e=>{if(e.pointerType==='mouse')end(e.clientX,e.clientY)},true);
- function end(x,y){if(sx==null)return;const dx=x-sx,dy=Math.abs(y-sy);sx=null;if(dx<-innerWidth*0.35&&dy<70){App.admVis=!App.admVis;LS.set('sm_admvis',App.admVis);if(!App.admVis){App.adminOn=false;LS.set('sm_admon',false);if(App.tab==='admin')App.tab='feed'}else Store.isAdmin=true;closeSheet();render();toast(App.admVis?'Кнопка «Админ» включена':'Кнопка «Админ» скрыта')}}})();
+ function end(x,y){if(sx==null)return;const dx=x-sx,dy=Math.abs(y-sy);sx=null;if(dx<-nw*0.35&&dy<70){App.admVis=!App.admVis;LS.set('sm_admvis',App.admVis);if(!App.admVis){App.adminOn=false;LS.set('sm_admon',false);if(App.tab==='admin')App.tab='feed'}else Store.isAdmin=true;closeSheet();render();toast(App.admVis?'Кнопка «Админ» включена':'Кнопка «Админ» скрыта')}}})();
 document.addEventListener('click',ev=>{const t=ev.target.closest('[data-zsl]');if(!t)return;App.zp.i=+t.dataset.zsl;mountPostZK()});
 document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-tab],[data-mode],[data-act],[data-fav],[data-open],[data-story],[data-zone],[data-shelf],[data-gift],[data-giftgo],[data-prod],[data-tagq],[data-rem],[data-qall],[data-mp],[data-copyc],[data-usec],[data-topic],[data-share],[data-atab],[data-editp],[data-es],[data-zdel],[data-emode],[data-ebz],[data-prdel]');if(!t)return;const d=t.dataset;
  if(d.tab==='admin'){App.adminOn=!App.adminOn;LS.set('sm_admon',App.adminOn);if(App.tab==='admin')App.tab='feed';closeSheet();render();toast(App.adminOn?'Режим админа: кнопки правки на карточках и в постах':'Режим админа выключен')}
