@@ -537,6 +537,7 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 .prodhd{display:flex;gap:14px;align-items:center}.prodhd img{height:120px;object-fit:contain;filter:drop-shadow(2px 4px 4px rgba(0,0,0,.3))}.prodhd b{font-size:calc(19px*var(--fz,1))}
 
 .madeby a span{display:inline-block;opacity:0;transform:translateY(-40px) rotate(-30deg)}.madeby.on a span{animation:mbdrop .6s cubic-bezier(.3,1.7,.5,1) forwards,mbwave 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.06s),calc(1s + var(--i)*.08s)}@keyframes mbdrop{to{opacity:1;transform:none}}@keyframes mbwave{0%,100%{transform:none}50%{transform:translateY(-7px);color:#ff7a1a}}
+.holmore summary{list-style:none;cursor:pointer;text-align:center;font-weight:800;color:var(--acc);padding:10px;border-radius:12px;background:var(--soft);margin-top:6px}.holmore summary::-webkit-details-marker{display:none}.holmore[open] summary{margin-bottom:6px}
 .madeby{text-align:center;color:var(--muted,#888);font-size:calc(14px*var(--fz,1));margin:22px 0 10px}.madeby a{color:var(--acc);font-weight:700;text-decoration:none}
 </style>
 </head>
@@ -793,7 +794,7 @@ function genHolidays(){const t=today(),y=+t.slice(0,4),L=[];for(const yy of [y,y
  return L}
 function upcomingHolidays(){const t=today(),lim=ymd(new Date(Date.now()+366*DAY)),seen=new Set(),out=[];genHolidays().concat(Store.config.holidays||[]).forEach(h=>{const k=h.date;if(h.date<t||h.date>lim||seen.has(k))return;seen.add(k);out.push(h)});return out.sort((a,b)=>a.date.localeCompare(b.date))}
 function holidaysHTML(short){const hs=upcomingHolidays().slice(0,short?2:40);if(!hs.length)return'';
- return `<div class="box"><div class="holhead"><b style="font-size:calc(21px*var(--fz,1))">🎉 Скоро праздник</b>${short?`<button class="btn sm ghost" data-act="cal">Календарь</button>`:''}</div><div style="margin-top:10px">${hs.map(holRow).join('')}</div></div>`}
+ return `<div class="box"><div class="holhead"><b style="font-size:calc(21px*var(--fz,1))">🎉 Скоро праздник</b>${short?`<button class="btn sm ghost" data-act="cal">Календарь</button>`:''}</div><div style="margin-top:10px">${hs.slice(0,3).map(holRow).join('')}${hs.length>3?`<details class="holmore"><summary>Показать все праздники (${hs.length}) ▾</summary>${hs.slice(3).map(holRow).join('')}</details>`:''}</div></div>`}
 function holRow(h){const d=new Date(h.date+'T00:00');const days=Math.ceil((d-new Date(today()+'T00:00'))/DAY);const on=st().holRem.includes(h.date);
  return `<div class="hol" style="background:var(--bg)"><div class="d">${d.getDate()}<small>${d.toLocaleString('ru',{month:'short'})}</small></div><div style="flex:1"><b>${esc(h.title)}</b><div class="muted">${days===0?'Сегодня':'через '+days+' дн.'}${h.tag?` · <a href="#" data-tagq="${esc(h.tag)}" style="color:var(--acc)">идеи подарков</a>`:''}</div></div><button class="btn sm ${on?'':'ghost'}" data-rem="${h.date}">${on?'🔔 Напомню':'Напомнить'}</button></div>`}
 function viewSearch(){const q=App.q.trim().toLowerCase();const src=visiblePosts(App.qAll?null:mode());
