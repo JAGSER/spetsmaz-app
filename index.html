@@ -621,18 +621,19 @@ const MONTHS=/(январ|феврал|март|апрел|ма[йя]|июн|и�
 function cleanFolder(n){let t=n.replace(/^\+/,'').replace(/\s*\((карусель|карсуель)\)/ig,'').replace(/^(Спецмазь|Шустер)\s*/i,'').replace(/(Карусель|Карсуель)\s*/i,'').trim()||n;const m=t.match(/^(20\d\d)\s+(.+)$/);return m?m[2]+' '+m[1]:t}
 function cleanFile(n){return n.replace(/\.[^.]+$/,'').replace(/^\d+[\s._-]*/,'').trim()}
 const isCar=n=>/карус|карсуел/i.test(n||'');
-async function crawl(){const posts=[];
+async function crawl(onPart){const posts=[];let meta={posts:{},config:{}};
  async function walk(path,mode,names){const items=await listAll(path);const files=items.filter(isMedia).sort(natural);const dirs=items.filter(x=>x.type==='dir'&&!/редизайн|креатив|анимации постов/i.test(x.name));
   const name=names[names.length-1],parent=names[names.length-2]||'';const month=names.slice().reverse().find(n=>MONTHS.test(n));
   const label=cleanFolder(month||name);
   if(files.length){
    if(isCar(name)||isCar(parent))posts.push({id:hid(path),mode,kind:'carousel',title:cleanFolder(name),group:label,dpath:path,slides:files.map(slideOf),created:Math.max(...files.map(f=>Date.parse(f.created)||0))});
-   else files.forEach((f,i)=>{const t=cleanFile(f.name);posts.push({id:hid(f.path),mode,kind:'single',title:t||(label+' · пост '+(i+1)),group:label,dpath:f.path,slides:[slideOf(f)],created:Date.parse(f.created)||0})})}
+   else files.forEach((f,i)=>{const t=cleanFile(f.name);posts.push({id:hid(f.path),mode,kind:'single',title:t||(label+' · пост '+(i+1)),group:label,dpath:f.path,slides:[slideOf(f)],created:Date.parse(f.created)||0})});
+   if(onPart)onPart(posts,meta)}
   await Promise.all(dirs.map(d=>walk(d.path,mode,names.concat(d.name))))}
  const root=await listAll('/');
- await Promise.all(root.filter(x=>x.type==='dir').map(d=>walk(d.path,/шуст/i.test(d.name)?'mood':'health',[d.name])));
- const mf=root.find(x=>x.name==='_app.json');let meta={posts:{},config:{}};
+ const mf=root.find(x=>x.name==='_app.json');
  if(mf){try{meta=await (await fetch(mf.file+(mf.file.includes('?')?'&':'?')+'nc='+Date.now())).json();meta.posts=meta.posts||{};meta.config=meta.config||{}}catch(e){}}
+ await Promise.all(root.filter(x=>x.type==='dir').map(d=>walk(d.path,/шуст/i.test(d.name)?'mood':'health',[d.name])));
  return {posts,meta}}
 function slideZonesOf(m,s){const sz=m.slideZones||{},zm=Store.meta.zm||{},A=Store.autoZ||{};if(sz[s.path]!==undefined)return sz[s.path]||[];if(s.md5&&zm[s.md5]!==undefined)return zm[s.md5]||[];return A[s.path]||(s.md5&&A['m:'+s.md5])||[]}
 function applyMeta(){const M=Store.meta;Store.config=Object.assign(clone(DEFAULT_CONFIG),M.config||{});fillSoc();
@@ -644,11 +645,13 @@ async function initStore(){
  Store.state=Object.assign(defState(),LS.get('sm_state',{}));
  const h=new URLSearchParams(location.hash.slice(1));if(h.get('access_token')){Store.token=h.get('access_token');LS.set('sm_token',Store.token);history.replaceState(null,'',location.pathname+'#admin');App.tab='admin'}
  Store.isAdmin=location.hash==='#admin'||!!Store.token||App.admVis;
- try{Store.auto=await (await fetch('titles.json',{cache:'no-cache'})).json()}catch(e){Store.auto={}}
- try{Store.autoZ=await (await fetch('zones.json',{cache:'no-cache'})).json()}catch(e){Store.autoZ={}}
- const cache=LS.get('sm_cache',null);if(cache&&Date.now()-cache.t<20*60e3){Store.base=cache.posts;Store.meta=cache.meta;applyMeta();Store.loading=false;render()}
- try{const r=await crawl();Store.base=r.posts;Store.meta=r.meta;LS.set('sm_cache',{t:Date.now(),posts:r.posts,meta:r.meta});applyMeta();Store.err=''}catch(e){if(!Store.base.length)Store.err='Не удалось загрузить посты. Проверьте интернет.'}
- Store.loading=false;
+ const gj=u=>fetch(u,{cache:'no-cache'}).then(r=>r.json()).catch(()=>({}));
+ [Store.auto,Store.autoZ]=await Promise.all([gj('titles.json'),gj('zones.json')]);
+ const cache=LS.get('sm_cache',null);const shown=!!(cache&&cache.posts&&cache.posts.length);
+ if(shown){Store.base=cache.posts;Store.meta=cache.meta;applyMeta();Store.loading=false}
+ let pt=0,pend=null;const part=(ps,mt)=>{const go=()=>{pend=null;pt=Date.now();Store.base=ps.slice();Store.meta=mt;applyMeta();render()};if(pend)return;const w=Math.max(0,500-(Date.now()-pt));pend=setTimeout(go,w)};
+ const job=(async()=>{try{const r=await crawl(shown?null:part);if(pend){clearTimeout(pend);pend=null}const same=shown&&JSON.stringify([r.posts,r.meta])===JSON.stringify([cache.posts,cache.meta]);LS.set('sm_cache',{t:Date.now(),posts:r.posts,meta:r.meta});if(same){Store.loading=false;return}Store.base=r.posts;Store.meta=r.meta;applyMeta();Store.err=''}catch(e){if(pend){clearTimeout(pend);pend=null}if(!Store.base.length)Store.err='Не удалось загрузить посты. Проверьте интернет.'}
+  Store.loading=false;if(Store.booted)render()})();
 }
 function saveState(){LS.set('sm_state',Store.state)}
 async function saveMeta(){if(!Store.token)throw {code:'notoken'};const h={Authorization:'OAuth '+Store.token};
@@ -1204,7 +1207,7 @@ window.addEventListener('hashchange',()=>{Store.isAdmin=location.hash==='#admin'
 // ================= boot =================
 (async()=>{Store.state=Object.assign(defState(),LS.get('sm_state',{}));applyTheme();try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{applyTheme();render()})}catch(e){}document.body.classList.toggle('mood',Store.state.mode==='mood');render();
  App.prevVisit=st().lastVisit||0;st().lastVisit=Date.now();saveState();
- loadAnims();await initStore();setMode(st().mode||'health');if(!st().onb)setTimeout(onboarding,700);setTimeout(()=>{const b=document.querySelector('[data-act=bell]');if(b&&b.querySelector('b'))b.classList.add('ring')},600);
+ loadAnims();await initStore();Store.booted=true;setMode(st().mode||'health');if(!st().onb)setTimeout(onboarding,700);setTimeout(()=>{const b=document.querySelector('[data-act=bell]');if(b&&b.querySelector('b'))b.classList.add('ring')},600);
  const tb=document.createElement('button');tb.className='totop';tb.dataset.act='top';tb.setAttribute('aria-label','Наверх');tb.textContent='↑';document.body.appendChild(tb);addEventListener('scroll',()=>tb.classList.toggle('show',scrollY>900),{passive:true});
  if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}})();
 </script>
