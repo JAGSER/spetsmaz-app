@@ -1292,9 +1292,9 @@ body:not(.mood) #app.desk>header .switch .h,body.mood #app.desk>header .switch .
 #app.desk #backpick{display:none}
 }
 @media(min-width:1300px){
-#app.desk>main{display:grid;grid-template-columns:1fr 1fr;column-gap:18px;align-content:start}
-#app.desk>main>*{grid-column:1/-1}
-#app.desk>main>.card{grid-column:auto;margin:0 0 18px}
+#app.desk.has-aside>main{display:grid;grid-template-columns:1fr 1fr;column-gap:18px;align-content:start}
+#app.desk.has-aside>main>*{grid-column:1/-1}
+#app.desk.has-aside>main>.card{grid-column:auto;margin:0 0 18px}
 }
 </style>
 <style>
@@ -1324,6 +1324,16 @@ body:not(.mood) #app.desk>header .switch .h,body.mood #app.desk>header .switch .
 .stwrap .sta.l{left:-12px}.stwrap .sta.r{right:-12px}
 .stwrap.atl .sta.l,.stwrap.atr .sta.r{display:none}
 #app.desk .stories{cursor:grab;user-select:none}
+</style>
+<style>
+@media(min-width:1100px){
+#app.desk main div:has(> .card){display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;align-items:start}
+#app.desk main div:has(> .card)>.card{margin:0}
+#app.desk main div:has(> .card)>:not(.card){grid-column:1/-1}
+#app.desk:not(.has-aside)>main:has(>.card){display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));column-gap:18px;align-content:start}
+#app.desk:not(.has-aside)>main:has(>.card)>*{grid-column:1/-1}
+#app.desk:not(.has-aside)>main:has(>.card)>.card{grid-column:auto;margin:0 0 18px}
+}
 </style>
 </body>
 </html>
