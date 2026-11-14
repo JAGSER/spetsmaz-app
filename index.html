@@ -541,6 +541,17 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 .holmore summary{list-style:none;cursor:pointer;text-align:center;font-weight:800;color:var(--acc);padding:10px;border-radius:12px;background:var(--soft);margin-top:6px}.holmore summary::-webkit-details-marker{display:none}.holmore[open] summary{margin-bottom:6px}
 .madeby{text-align:center;color:var(--muted,#888);font-size:calc(14px*var(--fz,1));margin:22px 0 10px}.madeby a{color:var(--acc);font-weight:700;text-decoration:none}
 </style>
+<style>
+.mintog{margin-left:auto;padding:6px 11px;border-radius:12px;background:var(--bg);color:var(--ink2);font-family:inherit;font-weight:700;font-size:calc(13px*var(--fz,1));line-height:1.1;white-space:nowrap}
+.box.bm .row.between{flex-wrap:wrap}
+.box.bm.min .bubble,.box.bm.min .bmfig{display:none}
+.box.bm.min .bmgrid{display:block}
+.box.bm.min .bmlist{flex-direction:row;flex-wrap:wrap}
+.box.bm.min .bmlist button{text-align:center}
+.bc-top .mintog{background:linear-gradient(180deg,#fbeccb,#e6cb93);color:#4a2c14;box-shadow:0 2px 0 #b48a52;align-self:center}
+.tagrow.mn{margin:6px 2px 4px!important}
+.bc-top b{white-space:nowrap}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -579,12 +590,14 @@ function prodPosts(ps,i){const tx=p=>((p.title||'')+' '+(p.text||'')+' '+(p.tags
 function shelfHTML(ps){const on=App.shelf;const cov=p=>{const s=p.slides[0]||{};return s.type==='image'?s.src:(s.poster||'')};
  const favs=ps.filter(p=>st().favs.includes(p.id));const unread=ps.filter(p=>!st().views[p.id]&&!st().favs.includes(p.id)).slice(0,8);
  const bk=(p,nw)=>`<button class="bk big" data-open="${p.id}" title="${esc(p.title)}"><img src="${esc(cov(p))}" alt="${esc(p.title)}" loading="lazy">${nw?'<em>не читали</em>':''}</button>`;
- let h=`<div class="box shelves bookcase"><div class="bc-top"><b>🐼 Полки Шустера</b></div>`;
+ const mn=!!st().shMin;const tags=SHELVES.filter(x=>x[0]!=='gift').map(([k,e,t])=>{const c=ps.filter(p=>shelfOf(p)===k).length;return `<button class="plaque sm ${on===k?'on':''}" data-shelf="${k}">${e} ${t}${c?` <small>${c}</small>`:''}</button>`}).join('');
+ let h=`<div class="box shelves bookcase${mn?' min':''}"><div class="bc-top"><b>🐼 Полки Шустера</b><button class="mintog" data-act="shmin">${mn?'Развернуть ▾':'Свернуть ▴'}</button></div>`;
+ if(mn)return h+`<div class="tagrow mn"><button class="plaque sm" data-tab="favs">❤️ Моя полка${favs.length?` <small>${favs.length}</small>`:''}</button><button class="plaque sm ${App.prod!=null?'on':''}" data-prod="-1">🍯 Сиропы и мармелад</button><button class="plaque sm ${on==='gift'?'on':''}" data-shelf="gift">🎁 Подарки</button>${tags}</div></div>`;
  h+=`<div class="shf"><button class="plaque" data-tab="favs"><i></i>❤️ Моя полка${favs.length?` <small>${favs.length}</small>`:''}<i></i></button><div class="items">`+
   (favs.length||unread.length?favs.map(p=>bk(p)).join('')+unread.map(p=>bk(p,1)).join(''):`<div class="shint">Нажмите ♡ на посте, и он встанет на эту полку</div>`)+`</div><div class="plank"></div></div>`;
  h+=`<div class="shf"><button class="plaque" data-prod="-1"><i></i>🍯 Сиропы и мармелад<i></i></button><div class="items">`+SH_PROD.map(([n],i)=>`<button class="gbox ${App.prod===i?'on':''}" data-prod="${i}"><img src="game/t${i}.png" alt=""><span>${esc(n.replace(/^(Сироп|Мармелад) /,''))}</span></button>`).join('')+`</div><div class="plank"></div></div>`;
  h+=`<div class="shf"><button class="plaque" data-shelf="gift"><i></i>🎁 Подарки<i></i></button><div class="items">`+GIFTS.map(([g,gt],n)=>`<button class="gbox ${App.giftTo===g?'on':''}" data-giftgo="${g}"><img src="game/t${[3,0,2,5,1][n]}.png" alt=""><span>${gt}</span></button>`).join('')+`</div><div class="plank"></div></div>`;
- h+=`<div class="bc-bot"><img class="bc-pk" src="panda-koala.webp" alt=""><div class="tagrow">${SHELVES.filter(x=>x[0]!=='gift').map(([k,e,t])=>{const c=ps.filter(p=>shelfOf(p)===k).length;return `<button class="plaque sm ${on===k?'on':''}" data-shelf="${k}">${e} ${t}${c?` <small>${c}</small>`:''}</button>`}).join('')}</div></div>`;
+ h+=`<div class="bc-bot"><img class="bc-pk" src="panda-koala.webp" alt=""><div class="tagrow">${tags}</div></div>`;
  return h+'</div>'}
 const BODY_FUN={head:'Ой, голова трещит!',neck:'Шею не повернуть!',shoulders:'Плечи, будто мешки таскал!',chest:'Кхе-кхе, дышать тяжко!',belly:'Живот бурчит, как трактор!',back:'Спину заклинило!',lower:'Поясница стреляет!',arms:'Локти скрипят, как дверь!',hands:'Пальцы не слушаются!',hips:'Бёдра ноют после дачи!',knees:'Колени хрустят, как сухарики!',feet:'Ноги гудят!'};
 const MODES={health:{t:'Здоровье',brand:'Спецмазь',em:'🛡️'},mood:{t:'Настроение',brand:'Доктор Шустер',em:'🐼'}};
@@ -784,7 +797,7 @@ function bodyMapHTML(){const z=App.bodyZone;const back=App.bodyView==='back'||(!
    <g class="shc"${O(268,243)}>${c2(190,248,28,SD,'shoulders')}${c2(346,248,28,SD,'shoulders')}</g>
    <g class="hd"${O(268,190)}>${head}</g>${overHead?arms:''}</g>${behindLegs?LOW:''}
  </g></svg>`;
- return `<div class="box bm"><div class="row between" style="flex-wrap:wrap;margin-bottom:4px"><b style="font-size:calc(21px*var(--fz,1))">Где болит?</b><div class="bmseg"><button class="${back?'':'on'}" data-act="bmfront">Спереди</button><button class="${back?'on':''}" data-act="bmback">Сзади</button></div></div>
+ const mn=!!st().bmMin;return `<div class="box bm${mn?' min':''}"><div class="row between" style="flex-wrap:wrap;margin-bottom:4px;gap:8px"><b style="font-size:calc(21px*var(--fz,1))">Где болит?</b><button class="mintog" data-act="bmmin">${mn?'Развернуть ▾':'Свернуть ▴'}</button><div class="bmseg"><button class="${back?'':'on'}" data-act="bmfront">Спереди</button><button class="${back?'on':''}" data-act="bmback">Сзади</button></div></div>
  <div class="bubble">${z?esc(BODY_FUN[z]||BODY[z]):'Нажмите, где болит!'}</div>
  <div class="bmgrid"><div class="bmfig">${svg}</div><div class="bmlist">${Object.entries(BODY).filter(([k])=>back?!['chest','belly'].includes(k):!BODY_BACK.includes(k)).map(([k,v])=>`<button class="${z===k?'on':''}" data-zone="${k}">${v}</button>`).join('')}</div></div>
  ${z?recoHTML(z):''}</div>`}
@@ -1175,6 +1188,7 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
   else if(a==='nosoc'){ev.preventDefault();toast('Ссылка скоро появится')}
   else if(a==='clearzone'){App.bodyZone='';render()}
    else if(a==='clearshelf'){App.shelf='';App.giftTo='';render()}
+  else if(a==='bmmin'||a==='shmin'){const k=a==='bmmin'?'bmMin':'shMin';st()[k]=!st()[k];saveState();render()}
   else if(a==='bmfront'||a==='bmback'){App.bodyView=a==='bmback'?'back':'front';render()}
   else if(a==='bodymap'){sheet(bodyMapHTML())}
   else if(a==='cal'){sheet(`<h2>Календарь праздников</h2>${upcomingHolidays().map(holRow).join('')||'<div class="empty">Скоро добавим</div>'}`)}
