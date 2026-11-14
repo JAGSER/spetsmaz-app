@@ -551,6 +551,7 @@ nav button{font-size:12px!important}.switch button{font-size:17px!important}.log
 .bc-top .mintog{background:linear-gradient(180deg,#fbeccb,#e6cb93);color:#4a2c14;box-shadow:0 2px 0 #b48a52;align-self:center}
 .tagrow.mn{margin:6px 2px 4px!important}
 .bc-top b{white-space:nowrap}
+.mintog.ic{width:34px;height:34px;padding:0;border-radius:50%;font-size:calc(18px*var(--fz,1));display:grid;place-items:center;flex:none}
 </style>
 </head>
 <body>
@@ -591,7 +592,7 @@ function shelfHTML(ps){const on=App.shelf;const cov=p=>{const s=p.slides[0]||{};
  const favs=ps.filter(p=>st().favs.includes(p.id));const unread=ps.filter(p=>!st().views[p.id]&&!st().favs.includes(p.id)).slice(0,8);
  const bk=(p,nw)=>`<button class="bk big" data-open="${p.id}" title="${esc(p.title)}"><img src="${esc(cov(p))}" alt="${esc(p.title)}" loading="lazy">${nw?'<em>не читали</em>':''}</button>`;
  const mn=!!st().shMin;const tags=SHELVES.filter(x=>x[0]!=='gift').map(([k,e,t])=>{const c=ps.filter(p=>shelfOf(p)===k).length;return `<button class="plaque sm ${on===k?'on':''}" data-shelf="${k}">${e} ${t}${c?` <small>${c}</small>`:''}</button>`}).join('');
- let h=`<div class="box shelves bookcase${mn?' min':''}"><div class="bc-top"><b>🐼 Полки Шустера</b><button class="mintog" data-act="shmin">${mn?'Развернуть ▾':'Свернуть ▴'}</button></div>`;
+ let h=`<div class="box shelves bookcase${mn?' min':''}"><div class="bc-top"><b>🐼 Полки Шустера</b><button class="mintog ic" data-act="shmin" aria-label="${mn?'Развернуть':'Свернуть'}" title="${mn?'Развернуть':'Свернуть'}">${mn?'▾':'▴'}</button></div>`;
  if(mn)return h+`<div class="tagrow mn"><button class="plaque sm" data-tab="favs">❤️ Моя полка${favs.length?` <small>${favs.length}</small>`:''}</button><button class="plaque sm ${App.prod!=null?'on':''}" data-prod="-1">🍯 Сиропы и мармелад</button><button class="plaque sm ${on==='gift'?'on':''}" data-shelf="gift">🎁 Подарки</button>${tags}</div></div>`;
  h+=`<div class="shf"><button class="plaque" data-tab="favs"><i></i>❤️ Моя полка${favs.length?` <small>${favs.length}</small>`:''}<i></i></button><div class="items">`+
   (favs.length||unread.length?favs.map(p=>bk(p)).join('')+unread.map(p=>bk(p,1)).join(''):`<div class="shint">Нажмите ♡ на посте, и он встанет на эту полку</div>`)+`</div><div class="plank"></div></div>`;
