@@ -1216,7 +1216,9 @@ window.addEventListener('hashchange',()=>{Store.isAdmin=location.hash==='#admin'
 const start=(v,q)=>{const u=v.dataset.asrc;v.dataset.st=1;let fin=false;const end=()=>{if(fin)return;fin=true;if(q){act--;pump()}};
  v.addEventListener('canplay',()=>{done.add(u);v.classList.add('ok');if(vis.has(v))v.play().catch(()=>{});end()},{once:true});v.addEventListener('error',end,{once:true});setTimeout(end,15000);
  v.preload='auto';v.src=u;v.load()};
-const pump=()=>{while(act<MAX){const c=[...document.querySelectorAll('video.anim[data-asrc]')].filter(v=>!v.dataset.st);if(!c.length)return;const vh=innerHeight;c.sort((a,b)=>{const ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect();const da=ra.bottom<0?-ra.bottom+vh:ra.top>vh?ra.top-vh+vh:Math.max(0,ra.top)+(ra.left<0||ra.left>innerWidth?vh/2:0);const db=rb.bottom<0?-rb.bottom+vh:rb.top>vh?rb.top-vh+vh:Math.max(0,rb.top)+(rb.left<0||rb.left>innerWidth?vh/2:0);return da-db});act++;start(c[0],true)}};
+const dist=v=>{const r=v.getBoundingClientRect(),vh=innerHeight;if(!r.width&&!r.height)return 1e9;return (r.bottom<0?-r.bottom:r.top>vh?r.top-vh:0)+(r.left<0||r.left>innerWidth?vh/3:0)};
+const pump=()=>{while(act<MAX){const lim=innerHeight*1.5;const c=[...document.querySelectorAll('video.anim[data-asrc]')].filter(v=>!v.dataset.st&&dist(v)<lim);if(!c.length)return;c.sort((a,b)=>dist(a)-dist(b));act++;start(c[0],true)}};
+let pq=0;addEventListener('scroll',()=>{if(pq)return;pq=setTimeout(()=>{pq=0;pump()},200)},{passive:true});
 const io=new IntersectionObserver(es=>{es.forEach(e=>{const v=e.target;if(e.isIntersecting){vis.add(v);if(v.dataset.st&&v.classList.contains('ok'))v.play().catch(()=>{});else if(!v.dataset.st&&done.has(v.dataset.asrc))start(v,false)}else{vis.delete(v);if(v.classList.contains('ok'))v.pause()}});pump()},{rootMargin:'250px 250px'});
 const scan=()=>{document.querySelectorAll('video.anim[data-asrc]:not([data-io])').forEach(v=>{v.dataset.io=1;io.observe(v)});pump()};
 new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});scan()})()</script>
