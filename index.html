@@ -739,8 +739,13 @@ function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._
 // ================= render =================
 const isDesk=()=>matchMedia('(min-width:1100px)').matches;
 function goZone(){setTimeout(()=>{if(isDesk()){scrollTo({top:0,behavior:'smooth'});return}const t=$('#zonehd');if(t)t.scrollIntoView({behavior:'smooth',block:'start'})},isDesk()?50:450)}
-function deskLayout(){const app=$('#app');app.classList.toggle('desk',isDesk());if(!isDesk())return;const h=app.querySelector(':scope>header'),nv=app.querySelector(':scope>nav');if(h&&nv)h.appendChild(nv);const b=app.querySelector('main>.box.bm,main>.box.shelves');if(b){const a=document.createElement('aside');a.appendChild(b);app.appendChild(a);app.classList.add('has-aside');fitAside();setTimeout(fitAside,700)}else app.classList.remove('has-aside')}
+function deskLayout(){const app=$('#app');app.classList.toggle('desk',isDesk());if(!isDesk())return;app.querySelectorAll('.stories').forEach(st=>{if(st.parentNode.classList.contains('stwrap'))return;const w=document.createElement('div');w.className='stwrap';st.before(w);w.append(st);w.insertAdjacentHTML('beforeend','<button class="sta l" aria-label="Назад">‹</button><button class="sta r" aria-label="Вперёд">›</button>');const upd=()=>{w.classList.toggle('atl',st.scrollLeft<4);w.classList.toggle('atr',st.scrollLeft+st.clientWidth>st.scrollWidth-4)};st.addEventListener('scroll',upd,{passive:true});setTimeout(upd,50);w.querySelectorAll('.sta').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();st.scrollBy({left:(b.classList.contains('l')?-1:1)*st.clientWidth*.8,behavior:'smooth'})}))});const h=app.querySelector(':scope>header'),nv=app.querySelector(':scope>nav');if(h&&nv)h.appendChild(nv);const b=app.querySelector('main>.box.bm,main>.box.shelves');if(b){const a=document.createElement('aside');a.appendChild(b);app.appendChild(a);app.classList.add('has-aside');fitAside();setTimeout(fitAside,700)}else app.classList.remove('has-aside')}
 function fitAside(){const b=document.querySelector('#app.desk>aside>.box');if(!b)return;b.style.zoom='';const h=b.offsetHeight,av=innerHeight-44;b.style.zoom=h>av?String(Math.max(.55,av/h)):''}
+(()=>{let dr=null;addEventListener('pointerdown',e=>{const st=e.target.closest&&e.target.closest('#app.desk .stories');if(!st||e.pointerType!=='mouse'||e.button)return;dr={st,x:e.clientX,l:st.scrollLeft,m:false}});
+ addEventListener('pointermove',e=>{if(!dr)return;const dx=e.clientX-dr.x;if(Math.abs(dx)>5)dr.m=true;if(dr.m){dr.st.scrollLeft=dr.l-dx;e.preventDefault()}});
+ addEventListener('pointerup',()=>{if(dr&&dr.m){const st=dr.st;const k=ev=>{ev.stopPropagation();ev.preventDefault()};addEventListener('click',k,{capture:true,once:true});setTimeout(()=>removeEventListener('click',k,{capture:true}),50)}dr=null});
+ addEventListener('wheel',e=>{const st=e.target.closest&&e.target.closest('#app.desk .stories');if(!st||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;const max=st.scrollWidth-st.clientWidth;if((e.deltaY>0&&st.scrollLeft<max-1)||(e.deltaY<0&&st.scrollLeft>0)){st.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false});
+ addEventListener('dragstart',e=>{if(e.target.closest&&e.target.closest('#app.desk .stories'))e.preventDefault()})})();
 addEventListener('resize',()=>{const d=isDesk();if(d!==$('#app').classList.contains('desk'))render();else if(d)fitAside()});
 function render(){
  const m=mode();document.body.classList.toggle('mood',m==='mood');{const dk=document.body.classList.contains('dark'),tc=m==='mood'?(dk?'#0F1913':'#E2F4E8'):(dk?'#1B1213':'#FBE6E3');const mt=document.querySelector('meta[name=theme-color]');if(mt&&mt.content!==tc)mt.content=tc}document.body.classList.toggle('m3on',App.tab==='game'&&!!(App.game&&App.game.c));
@@ -893,8 +898,14 @@ async function saveZonesFromPost(){const z=App.zp,p=Store.posts.find(x=>x.id===z
 function similarHTML(p){const tg=new Set([...(p.tags||[]),...(p.zones||[])]);const sc=visiblePosts(p.mode).filter(x=>x.id!==p.id).map(x=>({x,s:[...(x.tags||[]),...(x.zones||[])].filter(t=>tg.has(t)).length})).map(o=>{const tw=new Set(String(p.title).toLowerCase().split(/[^а-яёa-z]+/).filter(w=>w.length>4));o.s=o.s*3+String(o.x.title).toLowerCase().split(/[^а-яёa-z]+/).filter(w=>tw.has(w)).length;return o}).sort((a,b)=>b.s-a.s||b.x.publishAt-a.x.publishAt).slice(0,4).map(o=>o.x);
  if(!sc.length)return'';return `<h4 style="margin-top:22px">Похожие советы</h4><div class="sim">${sc.map(x=>`<button class="simc" data-open="${x.id}"><img src="${esc(x.slides[0].type==='image'?x.slides[0].src:x.slides[0].poster)}" alt=""><span>${esc(x.title)}</span></button>`).join('')}</div>`}
 const SHC={};['share-shuster.jpg','share-spetsmaz.jpg'].forEach(f=>{const i=new Image();i.src=f});function prepShare(id){if(!SHC[id])SHC[id]=buildShare(id).catch(e=>{delete SHC[id];throw e});return SHC[id]}
+function deskShare(p,file,url,txt){document.getElementById('shpop')?.remove();const iu=URL.createObjectURL(file),e=encodeURIComponent,t=e(p.title);
+ const d=document.createElement('div');d.id='shpop';d.innerHTML=`<div class="shp"><button class="shx" aria-label="Закрыть">✕</button><b style="font-size:20px">Поделиться</b><img src="${iu}" alt=""><div class="shb">
+ <a class="btn" href="${iu}" download="sovet.jpg">⬇ Скачать картинку</a><button class="btn ghost" data-shc>🔗 Скопировать ссылку</button>
+ <a class="btn ghost" target="_blank" rel="noopener" href="https://vk.com/share.php?url=${e(url)}&title=${t}">ВКонтакте</a><a class="btn ghost" target="_blank" rel="noopener" href="https://t.me/share/url?url=${e(url)}&text=${t}">Telegram</a><a class="btn ghost" target="_blank" rel="noopener" href="https://connect.ok.ru/offer?url=${e(url)}&title=${t}">Одноклассники</a></div></div>`;
+ d.addEventListener('click',ev=>{if(ev.target===d||ev.target.closest('.shx'))d.remove();else if(ev.target.closest('[data-shc]')){copy(txt);toast('Ссылка скопирована')}});document.body.appendChild(d)}
 async function shareImage(id){const p=Store.posts.find(x=>x.id===id);if(!p)return;const url=location.origin+location.pathname;const txt=`${p.title}\nЕщё советы: ${url}`;ut('Поделиться',{title:p.title});
  try{let ready=null;const pr=prepShare(id);pr.then(f=>ready=f,()=>{});await Promise.resolve();if(!ready)toast('Готовлю картинку…');const file=ready||await pr;
+  if(isDesk()){deskShare(p,file,url,txt);return}
   if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:txt});return}
   const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download='sovet.jpg';a.click();copy(txt)}catch(e){if(e&&e.name==='AbortError')return;if(e&&e.name==='NotAllowedError'){toast('Картинка готова, нажмите ещё раз');return}if(navigator.share)navigator.share({text:txt}).catch(()=>{});else copy(txt)}}
 async function buildShare(id){const p=Store.posts.find(x=>x.id===id);
@@ -1299,6 +1310,20 @@ body:not(.mood) #app.desk>header .switch .h,body.mood #app.desk>header .switch .
 #sheet.postv .pvside{grid-column:2;grid-row:1;height:calc(100vh - 48px);overflow:auto;padding-right:6px}
 #sheet.postv .pvside>.row:first-child{margin-top:0!important}
 }
+</style>
+<style>
+#shpop{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);display:grid;place-items:center;animation:fade .2s}
+#shpop .shp{position:relative;background:var(--bg);border-radius:22px;padding:22px;width:min(560px,92vw);max-height:92vh;overflow:auto;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+#shpop img{max-width:100%;max-height:calc(92vh - 330px);align-self:center;border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+#shpop .shb{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#shpop .shb .btn{text-align:center;text-decoration:none;justify-content:center;padding:11px 10px;font-size:15px;white-space:nowrap}
+#shpop .shb>:first-child{grid-column:1/-1}
+#shpop .shx{position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:50%;background:var(--card);font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.stwrap{position:relative}
+.stwrap .sta{position:absolute;top:30px;width:40px;height:40px;border-radius:50%;background:var(--card);color:var(--ink);font-size:28px;line-height:1;box-shadow:0 3px 12px rgba(0,0,0,.2);z-index:3;display:grid;place-items:center;padding-bottom:4px}
+.stwrap .sta.l{left:-12px}.stwrap .sta.r{right:-12px}
+.stwrap.atl .sta.l,.stwrap.atr .sta.r{display:none}
+#app.desk .stories{cursor:grab;user-select:none}
 </style>
 </body>
 </html>
