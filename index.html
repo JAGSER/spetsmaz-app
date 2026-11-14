@@ -737,6 +737,10 @@ function bindSliders(root){root.querySelectorAll('.slider').forEach(el=>{if(el._
  })}
 
 // ================= render =================
+const isDesk=()=>matchMedia('(min-width:1100px)').matches;
+function goZone(){setTimeout(()=>{if(isDesk()){scrollTo({top:0,behavior:'smooth'});return}const t=$('#zonehd');if(t)t.scrollIntoView({behavior:'smooth',block:'start'})},isDesk()?50:450)}
+function deskLayout(){const app=$('#app');app.classList.toggle('desk',isDesk());if(!isDesk())return;const h=app.querySelector(':scope>header'),nv=app.querySelector(':scope>nav');if(h&&nv)h.appendChild(nv);const b=app.querySelector('main>.box.bm,main>.box.shelves');if(b){const a=document.createElement('aside');a.appendChild(b);app.appendChild(a);app.classList.add('has-aside')}else app.classList.remove('has-aside')}
+addEventListener('resize',()=>{const d=isDesk();if(d!==$('#app').classList.contains('desk'))render()});
 function render(){
  const m=mode();document.body.classList.toggle('mood',m==='mood');{const dk=document.body.classList.contains('dark'),tc=m==='mood'?(dk?'#0F1913':'#E2F4E8'):(dk?'#1B1213':'#FBE6E3');const mt=document.querySelector('meta[name=theme-color]');if(mt&&mt.content!==tc)mt.content=tc}document.body.classList.toggle('m3on',App.tab==='game'&&!!(App.game&&App.game.c));
  const cfg=Store.config[m]||{};const n=notifications().length;
@@ -746,7 +750,7 @@ function render(){
   <div class="switch"><div class="pill"></div><button class="h" data-mode="health">Здоровье</button><button class="m" data-mode="mood">Настроение</button></div></header>
   <main>${({feed:viewFeed,search:viewSearch,game:viewGame,favs:viewFavs,me:viewMe,admin:viewAdmin})[App.tab]()}</main>
   <nav><div class="in">${tabs.map(t=>`<button class="${(t[0]==='admin'?App.adminOn:App.tab===t[0])?'on':''}" data-tab="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`).join('')}</div></nav>`;
- bindSliders($('#app'));afterRender();
+ deskLayout();bindSliders($('#app'));afterRender();
 }
 function cardHTML(p,hl){const f=st().favs.includes(p.id);const isNew=App.prevVisit&&p.publishAt>App.prevVisit&&p.publishAt<=now();const pr=(p.products||[])[0];const sched=p.publishAt&&p.publishAt>now();
  const H=s=>hl?highlight(s,hl):esc(s);
@@ -1154,11 +1158,11 @@ document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-ta
  else if(d.fav){const f=st().favs;const i=f.indexOf(d.fav);if(i>=0)f.splice(i,1);else{f.push(d.fav);flyHeart(t)}saveState();document.querySelectorAll(`[data-fav="${d.fav}"]`).forEach(b=>{b.classList.toggle('on',i<0)});if(App.tab==='favs'&&!$('#sheet'))render()}
  else if(d.open){openPost(d.open)}
  else if(d.story){openStory(d.story)}
- else if(d.zone){App.bodyZone=App.bodyZone===d.zone?'':d.zone;if(BODY_BACK.includes(App.bodyZone))App.bodyView='back';else if(App.bodyZone&&!['head','neck','shoulders','arms','hands','hips','knees','feet'].includes(App.bodyZone))App.bodyView='front';render();if(App.bodyZone)setTimeout(()=>{const t=$('#zonehd');if(t)t.scrollIntoView({behavior:'smooth',block:'start'})},450)}
+ else if(d.zone){App.bodyZone=App.bodyZone===d.zone?'':d.zone;if(BODY_BACK.includes(App.bodyZone))App.bodyView='back';else if(App.bodyZone&&!['head','neck','shoulders','arms','hands','hips','knees','feet'].includes(App.bodyZone))App.bodyView='front';render();if(App.bodyZone)goZone()}
  else if(d.tagq==='подарок'){ev.preventDefault();openGifts()}
-  else if(d.shelf){App.prod=null;App.shelf=App.shelf===d.shelf?'':d.shelf;if(App.shelf!=='gift')App.giftTo='';App.feedN=12;render();if(App.shelf)setTimeout(()=>{const t=$('#zonehd');if(t)t.scrollIntoView({behavior:'smooth',block:'start'})},450)}
+  else if(d.shelf){App.prod=null;App.shelf=App.shelf===d.shelf?'':d.shelf;if(App.shelf!=='gift')App.giftTo='';App.feedN=12;render();if(App.shelf)goZone()}
   else if(d.gift){App.giftTo=App.giftTo===d.gift?'':d.gift;App.feedN=12;render()}
-  else if(d.prod!=null){const i=+d.prod;App.prod=i<0||App.prod===i?null:i;App.shelf='';App.giftTo='';App.feedN=12;render();if(App.prod!=null)setTimeout(()=>{const t=$('#zonehd');if(t)t.scrollIntoView({behavior:'smooth',block:'start'})},450)}
+  else if(d.prod!=null){const i=+d.prod;App.prod=i<0||App.prod===i?null:i;App.shelf='';App.giftTo='';App.feedN=12;render();if(App.prod!=null)goZone()}
   else if(d.giftgo){App.prod=null;const was=App.shelf==='gift'&&App.giftTo===d.giftgo;App.shelf='gift';App.giftTo=was?'':d.giftgo;App.feedN=12;render();requestAnimationFrame(()=>{const e=document.querySelector('.gset');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})})}
   else if(d.tagq){ev.preventDefault();closeSheet();App.tab='search';App.q=d.tagq;render();scrollTo(0,0)}
  else if(d.rem){const r=st().holRem;const i=r.indexOf(d.rem);if(i>=0)r.splice(i,1);else{r.push(d.rem);toast('Напомним за 3 дня')}saveState();if($('#sheet'))$('#sheet').querySelectorAll(`[data-rem="${d.rem}"]`).forEach(b=>{b.textContent=i<0?'🔔 Напомню':'Напомнить';b.classList.toggle('ghost',i>=0)});render()}
@@ -1249,12 +1253,37 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 <button id="backpick" type="button">↑ Вернуться к выбору</button>
 <script>
 (function(){const b=document.getElementById('backpick');
- function hh(){const h=document.querySelector('header');const v=h&&getComputedStyle(h).display!=='none'?h.getBoundingClientRect().bottom:0;document.documentElement.style.setProperty('--hdh',Math.max(0,v)+'px');return v}
+ function hh(){if(isDesk()){document.documentElement.style.setProperty('--hdh','0px');return 0}const h=document.querySelector('header');const v=h&&getComputedStyle(h).display!=='none'?h.getBoundingClientRect().bottom:0;document.documentElement.style.setProperty('--hdh',Math.max(0,v)+'px');return v}
  function pick(){return mode()==='mood'?(App.shelf||App.prod!=null?document.querySelector('.box.shelves'):null):(App.bodyZone?document.querySelector('.box.bm'):null)}
- function upd(){const bm=pick();const on=!!(App.tab==='feed'&&bm&&bm.getBoundingClientRect().bottom<hh()+120);b.classList.toggle('on',on)}
+ function upd(){const bm=pick();const on=!!(!isDesk()&&App.tab==='feed'&&bm&&bm.getBoundingClientRect().bottom<hh()+120);b.classList.toggle('on',on)}
  addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);new MutationObserver(()=>requestAnimationFrame(upd)).observe(document.getElementById('app'),{childList:true});
  b.addEventListener('click',()=>{const bm=pick();if(bm)scrollTo({top:Math.max(0,bm.getBoundingClientRect().top+scrollY-hh()-8),behavior:'smooth'})});hh();
 })();
 </script>
+<style>
+@media(min-width:1100px){
+#app.desk{max-width:1440px;display:grid;grid-template-columns:230px minmax(0,1fr);column-gap:32px;padding:0 24px;margin:0 auto}
+#app.desk.has-aside{grid-template-columns:230px minmax(0,1fr) 420px}
+#app.desk>header{grid-column:1;grid-row:1;position:sticky;top:0;align-self:start;height:100vh;padding:22px 0;display:flex;flex-direction:column;gap:18px;background:transparent;overflow:auto}
+#app.desk>header .top{flex-direction:column;align-items:flex-start;gap:14px}
+#app.desk>header .switch{display:flex;flex-direction:column;height:auto;width:100%;padding:4px}
+#app.desk>header .switch .pill{display:none}
+#app.desk>header .switch button{padding:12px 16px;border-radius:14px;text-align:left}
+body:not(.mood) #app.desk>header .switch .h,body.mood #app.desk>header .switch .m{background:var(--acc);color:#fff}
+#app.desk nav{position:static;background:transparent;border:0;justify-content:flex-start;transform:none;padding:0}
+#app.desk nav .in{flex-direction:column;gap:4px;max-width:none}
+#app.desk nav button{flex-direction:row;justify-content:flex-start;gap:12px;padding:10px 14px;border-radius:14px;font-size:16px!important;width:100%;flex:none}
+#app.desk nav button.on{background:var(--soft)}
+#app.desk>main{grid-column:2;grid-row:1;padding:22px 0 60px;min-width:0}
+#app.desk>aside{grid-column:3;grid-row:1;position:sticky;top:0;align-self:start;padding:22px 0;max-height:100vh;overflow:auto;scrollbar-width:thin}
+#app.desk>aside>.box{margin:0}
+#app.desk #backpick{display:none}
+}
+@media(min-width:1300px){
+#app.desk>main{display:grid;grid-template-columns:1fr 1fr;column-gap:18px;align-content:start}
+#app.desk>main>*{grid-column:1/-1}
+#app.desk>main>.card{grid-column:auto;margin:0 0 18px}
+}
+</style>
 </body>
 </html>
