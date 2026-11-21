@@ -17,7 +17,7 @@ button{cursor:pointer;border:0;background:none}
 .wrap{max-width:820px;margin:0 auto;padding:0 14px 80px}
 header{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 8px}
 .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.mark{width:36px;height:36px;border-radius:10px;background:var(--acc);display:grid;place-items:center;color:#fff;font-weight:900}
+.mark{width:36px;height:36px;border-radius:10px;background:var(--acc);display:grid;place-items:center;color:#fff;font-weight:900;overflow:hidden}
 h1{font-size:21px;font-weight:900;letter-spacing:-.3px;margin:0;flex:1}
 .sw{display:flex;background:#fff;border-radius:14px;padding:3px}
 .sw button{padding:8px 14px;border-radius:11px;font-weight:800;font-size:16px;color:var(--mut)}
@@ -77,7 +77,7 @@ h2{font-size:19px;font-weight:800;margin:22px 0 8px;color:var(--acc2)}
 <body>
 <div class="wrap">
 <header id="hd">
- <div class="hrow"><div class="mark" id="mk">С</div><h1>Статьи</h1>
+ <div class="hrow"><div class="mark" id="mk"><img src="/logo-health.png?v=2" alt="" style="width:100%;height:100%;object-fit:contain;padding:3px"></div><h1>Статьи</h1>
   <div class="sw"><button data-b="sp">Спецмазь</button><button data-b="sh">Шустер</button></div>
   <button class="disk" id="disk">Диск</button></div>
  <div class="tabs" id="tabs">
@@ -212,7 +212,7 @@ ${FORMAT}`;
 function newArt(o){const a=Object.assign({id:uid(),brand:S.b,createdAt:Date.now(),updatedAt:Date.now()},o);db.articles.unshift(a);persist();return a}
 
 // ---------- отрисовка ----------
-function setBrand(b){S.b=b;LS.set('art_brand',b);document.body.classList.toggle('sh',b==='sh');$('#mk').textContent=b==='sh'?'Ш':'С';
+function setBrand(b){S.b=b;LS.set('art_brand',b);document.body.classList.toggle('sh',b==='sh');$('#mk').innerHTML=`<img src="/${b==='sh'?'logo-panda.png':'logo-health.png?v=2'}" alt="" style="width:100%;height:100%;object-fit:contain;padding:3px">`;
  document.querySelectorAll('.sw button').forEach(x=>x.classList.toggle('on',x.dataset.b===b));loadTopics(b).then(()=>{if(S.tab==='top'&&!S.edit)render()}).catch(()=>{});}
 function setTab(t){S.tab=t;S.edit=null;history.replaceState(null,'',location.pathname+'?b='+S.b);render();scrollTo(0,0)}
 function chips(name,opts,val){return `<div class="chips" data-chip="${name}">${opts.map(([k,l])=>`<button data-v="${esc(k)}" class="${k===val?'on':''}">${esc(l)}</button>`).join('')}</div>`}

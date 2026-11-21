@@ -14,7 +14,7 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,syste
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .wrap{max-width:760px;margin:0 auto;padding:0 14px 60px}
 header{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 10px;display:flex;align-items:center;gap:10px}
-.mark{width:36px;height:36px;border-radius:10px;background:var(--acc);display:grid;place-items:center;color:#fff;font-weight:900}
+.mark{width:36px;height:36px;border-radius:10px;background:var(--acc);display:grid;place-items:center;color:#fff;font-weight:900;overflow:hidden}
 h1{font-size:21px;font-weight:900;letter-spacing:-.3px;margin:0;flex:1}
 .btn{background:var(--acc);color:#fff;font-weight:800;padding:10px 16px;border-radius:14px;font-size:16px}
 .btn:active{background:var(--acc2)}
@@ -49,7 +49,7 @@ ol{margin:6px 0 0;padding-left:22px;color:#4b4642;line-height:1.45}
 </head>
 <body>
 <div class="wrap">
-<header><div class="mark">Ш</div><h1>Темы Шустер</h1><a class="btn ghost" href="/articles/?b=sh">✍ Статьи</a><button class="btn" id="copyAll">Копировать всё</button></header>
+<header><div class="mark"><img src="/logo-panda.png" alt="" style="width:100%;height:100%;object-fit:contain;padding:3px"></div><h1>Темы Шустер</h1><a class="btn ghost" href="/articles/?b=sh">✍ Статьи</a><button class="btn" id="copyAll">Копировать всё</button></header>
 <div class="sync" id="sync"></div>
 <div id="list"></div>
 </div>
