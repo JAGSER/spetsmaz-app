@@ -35,15 +35,26 @@ ol{margin:6px 0 0;padding-left:22px;color:#4b4642;line-height:1.45}
 .wish.on{display:flex}
 .wish input{flex:1;font:inherit;font-size:16px;padding:8px 12px;border:1px solid var(--line);border-radius:11px}
 .st{font-size:14px;color:var(--mut)}
+.hd a.btn{text-decoration:none}
+.addrow{display:flex;gap:8px;flex-wrap:wrap;margin:-2px 0 14px}
+.addwish{display:none;gap:8px;margin:0 0 14px}
+.addwish.on{display:flex}
+.addwish input{flex:1;font:inherit;font-size:16px;padding:8px 12px;border:1px solid var(--line);border-radius:11px;min-width:0}
+.badge{display:inline-block;background:var(--soft);color:var(--acc2);font-weight:700;font-size:13px;padding:3px 9px;border-radius:9px;margin-left:6px;vertical-align:middle}
+.newsec{display:flex;gap:8px;margin-top:22px}
+.newsec input{flex:1;font:inherit;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:11px;min-width:0}
+.sync{font-size:13px;color:var(--mut)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:14px;font-weight:600;display:none;z-index:9}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header><div class="mark">Ш</div><h1>Темы Шустер</h1><button class="btn" id="copyAll">Копировать всё</button></header>
+<header><div class="mark">Ш</div><h1>Темы Шустер</h1><a class="btn ghost" href="/articles/?b=sh">✍ Статьи</a><button class="btn" id="copyAll">Копировать всё</button></header>
+<div class="sync" id="sync"></div>
 <div id="list"></div>
 </div>
 <div class="toast" id="toast"></div>
+<script src="/articles/kit.js"></script>
 <script>
 const BRAND="Бренд «Доктор Шустер»: мармелад, сиропы, травяные чаи, бальзамы, своя косметика; ВК-посты 3:4 с текстом. Новых направлений не придумывать, держаться этих продуктов. Логика персонажей:\n\n- Панда в красной худи: мармелад, сладости, десерты, сиропы, рецепты, чаепитие, праздничный стол и гастрономические сочетания.\n- Коала в зелёной худи: травы, травяные чаи, бальзамы, аптечные продукты, состав, применение и мягкие темы о здоровье и уходе.";
 const SECTIONS=[{"name": "Посты, декабрь", "items": [{"title": "Подарочный набор, который приятно собрать самому", "char": "панда в красной худи", "desc": "Идеи сочетаний мармелада, сиропа и травяного чая для уютного зимнего подарка.", "count": "", "slides": []}, {"title": "Как украсить десерт мармеладом", "char": "панда в красной худи", "desc": "Три простых способа превратить обычный десерт в праздничное угощение.", "count": "", "slides": []}, {"title": "Сироп для зимнего лимонада", "char": "панда в красной худи", "desc": "Рецепт яркого напитка, который подойдёт и для праздничного стола, и для тихого вечера.", "count": "", "slides": []}, {"title": "Праздничная сырная тарелка с мармеладом", "char": "панда в красной худи", "desc": "Идеи сочетаний фруктового мармелада, сыров, орехов и ягод.", "count": "", "slides": []}, {"title": "Как выбрать сладкий подарок для семьи", "char": "панда в красной худи", "desc": "Шпаргалка по вкусам, форматам и составу праздничных наборов.", "count": "", "slides": []}, {"title": "Почему травяной чай мутнеет после заваривания", "char": "коала в зелёной худи", "desc": "Разбираемся, какие особенности растений и воды могут влиять на прозрачность напитка.", "count": "", "slides": []}, {"title": "Чем заменить второй кофе днём", "char": "панда в красной худи", "desc": "Идеи напитков с травяным чаем и сиропом для спокойной вкусовой паузы.", "count": "", "slides": []}, {"title": "Мёд, сироп или мармелад: что добавить к чаю", "char": "панда в красной худи", "desc": "Сравниваем разные варианты сладкого дополнения и подбираем их под вкус напитка.", "count": "", "slides": []}, {"title": "Как правильно заваривать чай в термосе", "char": "коала в зелёной худи", "desc": "Простые правила, чтобы травы не стали слишком горькими и сохранили аромат.", "count": "", "slides": []}, {"title": "Десертные бокалы с мармеладом и кремом", "char": "панда в красной худи", "desc": "Быстрый рецепт порционного угощения без сложной выпечки.", "count": "", "slides": []}, {"title": "Как читать срок годности бальзама", "char": "коала в зелёной худи", "desc": "Объясняем, где искать дату, как учитывать вскрытие и когда продукт лучше не использовать.", "count": "", "slides": []}, {"title": "Зимний чай с ягодным сиропом", "char": "панда в красной худи", "desc": "Рецепт ароматного напитка с ярким вкусом для холодного вечера.", "count": "", "slides": []}, {"title": "Почему чай заваривают не кипятком", "char": "коала в зелёной худи", "desc": "Как температура воды влияет на вкус, аромат и свойства травяного напитка.", "count": "", "slides": []}, {"title": "Мармелад в завтраке: 4 простые идеи", "char": "панда в красной худи", "desc": "Варианты подачи мармелада с кашей, творогом, тостами и йогуртом.", "count": "", "slides": []}, {"title": "Как хранить подарочный набор до праздника", "char": "коала в зелёной худи", "desc": "Советы по размещению мармелада, сиропа и чая, чтобы сохранить вкус и аромат.", "count": "", "slides": []}], "carousel": false}, {"name": "Посты, январь", "items": [{"title": "Как вернуть чаю праздничный аромат", "char": "панда в красной худи", "desc": "Идеи добавок и сочетаний, которые помогут разнообразить зимнее чаепитие после праздников.", "count": "", "slides": []}, {"title": "Сироп в каше: как подобрать вкус", "char": "панда в красной худи", "desc": "Подсказываем, какие ягодные и фруктовые сиропы лучше сочетаются с разными видами каш.", "count": "", "slides": []}, {"title": "Что приготовить из оставшегося мармелада", "char": "панда в красной худи", "desc": "Три простых варианта десертов для угощения без лишних продуктов.", "count": "", "slides": []}, {"title": "Травяной чай для вечернего ритуала", "char": "коала в зелёной худи", "desc": "Как подобрать мягкий состав для спокойного чаепития перед сном.", "count": "", "slides": []}, {"title": "Почему один и тот же чай пахнет по-разному", "char": "коала в зелёной худи", "desc": "Разбираемся, как хранение, температура воды и посуда влияют на аромат трав.", "count": "", "slides": []}, {"title": "Как сочетать сироп с натуральным йогуртом", "char": "панда в красной худи", "desc": "Идеи лёгких десертов для завтрака или перекуса.", "count": "", "slides": []}, {"title": "Бальзам в зимней аптечке: что проверить", "char": "коала в зелёной худи", "desc": "Разбираем срок годности, условия хранения и назначение продукта перед использованием.", "count": "", "slides": []}, {"title": "Мармелад к каше, творогу и сырникам", "char": "панда в красной худи", "desc": "Три идеи для разнообразных завтраков с натуральными сладостями.", "count": "", "slides": []}, {"title": "Чем отличаются листовой чай и чай в пакетиках", "char": "коала в зелёной худи", "desc": "Сравниваем удобство, размер частиц, вкус и правила заваривания.", "count": "", "slides": []}, {"title": "Сироп для домашнего какао", "char": "панда в красной худи", "desc": "Рецепт уютного напитка с насыщенным вкусом без сложных ингредиентов.", "count": "", "slides": []}, {"title": "Можно ли смешивать разные травяные чаи", "char": "коала в зелёной худи", "desc": "Правила составления домашних купажей и сочетания вкусов без лишней горечи.", "count": "", "slides": []}, {"title": "Сладкий перекус без выпечки", "char": "панда в красной худи", "desc": "Быстрый рецепт с мармеладом, творогом и орехами для рабочего дня.", "count": "", "slides": []}, {"title": "Как выбрать чай по времени дня", "char": "коала в зелёной худи", "desc": "Подбираем травяные напитки для утра, дневной паузы и спокойного вечера.", "count": "", "slides": []}, {"title": "Зачем встряхивать сироп перед употреблением", "char": "коала в зелёной худи", "desc": "Объясняем, когда перемешивание помогает равномерно распределить натуральные компоненты.", "count": "", "slides": []}, {"title": "Крем или бальзам для сухих рук зимой", "char": "коала в зелёной худи", "desc": "Разбираемся, чем отличаются текстуры и какой уход удобнее в разных ситуациях.", "count": "", "slides": []}], "carousel": false}];
@@ -53,27 +64,33 @@ const STORE='topics_'+location.pathname.replace(/\W/g,'');
 let data;
 try{data=JSON.parse(localStorage.getItem(STORE))}catch(e){}
 if(!data||data.v!==6)data={v:6,s:SECTIONS};
-const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(data))}catch(e){}};
+const syncEl=()=>document.getElementById('sync');
+const syncTxt={ok:'Темы сохранены в общую базу на Диске',local:'Темы сохраняются только на этом устройстве. Подключите Диск в разделе «Статьи», чтобы список был общий',err:'Не удалось сохранить на Диск, попробую при следующей правке'};
+const save=()=>{data.updatedAt=Date.now();try{localStorage.setItem(STORE,JSON.stringify(data))}catch(e){}if(window.Kit)Kit.pushTopics(STORE,data,st=>{const e=syncEl();if(e)e.textContent=syncTxt[st]||''})};
+const artDone=()=>{try{const db=JSON.parse(localStorage.getItem('art_db'))||{};const m={};(db.articles||[]).forEach(a=>{if(!a.deleted&&a.topic&&a.topic.page===STORE.replace('topics_',''))m[a.topic.title]=a.postId?'на сайте':'статья'});return m}catch(e){return {}}};
 const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2200)}
 
 function render(){
- const L=document.getElementById('list');L.innerHTML='';
+ const L=document.getElementById('list');L.innerHTML='';const AD=artDone();
  data.s.forEach((sec,si)=>{
   const h=document.createElement('h2');h.textContent=sec.name;L.appendChild(h);
   sec.items.forEach((it,ii)=>{
    const c=document.createElement('div');c.className='card';c.dataset.si=si;c.dataset.ii=ii;
    const car=sec.carousel;
-   c.innerHTML=`<div class="t"><span class="num">${ii+1}.</span><span contenteditable data-f="title">${esc(it.title)}</span></div>
+   c.innerHTML=`<div class="t"><span class="num">${ii+1}.</span><span contenteditable data-f="title">${esc(it.title)}</span>${AD[it.title]?`<span class="badge">✓ ${AD[it.title]}</span>`:''}</div>
     <div class="row"><b>Персонаж:</b> <span contenteditable data-f="char">${esc(it.char)}</span></div>
     ${car?`<div class="row"><b>Картинок:</b> <span contenteditable data-f="count">${esc(it.count)}</span></div>
      <ol contenteditable data-f="slides">${(it.slides||[]).map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`
      :`<div class="row"><b>Описание:</b> <span contenteditable data-f="desc">${esc(it.desc)}</span></div>`}
-    <div class="acts"><button class="btn sm ghost" data-a="regen">↻ Перегенерировать</button><button class="btn sm ghost" data-a="copy">Копировать</button><span class="st"></span></div>
+    <div class="acts"><button class="btn sm ghost" data-a="regen">↻ Перегенерировать</button><button class="btn sm ghost" data-a="copy">Копировать</button><button class="btn sm ghost" data-a="art">✍ Статья</button>${it.added?'<button class="btn sm ghost" data-a="del">✕</button>':''}<span class="st"></span></div>
     <div class="wish"><input placeholder="Пожелание к новой теме (можно пусто)"><button class="btn sm" data-a="go">Создать</button></div>`;
    L.appendChild(c);
   });
+  const ar=document.createElement('div');ar.className='addrow';ar.dataset.si=si;ar.innerHTML=`<button class="btn sm" data-a="addai">+ Добавить тему</button><button class="btn sm ghost" data-a="addman">+ Вписать вручную</button><span class="st"></span>`;L.appendChild(ar);
+  const aw=document.createElement('div');aw.className='addwish';aw.dataset.si=si;aw.innerHTML=`<input placeholder="О чём новая тема? (можно пусто)"><button class="btn sm" data-a="addgo">Создать</button>`;L.appendChild(aw);
  });
+ const ns=document.createElement('div');ns.className='newsec';ns.innerHTML=`<input id="nsname" placeholder="Новый раздел, например: Посты, февраль"><button class="btn sm" data-a="newsec">+ Раздел</button>`;L.appendChild(ns);
 }
 function itemText(sec,it,i){
  let t=`${i+1}. ${it.title}\nПерсонаж: ${it.char}\n`;
@@ -92,12 +109,21 @@ document.addEventListener('input',e=>{
 document.getElementById('copyAll').onclick=()=>copy(allText());
 document.addEventListener('click',e=>{
  const b=e.target.closest('[data-a]');if(!b)return;
+ if(b.dataset.a==='newsec'){const v=document.getElementById('nsname').value.trim();if(!v){toast('Впишите название раздела');return}const car=/карусел/i.test(v);data.s.push({name:v,items:[],carousel:car});save();render();toast('Раздел добавлен');return}
+ const row=b.closest('.addrow,.addwish');
+ if(row){const si=+row.dataset.si;const sec=data.s[si];
+  if(b.dataset.a==='addai'){const w=row.nextElementSibling;w.classList.toggle('on');if(w.classList.contains('on'))w.querySelector('input').focus()}
+  if(b.dataset.a==='addman'){sec.items.push({title:'Новая тема',char:CHARS[0],desc:'',count:'',slides:[],added:true});save();render();const cs=document.querySelectorAll(`.card[data-si="${si}"] [data-f="title"]`);const el=cs[cs.length-1];if(el){el.focus();document.getSelection().selectAllChildren(el)}}
+  if(b.dataset.a==='addgo')addTopic(si,row.querySelector('input').value.trim(),row.previousElementSibling.querySelector('.st'));
+  return}
  const c=b.closest('.card');const sec=data.s[c.dataset.si];const ii=+c.dataset.ii;const it=sec.items[ii];
  if(b.dataset.a==='copy')copy(itemText(sec,it,ii));
+ if(b.dataset.a==='art'){location.href='/articles/?b=sh#topic='+encodeURIComponent(STORE.replace('topics_','')+'|'+c.dataset.si+'|'+ii);return}
+ if(b.dataset.a==='del'){if(confirm('Удалить эту добавленную тему?')){sec.items.splice(ii,1);save();render()}return}
  if(b.dataset.a==='regen'){const w=c.querySelector('.wish');w.classList.toggle('on');if(w.classList.contains('on'))w.querySelector('input').focus()}
  if(b.dataset.a==='go')regen(c,sec,ii,c.querySelector('.wish input').value.trim());
 });
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.wish input')){e.preventDefault();e.target.nextElementSibling.click()}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.addwish input')){e.preventDefault();e.target.nextElementSibling.click();return}if(e.key==='Enter'&&e.target.matches('#nsname')){e.preventDefault();e.target.nextElementSibling.click();return}if(e.key==='Enter'&&e.target.matches('.wish input')){e.preventDefault();e.target.nextElementSibling.click()}});
 
 // запросы к Claude идут через сервер «Помощника» (ключ только там), без регистрации
 let HF=null,HREADY=null,HID=0;const HW={};
@@ -134,7 +160,23 @@ ${wish?'Пожелание: '+wish+'\n':''}Персонаж строго оди�
   save();render();toast('Тема обновлена');
  }catch(e){c.classList.remove('busy');st.textContent=e.message}
 }
+async function addTopic(si,wish,st){
+ const sec=data.s[si];st.textContent='Придумываю тему…';
+ const others=data.s.flatMap(s=>s.items.map(x=>x.title));
+ const shape=sec.carousel?'{"title":"короткое название карусели","char":"персонаж","count":"N, одна общая обложка и M дополнительных","slides":["тема доп. картинки 1","..."]} (M от 5 до 7, slides ровно M штук)'
+  :'{"title":"заголовок поста","char":"персонаж","desc":"описание одной фразой"}';
+ const prompt=`${BRAND}
+Раздел: ${sec.name}. Придумай ОДНУ новую тему ${sec.carousel?'карусели':'поста'} для этого раздела, продолжая список.
+${wish?'Пожелание: '+wish+'\n':''}Персонаж строго один из: ${CHARS.join(', ')}. Выбирай по логике персонажей.
+Стиль заголовков как у прошлых тем. Нельзя повторять или перефразировать темы ниже.
+Темы на странице: ${others.join('; ')}
+Уже вышедшие темы: ${PAST.join('; ')}
+Ответ строго JSON: ${shape}`;
+ try{const r=await callApi(prompt,st);sec.items.push({title:r.title||'Новая тема',char:r.char||CHARS[0],desc:r.desc||'',count:r.count||'',slides:Array.isArray(r.slides)?r.slides:[],added:true});save();render();toast('Тема добавлена')}
+ catch(e){st.textContent=e.message}}
 render();
+addEventListener('load',()=>{if(window.Kit)Kit.syncTopics(STORE,data).then(d=>{if(d&&d!==data){data=d;render()}const e=syncEl();if(e&&!Kit.token())e.textContent=syncTxt.local})});
+addEventListener('pageshow',e=>{if(e.persisted)render()});
 </script>
 </body>
 </html>
