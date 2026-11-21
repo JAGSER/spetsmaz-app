@@ -139,7 +139,13 @@ function blockLines(el){const t=(el.innerText||'').replace(/ /g,' ');const tag=
  if(el.classList&&el.classList.contains('tip'))return t.split('\n').filter(x=>x.trim()).map(x=>'> '+x.trim());
  return t.split('\n').map(x=>x.trim()).filter(Boolean)}
 function htmlToBody(ed){const out=[];[...ed.childNodes].forEach(n=>{if(n.nodeType===3){if(n.textContent.trim())out.push(n.textContent.trim());return}if(n.nodeType!==1)return;const ls=blockLines(n);if(ls.length)out.push(ls.join('\n'))});return out.join('\n\n')}
-const clean=t=>String(t||'').replace(/—/g,'-').replace(/\*\*/g,'');
+const clean=t=>String(t||'')
+ .replace(/\s*\(\s*\[[^\]]*\]\([^)]*\)\s*\)/g,'')
+ .replace(/\[([^\]]*)\]\((https?:)?[^)]*\)/g,'')
+ .replace(/\s*\(\s*(https?:\/\/|www\.)[^\s)]*\s*\)/g,'')
+ .replace(/(https?:\/\/|www\.)[^\s)]+/g,'')
+ .replace(/[ \t]+([.,!?;:])/g,'$1').replace(/[ \t]{2,}/g,' ')
+ .replace(/—/g,'-').replace(/\*\*/g,'');
 function plain(a){const L=[];if(a.title)L.push(a.title,'');String(a.body||'').split('\n').forEach(l=>{const s=l.trim();if(!s){L.push('');return}
  if(s.startsWith('# '))L.push(s.slice(2));else if(s.startsWith('- '))L.push('• '+s.slice(2));else if(s.startsWith('> '))L.push('💡 '+s.slice(2));else L.push(s)});return L.join('\n').replace(/\n{3,}/g,'\n\n').trim()}
 function tgHTML(a){const h=[];if(a.title)h.push('<b>'+esc(a.title)+'</b>','');String(a.body||'').split('\n').forEach(l=>{const s=l.trim();if(!s){h.push('');return}
@@ -150,7 +156,7 @@ async function copyText(t,html){try{if(html&&window.ClipboardItem){await navigat
 const FORMAT=`Ответ строго в формате:
 TITLE: заголовок статьи
 ---
-текст статьи, где строка, начинающаяся с "# ", это подзаголовок; с "- " это пункт списка; с "> " это важная приписка или совет; остальные строки это абзацы. Между абзацами пустая строка. Эмодзи пиши прямо в тексте, как у редакторов. Никакого другого markdown, без **. Не используй длинное тире (—), вместо него дефис, двоеточие или запятую.`;
+текст статьи, где строка, начинающаяся с "# ", это подзаголовок; с "- " это пункт списка; с "> " это важная приписка или совет; остальные строки это абзацы. Между абзацами пустая строка. Эмодзи пиши прямо в тексте, как у редакторов. Никакого другого markdown, без **. Никаких ссылок, адресов сайтов и источников в тексте. Не используй длинное тире (—), вместо него дефис, двоеточие или запятую.`;
 function sysFor(b){return `Ты редактор соцсетей бренда «${NAMES[b]}». Пишешь статьи и посты для ВКонтакте и Telegram так, как пишут штатные редакторы бренда. Отвечай по-русски. Не представляй персонажа словами вроде «это панда» или «я панда в худи»: просто пиши от первого лица, как редакторы. Где это уместно и не навязчиво, упоминай продукцию бренда (без выдуманных названий и цен).`}
 function ctxFor(b){const bi=S.brandInfo[b]||{};return `${bi.brand||''}
 
@@ -261,7 +267,7 @@ function mountEditor(){const a=S.edit,ed=$('#ed');document.documentElement.style
  ed.addEventListener('input',sv);$('#etitle').addEventListener('input',sv);
  ed.addEventListener('paste',e=>{e.preventDefault();const t=(e.clipboardData||window.clipboardData).getData('text/plain');document.execCommand('insertText',false,t)})}
 function flushEditor(){if(!S.edit||!$('#ed'))return;clearTimeout(edT);const a=S.edit;a.title=clean($('#etitle').value.trim());a.body=htmlToBody($('#ed'));a.updatedAt=Date.now();persist()}
-function openArt(id){const a=db.articles.find(x=>x.id===id);if(!a)return;if(a.brand!==S.b)setBrand(a.brand);S.edit=a;S.undo=[];render();scrollTo(0,0)}
+function openArt(id){const a=db.articles.find(x=>x.id===id);if(!a)return;const cb=clean(a.body),ct=clean(a.title);if(cb!==a.body||ct!==a.title){a.body=cb;a.title=ct;a.updatedAt=Date.now();persist()}if(a.brand!==S.b)setBrand(a.brand);S.edit=a;S.undo=[];render();scrollTo(0,0)}
 
 // блоки редактора, затронутые выделением
 function selBlocks(){const ed=$('#ed'),sel=getSelection();if(!sel.rangeCount)return null;const r=sel.getRangeAt(0);if(!ed.contains(r.commonAncestorContainer))return null;
