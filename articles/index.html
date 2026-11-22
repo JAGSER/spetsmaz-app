@@ -340,7 +340,8 @@ function editorHTML(a){return `<div class="card">
  <div class="ai"><button class="btn sm ghost" data-ai="Перепиши по-другому, сохранив смысл">Переписать</button><button class="btn sm ghost" data-ai="Сделай короче, оставь главное">Короче</button><button class="btn sm ghost" data-ai="Раскрой подробнее, добавь полезные детали">Подробнее</button><button class="btn sm ghost" data-ai="Сделай проще и живее, как в разговоре">Проще</button></div>
  <div class="ai" style="margin-top:8px"><input id="aiw" placeholder="Своё пожелание к правке"><button class="btn sm" data-ai="own">Применить</button></div>
  <div class="st" id="st"></div>
- <div class="acts"><button class="btn" data-act="site">📤 На сайт к посту</button><button class="btn ghost" data-act="vk">Копировать для ВК</button><button class="btn ghost" data-act="tg">Копировать для Telegram</button></div>
+ ${a.postId?`<div class="pub" style="background:#e6f6ec"><b style="color:#157A43">✓ Опубликовано на сайте</b><div class="mut">К посту «${esc(a.postTitle||'')}»${a.sentAt?', '+new Date(a.sentAt).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}):''}</div><div class="acts"><button class="btn sm" data-act="siteupd">Обновить текст на сайте</button><button class="btn sm ghost" data-act="unsite">Убрать с сайта</button></div></div>`:''}
+ <div class="acts"><button class="btn" data-act="site">📤 ${a.postId?'К другому посту':'На сайт к посту'}</button><button class="btn ghost" data-act="vk">Копировать для ВК</button><button class="btn ghost" data-act="tg">Копировать для Telegram</button></div>
  ${pubHTML(a)}
  <div class="acts"><button class="btn ghost sm" data-act="back">← К списку</button><button class="btn ghost sm" data-act="imgtopic">🖼 Тема для картинки</button><button class="btn ghost sm" data-act="dup">Копия</button><button class="btn ghost sm" data-act="del">Удалить</button></div>
  ${a.src?`<details style="margin-top:14px"><summary class="mut">Оригинал</summary><div class="mut" style="white-space:pre-wrap;margin-top:8px">${esc(a.src)}</div></details>`:''}
@@ -398,6 +399,22 @@ async function ensurePosts(st){let c=cachePosts();if(c)return c;st.textContent='
  for(let i=0;i<60&&!c;i++){await new Promise(r=>setTimeout(r,1000));c=cachePosts()}f.remove();if(!c)throw new Error('Не удалось загрузить посты сайта');return c}
 const norm=s=>String(s||'').toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я0-9 ]/g,' ').split(/\s+/).filter(w=>w.length>3).map(w=>w.slice(0,6));
 function sim(a,b){const A=new Set(norm(a)),B=norm(b);if(!A.size||!B.length)return 0;return B.filter(w=>A.has(w)).length/Math.sqrt(A.size*B.length)}
+async function siteWrite(a,pid,ptitle){const st=$('#st');if(!Kit.token()){Kit.connectBox(()=>{setDisk('ok');siteWrite(a,pid,ptitle)});return}
+ st.textContent='Отправляю на сайт…';
+ try{const M=(await Kit.readAuth('_app.json'))||{posts:{},config:{}};M.posts=M.posts||{};
+  const body=(a.title&&a.title.trim().toLowerCase()!==String(ptitle||'').trim().toLowerCase()?'# '+a.title+'\n\n':'')+a.body;
+  M.posts[pid]=Object.assign({},M.posts[pid]||{},{body});
+  if(a.postId&&a.postId!==pid&&M.posts[a.postId]&&M.posts[a.postId].body===a.siteBody)delete M.posts[a.postId].body;
+  await Kit.write('_app.json',M);const cc=LS.get('sm_cache',null);if(cc){cc.meta=M;LS.set('sm_cache',cc)}
+  a.postId=pid;a.postTitle=ptitle;a.sentAt=Date.now();a.siteBody=body;a.plan=Object.assign({},a.plan||{},{site:true});a.updatedAt=Date.now();persist();render();toast('Текст на сайте обновлён',3000)}
+ catch(err){st.textContent=err&&err.code==='notoken'?'Подключите Диск заново':'Не удалось отправить: '+(err.message||err.code||'')}}
+async function unSite(a){if(!confirm('Убрать текст этой статьи с сайта? Пост с картинками останется, пропадёт только текст.'))return;const st=$('#st');
+ if(!Kit.token()){Kit.connectBox(()=>{setDisk('ok');unSite(a)});return}
+ st.textContent='Убираю с сайта…';
+ try{const M=(await Kit.readAuth('_app.json'))||{posts:{}};M.posts=M.posts||{};if(M.posts[a.postId])delete M.posts[a.postId].body;
+  await Kit.write('_app.json',M);const cc=LS.get('sm_cache',null);if(cc){cc.meta=M;LS.set('sm_cache',cc)}
+  a.postId='';a.postTitle='';a.sentAt=0;a.siteBody='';a.updatedAt=Date.now();persist();render();toast('Текст убран с сайта',3000)}
+ catch(err){st.textContent=err&&err.code==='notoken'?'Подключите Диск заново':'Не получилось: '+(err.message||err.code||'')}}
 async function sendToSite(){const a=S.edit;flushEditor();const st=$('#st');
  if(!Kit.token()){Kit.connectBox(()=>{setDisk('ok');pushNow();sendToSite()});return}
  let c;try{c=await ensurePosts(st)}catch(e){st.textContent=e.message;return}st.textContent='';
@@ -412,15 +429,7 @@ async function sendToSite(){const a=S.edit;flushEditor();const st=$('#st');
  w.querySelector('#pq').oninput=e=>{const q=e.target.value.toLowerCase();w.querySelector('#pl').innerHTML=posts.filter(p=>!q||p.title.toLowerCase().includes(q)).slice(0,60).map(row).join('')};
  w.addEventListener('click',async e=>{const r=e.target.closest('[data-pid]');if(!r)return;const p=posts.find(x=>x.id===r.dataset.pid);
   if(p.hasBody&&p.id!==a.postId&&!confirm('У этого поста уже есть текст. Заменить его этой статьёй?'))return;
-  w.remove();st.textContent='Отправляю на сайт…';
-  try{const M=(await Kit.readAuth('_app.json'))||{posts:{},config:{}};M.posts=M.posts||{};
-   const body=(a.title&&a.title.trim().toLowerCase()!==p.title.trim().toLowerCase()?'# '+a.title+'\n\n':'')+a.body;
-   M.posts[p.id]=Object.assign({},M.posts[p.id]||{},{body});
-   if(a.postId&&a.postId!==p.id&&M.posts[a.postId]&&M.posts[a.postId].body&&M.posts[a.postId].body.includes(a.body.slice(0,80)))delete M.posts[a.postId].body;
-   await Kit.write('_app.json',M);
-   const cc=LS.get('sm_cache',null);if(cc){cc.meta=M;LS.set('sm_cache',cc)}
-   a.postId=p.id;a.postTitle=p.title;a.sentAt=Date.now();a.updatedAt=Date.now();persist();render();toast('Текст добавлен к посту на сайте',3000)}
-  catch(err){st.textContent=err&&err.code==='notoken'?'Подключите Диск заново':'Не удалось отправить: '+(err.message||err.code||'')}})}
+  w.remove();siteWrite(a,p.id,p.title)})}
 
 // ---------- события ----------
 document.addEventListener('click',async e=>{
@@ -462,6 +471,8 @@ document.addEventListener('click',async e=>{
   if(k==='vk')copyText(plain(a));
   if(k==='tg')copyText(plain(a),tgHTML(a));
   if(k==='site')sendToSite();
+  if(k==='siteupd')siteWrite(a,a.postId,a.postTitle);
+  if(k==='unsite')unSite(a);
   if(k==='back'){S.edit=null;S.tab=a.topic&&S.tab==='top'?'top':'base';render()}
   if(k==='imgtopic'){loadTopics(a.brand).then(d=>{const w=document.createElement('div');w.className='modal';
    w.innerHTML=`<div class="box"><div class="hrow"><h3 style="flex:1;margin:0">В какой раздел добавить тему для картинки?</h3><button class="btn sm ghost" data-x>Закрыть</button></div><p class="mut">Нейросеть сделает тему поста или карусели по этой статье и добавит её в список тем.</p>${d.s.map((sec,si)=>`<div class="pi" data-sec="${si}"><div><b>${esc(sec.name)}</b><span class="mut">${sec.items.length} тем</span></div></div>`).join('')}</div>`;
