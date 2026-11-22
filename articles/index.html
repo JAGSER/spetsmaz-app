@@ -49,6 +49,9 @@ h2{font-size:19px;font-weight:800;margin:22px 0 8px;color:var(--acc2)}
 .ti .tt b span{font-size:inherit;color:inherit}
 [contenteditable]{outline:none;border-radius:6px}
 .ti [contenteditable]:focus{background:var(--soft)}
+.pday{font-weight:800;color:var(--acc2);margin:18px 2px 6px}
+input.dt{padding:8px 10px;border:1px solid var(--line);border-radius:11px;font-size:16px;background:#fff}
+.pub{background:#f7f5f3;border-radius:16px;padding:12px;margin-top:14px}
 .badge{display:inline-block;background:var(--soft);color:var(--acc2);font-weight:700;font-size:13px;padding:3px 9px;border-radius:9px;margin:4px 6px 0 0}
 .badge.gr{background:#e6f6ec;color:#157A43}
 /* редактор */
@@ -84,7 +87,7 @@ h2{font-size:19px;font-weight:800;margin:22px 0 8px;color:var(--acc2)}
   <div class="sw"><button data-b="sp">Спецмазь</button><button data-b="sh">Шустер</button></div>
   <button class="disk" id="disk">Диск</button></div>
  <div class="tabs" id="tabs">
-  <button data-t="new">✍ Новая</button><button data-t="rew">♻ Переписать</button><button data-t="top">📋 По темам</button><button data-t="base">🗂 База</button>
+  <button data-t="new">✍ Новая</button><button data-t="rew">♻ Переписать</button><button data-t="top">📋 По темам</button><button data-t="plan">📅 План</button><button data-t="base">🗂 База</button>
  </div>
 </header>
 <main id="main"></main>
@@ -215,7 +218,7 @@ ${FORMAT}`;
 function newArt(o){const a=Object.assign({id:uid(),brand:S.b,createdAt:Date.now(),updatedAt:Date.now()},o);db.articles.unshift(a);persist();return a}
 
 // ---------- отрисовка ----------
-function setBrand(b){S.b=b;LS.set('art_brand',b);document.body.classList.toggle('sh',b==='sh');$('#mk').innerHTML=`<img src="/${b==='sh'?'logo-panda.png':'logo-health.png?v=2'}" alt="" style="width:100%;height:100%;object-fit:contain;padding:3px">`;
+function setBrand(b){S.b=b;S.vkLoaded=false;LS.set('art_brand',b);document.body.classList.toggle('sh',b==='sh');$('#mk').innerHTML=`<img src="/${b==='sh'?'logo-panda.png':'logo-health.png?v=2'}" alt="" style="width:100%;height:100%;object-fit:contain;padding:3px">`;
  document.querySelectorAll('.sw button').forEach(x=>x.classList.toggle('on',x.dataset.b===b));loadTopics(b).then(()=>{if(S.tab==='top'&&!S.edit)render()}).catch(()=>{});}
 function setTab(t){S.tab=t;S.edit=null;history.replaceState(null,'',location.pathname+'?b='+S.b);render();scrollTo(0,0)}
 function chips(name,opts,val){return `<div class="chips" data-chip="${name}">${opts.map(([k,l])=>`<button data-v="${esc(k)}" class="${k===val?'on':''}">${esc(l)}</button>`).join('')}</div>`}
@@ -223,8 +226,65 @@ function charChips(f){if(S.b!=='sh')return '';const cs=(S.brandInfo.sh||{}).char
 function typeSel(f){return `<label class="l">Тип материала</label><select class="f" data-k="type">${TYPES.map(t=>`<option ${t===(f.type||'Автовыбор')?'selected':''}>${t}</option>`).join('')}</select>`}
 const SIZE_HINT={same:'Примерно той же длины, что и оригинал.',post:'Пост: короткий текст под картинку в ВК или Telegram, 700-1200 знаков. Одна мысль, 3-5 советов или фактов, вопрос подписчикам.',art:'Статья: развёрнутый материал, 1800-2800 знаков. С подзаголовками и списками, раскрывает тему подробнее, чем подпись к картинке. Подходит для текста к посту на сайте.',long:'Большая статья: подробный разбор, 3500-5000 знаков. Для лонгрида: статья ВК, сайт, полный разбор темы с рецептами, составом, советами.'};
 function sizeChips(f,same){const v=f.size||(same?'same':'art');return `<label class="l">Объём</label>${chips('size',[...(same?[['same','Как в оригинале']]:[]),...Object.entries(SIZES).map(([k,v])=>[k,v[0]])],v)}<div class="mut" id="szhint" style="margin-top:6px">${SIZE_HINT[v]||''}</div>`}
-const TAB_HINT={new:'Новая статья с нуля на любую тему в стиле редакторов бренда.',rew:'Вставьте чужую статью, получите свой текст в стиле бренда без совпадений с оригиналом.',top:'Утверждённые темы постов. Здесь же можно добавлять новые темы и писать по ним статьи.',base:'Все написанные статьи этого бренда: поиск, правка, копирование, отправка на сайт.'};
+const TAB_HINT={plan:'Публикации по датам: запланированные статьи и отложенные посты ВК. Дату можно поменять прямо здесь, время по часам вашего устройства.',new:'Новая статья с нуля на любую тему в стиле редакторов бренда.',rew:'Вставьте чужую статью, получите свой текст в стиле бренда без совпадений с оригиналом.',top:'Утверждённые темы постов. Здесь же можно добавлять новые темы и писать по ним статьи.',base:'Все написанные статьи этого бренда: поиск, правка, копирование, отправка на сайт.'};
 function F(){S.form[S.tab]=S.form[S.tab]||{};return S.form[S.tab]}
+
+// ---------- публикации и ВК ----------
+const PROXY='https://pomoshnik.jagser.deno.net';
+const VK_SCREEN={sp:'spetzmaz',sh:'dr.shuster'};
+const vkTok=()=>LS.get('vk_token','')||'';
+async function vk(method,params){const t=vkTok();if(!t)throw {code:'novk'};const r=await fetch(PROXY+'/vk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({method,params,token:t})});const d=await r.json();
+ if(d.error){if(d.error.error_code===5)LS.set('vk_token','');throw new Error(d.error.error_msg||'ошибка ВК')}return d.response}
+async function vkGroup(b){const k='vk_gid_'+b;let g=LS.get(k,0);if(g)return g;const r=await vk('utils.resolveScreenName',{screen_name:VK_SCREEN[b]});if(!r||!r.object_id)throw new Error('Группа ВК не найдена');g=r.object_id;LS.set(k,g);return g}
+function vkConnect(onOk){const w=document.createElement('div');w.className='kit-modal';
+ const link='https://oauth.vk.com/authorize?client_id=2685278&scope=wall,photos,groups,offline&redirect_uri=https://oauth.vk.com/blank.html&display=page&response_type=token&revoke=1';
+ w.innerHTML=`<div class="kit-box"><h3>Подключите ВКонтакте</h3><p>Нужен вход того, кто админ или редактор групп Спецмазь и Шустер. Нажмите кнопку, разрешите доступ, затем скопируйте из адресной строки всю ссылку (или часть после access_token=) и вставьте сюда. Это нужно один раз на этом устройстве.</p>
+ <a class="kit-btn ghost" href="${link}" target="_blank" rel="noopener">Открыть вход ВК</a><div class="kit-row"><input placeholder="Вставьте ссылку или ключ"><button class="kit-btn">ОК</button></div><button class="kit-x">Закрыть</button></div>`;
+ document.body.appendChild(w);w.querySelector('.kit-x').onclick=()=>w.remove();
+ w.querySelector('.kit-row .kit-btn').onclick=async()=>{let v=w.querySelector('input').value.trim();const m=v.match(/access_token=([^&\s]+)/);if(m)v=m[1];if(!v)return;LS.set('vk_token',v);
+  try{const u=await vk('users.get',{});w.remove();toast('ВК подключён: '+(u[0]?u[0].first_name+' '+u[0].last_name:''));onOk&&onOk()}catch(e){LS.set('vk_token','');alert('Ключ не подошёл: '+e.message)}}}
+const dtLocal=ms=>{if(!ms)return '';const d=new Date(ms);const z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`};
+const fromLocal=v=>v?new Date(v).getTime():0;
+const dayName=ms=>new Date(ms).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+const hm=ms=>new Date(ms).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+function postImages(a){const c=LS.get('sm_cache',null);if(!a.postId||!c)return [];const p=(c.posts||[]).find(x=>x.id===a.postId);if(!p)return [];return (p.slides||[]).filter(s=>s.type!=='video').map(s=>s.full||s.src).filter(Boolean).slice(0,10)}
+function pubHTML(a){const P=a.plan||{};const imgs=postImages(a);return `<div class="pub"><b>📅 Публикация</b>
+ <div class="ai" style="margin-top:8px"><input type="datetime-local" class="dt" id="pdate" value="${dtLocal(P.at)}"><button class="btn sm ghost" data-pub="save">Сохранить дату</button></div>
+ <div class="chips" data-pubch style="margin-top:8px">${[['vk','ВК'],['tg','Telegram'],['site','Сайт']].map(([k,l])=>`<button data-v="${k}" class="${P[k]?'on':''}">${l}</button>`).join('')}</div>
+ <div class="mut" style="margin-top:8px">${imgs.length?`Картинки: ${imgs.length} из поста «${esc(a.postTitle||'')}»`:'Картинок нет: чтобы приложить картинки, сначала отправьте статью на сайт к посту'}</div>
+ ${P.vkPid?`<div class="mut" style="margin-top:6px;color:#157A43;font-weight:700">✓ Отложен в ВК на ${dayName(P.at)}, ${hm(P.at)}</div>`:''}
+ <div class="acts">${P.vkPid?`<button class="btn sm" data-pub="vkupd">Обновить в ВК</button><button class="btn sm ghost" data-pub="vkdel">Убрать из отложенных ВК</button>`:`<button class="btn sm" data-pub="vk">Отложить в ВК</button>`}</div><div class="st" id="pst"></div></div>`}
+async function vkSchedule(a,upd){const st=$('#pst');const at=fromLocal(($('#pdate')||{}).value)||(a.plan&&a.plan.at);if(!at){toast('Укажите дату и время');return}if(at<Date.now()+60000){toast('Дата должна быть в будущем');return}
+ if(!vkTok()){vkConnect(()=>vkSchedule(a,upd));return}
+ try{st.textContent='Отправляю в ВК…';const gid=await vkGroup(a.brand);a.plan=Object.assign({},a.plan||{},{at,vk:true});
+  let att=a.plan.vkAtt||'';const imgs=postImages(a);
+  if(imgs.length&&(!att||a.plan.vkAttPost!==a.postId)){st.textContent='Загружаю картинки в ВК…';const r=await (await fetch(PROXY+'/vk-photo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:vkTok(),group_id:gid,urls:imgs})})).json();if(r.error)throw new Error(r.error);att=r.attachments.join(',');a.plan.vkAtt=att;a.plan.vkAttPost=a.postId}
+  const params={owner_id:-gid,from_group:1,message:plain(a),publish_date:Math.floor(at/1000)};if(att)params.attachments=att;
+  if(upd&&a.plan.vkPid){params.post_id=a.plan.vkPid;await vk('wall.edit',params)}else{const r=await vk('wall.post',params);a.plan.vkPid=r.post_id;a.plan.vkGid=gid}
+  a.updatedAt=Date.now();persist();render();toast('Отложено в ВК: '+dayName(at)+', '+hm(at),3500)}
+ catch(e){if(e&&e.code==='novk'){vkConnect(()=>vkSchedule(a,upd));return}st.textContent='Не получилось: '+(e.message||e)}}
+async function vkUnschedule(a){if(!confirm('Убрать этот пост из отложенных ВК?'))return;const st=$('#pst');try{await vk('wall.delete',{owner_id:-a.plan.vkGid,post_id:a.plan.vkPid});delete a.plan.vkPid;a.updatedAt=Date.now();persist();render();toast('Убрано из отложенных ВК')}catch(e){st.textContent='Не получилось: '+(e.message||e)}}
+// вкладка «План»
+async function loadVK(){S.vkLoaded=true;S.vk=S.vk||{};if(!vkTok()){render();return}
+ try{const gid=await vkGroup(S.b);const r=await vk('wall.get',{owner_id:-gid,filter:'postponed',count:100});S.vk[S.b]={gid,items:r.items||[]};S.vkErr=''}catch(e){S.vkErr=e.message||String(e)}if(S.tab==='plan'&&!S.edit)render()}
+function vkAtt(p){return (p.attachments||[]).map(x=>{const o=x[x.type];return o&&o.owner_id!=null?`${x.type}${o.owner_id}_${o.id}${o.access_key?'_'+o.access_key:''}`:''}).filter(Boolean).join(',')}
+function planHTML(){const list=arts().filter(a=>a.brand===S.b&&a.plan&&a.plan.at).sort((x,y)=>x.plan.at-y.plan.at);
+ const V=(S.vk&&S.vk[S.b])||{items:[]};const linked=new Set(list.map(a=>a.plan.vkPid).filter(Boolean));
+ const rows=[...list.map(a=>({at:a.plan.at,a})),...V.items.filter(p=>!linked.has(p.id)).map(p=>({at:p.date*1000,v:p}))].sort((x,y)=>x.at-y.at);
+ let h=`<div class="mut" style="margin:12px 2px 0">${TAB_HINT.plan}</div><div class="card" style="padding:12px"><div class="acts" style="margin:0">${vkTok()?`<span class="badge gr">✓ ВК подключён</span><button class="btn sm ghost" data-vkrefresh>Обновить из ВК</button>`:`<button class="btn sm" data-vkconnect>Подключить ВКонтакте</button><span class="mut">чтобы видеть и ставить отложенные посты групп</span>`}</div>${S.vkErr?`<div class="st">ВК: ${esc(S.vkErr)}</div>`:''}</div>`;
+ if(!rows.length)return h+'<div class="card mut">Пока ничего не запланировано. Откройте статью и укажите дату в блоке «Публикация».</div>';
+ let day='';rows.forEach(r=>{const d=dayName(r.at);if(d!==day){day=d;h+=`<div class="pday">${d}</div>`}const past=r.at<Date.now();
+  if(r.a){const a=r.a,P=a.plan;h+=`<div class="ti"><div class="tt"><b>${hm(r.at)} · ${esc(a.title)}</b><div>${P.vk?`<span class="badge ${P.vkPid?'gr':''}">${P.vkPid?'✓ ВК отложен':'ВК'}</span>`:''}${P.tg?'<span class="badge">Telegram</span>':''}${P.site?`<span class="badge ${a.postId?'gr':''}">Сайт${a.postId?' ✓':''}</span>`:''}${past?'<span class="badge">время прошло</span>':''}</div>
+   <div class="ai" style="margin-top:6px"><input type="datetime-local" class="dt" value="${dtLocal(P.at)}" data-redate="${a.id}"><span class="st" id="pst-${a.id}"></span></div></div><button class="btn sm ghost" data-open="${a.id}">Открыть</button></div>`}
+  else{const p=r.v;h+=`<div class="ti"><div class="tt"><b>${hm(r.at)} · <span class="badge gr" style="margin:0">ВК отложка</span></b><span style="display:block;margin-top:4px">${esc((p.text||'').slice(0,160))}${(p.text||'').length>160?'…':''}${(p.attachments||[]).length?` · вложений: ${p.attachments.length}`:''}</span>
+   <div class="ai" style="margin-top:6px"><input type="datetime-local" class="dt" value="${dtLocal(r.at)}" data-vkredate="${p.id}"><span class="st" id="vst-${p.id}"></span></div></div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn sm ghost" data-vkimport="${p.id}">В базу</button><button class="btn sm ghost" data-vkdel="${p.id}">Удалить</button></div></div>`}});
+ return h}
+async function redateArt(id,v){const a=db.articles.find(x=>x.id===id);const at=fromLocal(v);if(!a||!at)return;const st=$('#pst-'+id);a.plan=Object.assign({},a.plan||{},{at});
+ if(a.plan.vkPid){if(at<Date.now()+60000){st.textContent='Для ВК дата должна быть в будущем';return}st.textContent='Меняю дату в ВК…';
+  try{await vk('wall.edit',Object.assign({owner_id:-a.plan.vkGid,post_id:a.plan.vkPid,message:plain(a),publish_date:Math.floor(at/1000)},a.plan.vkAtt?{attachments:a.plan.vkAtt}:{}));st.textContent='✓ дата в ВК изменена'}catch(e){st.textContent='ВК: '+(e.message||e)}}
+ else st.textContent='✓ сохранено';a.updatedAt=Date.now();persist()}
+async function redateVK(pid,v){const V=S.vk[S.b];const p=V.items.find(x=>x.id===pid);const at=fromLocal(v);const st=$('#vst-'+pid);if(!p||!at)return;if(at<Date.now()+60000){st.textContent='Дата должна быть в будущем';return}
+ st.textContent='Меняю дату…';try{const prm={owner_id:-V.gid,post_id:pid,message:p.text||'',publish_date:Math.floor(at/1000)};const att=vkAtt(p);if(att)prm.attachments=att;await vk('wall.edit',prm);p.date=Math.floor(at/1000);st.textContent='✓ дата изменена'}catch(e){st.textContent='ВК: '+(e.message||e)}}
 
 function render(){
  document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t===S.tab&&!S.edit));
@@ -237,6 +297,7 @@ function render(){
   ${sizeChips(f,true)}<label class="l">Пожелания</label><textarea class="f" data-k="wish" placeholder="Например: привязать к нашему сиропу, убрать рецепт">${esc(f.wish)}</textarea>
   <div class="acts"><button class="btn" data-go="rew">♻ Переписать в нашем стиле</button></div><div class="st" id="st"></div></div>`}
  else if(S.tab==='top')M.innerHTML=topicsHTML();
+ else if(S.tab==='plan'){M.innerHTML=planHTML();if(!S.vkLoaded)loadVK()}
  else M.innerHTML=baseHTML();
 }
 function topicsHTML(){const d=S.topics[S.b];if(!d)return '<div class="card mut">Загружаю темы…</div>';
@@ -268,7 +329,7 @@ ${fromArt?`Тема должна быть картинкой к уже напи�
 function baseHTML(){const q=S.filter.toLowerCase();const list=arts().filter(a=>a.brand===S.b&&(!q||(a.title+' '+a.body).toLowerCase().includes(q)));
  const ML={new:'Новая',rew:'Переписанная',topic:'По теме'};
  return `<div class="mut" style="margin:12px 2px 0">${TAB_HINT.base}</div><div class="card" style="padding:10px"><input class="f" id="flt" value="${esc(S.filter)}" placeholder="Поиск по статьям ${NAMES[S.b]}"></div>
- ${list.length?list.map(a=>`<div class="ti"><div class="tt"><b>${esc(a.title)}</b><span>${new Date(a.updatedAt||a.createdAt).toLocaleDateString('ru-RU')} · ${ML[a.mode]||''} · ${String(a.body||'').length} знаков</span><div>${a.postId?`<span class="badge gr">✓ на сайте: ${esc(a.postTitle||'')}</span>`:''}</div></div><button class="btn sm ghost" data-open="${a.id}">Открыть</button></div>`).join(''):'<div class="card mut">Пока нет статей. Напишите новую, перепишите чужую или выберите тему.</div>'}`}
+ ${list.length?list.map(a=>`<div class="ti"><div class="tt"><b>${esc(a.title)}</b><span>${new Date(a.updatedAt||a.createdAt).toLocaleDateString('ru-RU')} · ${ML[a.mode]||''} · ${String(a.body||'').length} знаков</span><div>${a.postId?`<span class="badge gr">✓ на сайте: ${esc(a.postTitle||'')}</span>`:''}${a.plan&&a.plan.at?`<span class="badge ${a.plan.vkPid?'gr':''}">📅 ${new Date(a.plan.at).toLocaleDateString('ru-RU')} ${hm(a.plan.at)}${a.plan.vkPid?' · ВК':''}</span>`:''}</div></div><button class="btn sm ghost" data-open="${a.id}">Открыть</button></div>`).join(''):'<div class="card mut">Пока нет статей. Напишите новую, перепишите чужую или выберите тему.</div>'}`}
 
 function editorHTML(a){return `<div class="card">
  <input class="ed-title" id="etitle" value="${esc(a.title)}" placeholder="Заголовок">
@@ -280,6 +341,7 @@ function editorHTML(a){return `<div class="card">
  <div class="ai" style="margin-top:8px"><input id="aiw" placeholder="Своё пожелание к правке"><button class="btn sm" data-ai="own">Применить</button></div>
  <div class="st" id="st"></div>
  <div class="acts"><button class="btn" data-act="site">📤 На сайт к посту</button><button class="btn ghost" data-act="vk">Копировать для ВК</button><button class="btn ghost" data-act="tg">Копировать для Telegram</button></div>
+ ${pubHTML(a)}
  <div class="acts"><button class="btn ghost sm" data-act="back">← К списку</button><button class="btn ghost sm" data-act="imgtopic">🖼 Тема для картинки</button><button class="btn ghost sm" data-act="dup">Копия</button><button class="btn ghost sm" data-act="del">Удалить</button></div>
  ${a.src?`<details style="margin-top:14px"><summary class="mut">Оригинал</summary><div class="mut" style="white-space:pre-wrap;margin-top:8px">${esc(a.src)}</div></details>`:''}
  </div>`}
@@ -384,6 +446,14 @@ document.addEventListener('click',async e=>{
  const am=t.closest('[data-addman]');if(am){const si=+am.dataset.addman;const sec=S.topics[S.b].s[si];const bi=S.brandInfo[S.b]||{};sec.items.push({title:'Новая тема',char:(bi.chars||[''])[0],desc:'',count:'',slides:[],added:true});saveTopics(S.b);render();const el=$(`[data-tf="title"][data-si="${si}"][data-ii="${sec.items.length-1}"]`);if(el){el.scrollIntoView({block:'center'});el.focus();getSelection().selectAllChildren(el)}return}
  const dt=t.closest('[data-deltopic]');if(dt){const [si,ii]=dt.dataset.deltopic.split('|').map(Number);if(!confirm('Удалить эту добавленную тему?'))return;S.topics[S.b].s[si].items.splice(ii,1);saveTopics(S.b);render();return}
  if(t.closest('[data-newsec]')){const v=($('#nsname').value||'').trim();if(!v){toast('Впишите название раздела');return}S.topics[S.b].s.push({name:v,items:[],carousel:/карусел/i.test(v)});saveTopics(S.b);render();toast('Раздел добавлен');return}
+ if(t.closest('[data-vkconnect]')){vkConnect(()=>{S.vkLoaded=false;render()});return}
+ if(t.closest('[data-vkrefresh]')){S.vkLoaded=false;render();toast('Обновляю из ВК');return}
+ const vd=t.closest('[data-vkdel]');if(vd){const pid=+vd.dataset.vkdel;if(!confirm('Удалить этот отложенный пост из ВК?'))return;try{await vk('wall.delete',{owner_id:-S.vk[S.b].gid,post_id:pid});S.vk[S.b].items=S.vk[S.b].items.filter(x=>x.id!==pid);render();toast('Удалено из отложенных ВК')}catch(e){toast('ВК: '+(e.message||e),4000)}return}
+ const vi=t.closest('[data-vkimport]');if(vi){const V=S.vk[S.b];const p=V.items.find(x=>x.id===+vi.dataset.vkimport);if(!p)return;const lines=(p.text||'').split('\n');const a=newArt({mode:'vk',title:clean(lines[0]||'Пост из ВК').slice(0,120),body:clean(lines.slice(1).join('\n').trim()),plan:{at:p.date*1000,vk:true,vkPid:p.id,vkGid:V.gid,vkAtt:vkAtt(p)}});S.edit=a;render();toast('Пост ВК добавлен в базу');return}
+ const pc=t.closest('[data-pubch] button');if(pc&&S.edit){const a=S.edit;a.plan=Object.assign({},a.plan||{});a.plan[pc.dataset.v]=!a.plan[pc.dataset.v];pc.classList.toggle('on',a.plan[pc.dataset.v]);a.updatedAt=Date.now();persist();return}
+ const pb=t.closest('[data-pub]');if(pb&&S.edit){const a=S.edit;flushEditor();const k=pb.dataset.pub;
+  if(k==='save'){const at=fromLocal($('#pdate').value);if(!at){toast('Укажите дату и время');return}a.plan=Object.assign({},a.plan||{},{at});a.updatedAt=Date.now();persist();if(a.plan.vkPid)await vkSchedule(a,true);else{render();toast('Дата сохранена: '+dayName(at)+', '+hm(at),3000)}}
+  if(k==='vk')vkSchedule(a,false);if(k==='vkupd')vkSchedule(a,true);if(k==='vkdel')vkUnschedule(a);return}
  const fm=t.closest('[data-fmt]');if(fm){fmt(fm.dataset.fmt);return}
  if(t.closest('[data-undo]')){const u=S.undo.pop();if(!u){toast('Нечего возвращать');return}Object.assign(S.edit,u,{updatedAt:Date.now()});persist();render();return}
  const ai=t.closest('[data-ai]');if(ai){let ins=ai.dataset.ai;if(ins==='own'){ins=$('#aiw').value.trim();if(!ins){toast('Впишите пожелание');return}}aiEdit(ins);return}
@@ -404,7 +474,7 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('mousedown',e=>{if(e.target.closest('#tool button,[data-ai]'))e.preventDefault()});
 let tEdT=null;document.addEventListener('input',e=>{const tf=e.target.dataset&&e.target.dataset.tf;if(tf){const it=S.topics[S.b].s[+e.target.dataset.si].items[+e.target.dataset.ii];it[tf]=e.target.textContent.trim();clearTimeout(tEdT);tEdT=setTimeout(()=>saveTopics(S.b),800);return}const k=e.target.dataset&&e.target.dataset.k;if(k){F()[k]=e.target.value;LS.set('art_form',S.form)}if(e.target.id==='flt'){S.filter=e.target.value;const pos=e.target.selectionStart;render();const f=$('#flt');f.focus();f.setSelectionRange(pos,pos)}});
-document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.k;if(k){F()[k]=e.target.value;LS.set('art_form',S.form)}});
+document.addEventListener('change',e=>{if(e.target.dataset&&e.target.dataset.redate){redateArt(e.target.dataset.redate,e.target.value);return}if(e.target.dataset&&e.target.dataset.vkredate){redateVK(+e.target.dataset.vkredate,e.target.value);return}const k=e.target.dataset&&e.target.dataset.k;if(k){F()[k]=e.target.value;LS.set('art_form',S.form)}});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.tf){e.preventDefault();e.target.blur();return}if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.twish!==undefined){e.preventDefault();e.target.nextElementSibling.click();return}if(e.key==='Enter'&&e.target.id==='nsname'){e.preventDefault();e.target.nextElementSibling.click();return}if(e.key==='Enter'&&e.target.id==='aiw'){e.preventDefault();e.target.nextElementSibling.click()}});
 addEventListener('pagehide',flushEditor);
 
