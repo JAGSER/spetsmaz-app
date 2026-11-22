@@ -73,6 +73,11 @@ function toast(t){const e=document.getElementById('toast');e.textContent=t;e.sty
 
 function render(){
  const L=document.getElementById('list');L.innerHTML='';const AD=artDone();
+ const top=document.createElement('div');top.className='card addtop';top.innerHTML=`<div class="t">Новая тема</div>
+  <div class="row"><select id="tsec" style="font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:11px;width:100%">${data.s.map((sec,si)=>`<option value="${si}" ${si===(window._tsec??data.s.length-1)?'selected':''}>${esc(sec.name)}</option>`).join('')}</select></div>
+  <div class="addwish on" style="margin:10px 0 0"><input id="twish" placeholder="О чём новая тема? (можно пусто)"></div>
+  <div class="acts"><button class="btn sm" data-a="addgo">+ Придумать тему</button><button class="btn sm ghost" data-a="addman">Вписать вручную</button><span class="st" id="ast"></span></div>
+  <div class="newsec" style="margin-top:12px"><input id="nsname" placeholder="Новый раздел, например: Посты, февраль"><button class="btn sm" data-a="newsec">+ Раздел</button></div>`;L.appendChild(top);
  data.s.forEach((sec,si)=>{
   const h=document.createElement('h2');h.textContent=sec.name;L.appendChild(h);
   sec.items.forEach((it,ii)=>{
@@ -86,11 +91,8 @@ function render(){
     <div class="acts"><button class="btn sm ghost" data-a="regen">↻ Перегенерировать</button><button class="btn sm ghost" data-a="copy">Копировать</button><button class="btn sm ghost" data-a="art">✍ Статья</button>${it.added?'<button class="btn sm ghost" data-a="del">✕</button>':''}<span class="st"></span></div>
     <div class="wish"><input placeholder="Пожелание к новой теме (можно пусто)"><button class="btn sm" data-a="go">Создать</button></div>`;
    L.appendChild(c);
-  });
-  const ar=document.createElement('div');ar.className='addrow';ar.dataset.si=si;ar.innerHTML=`<button class="btn sm" data-a="addai">+ Добавить тему</button><button class="btn sm ghost" data-a="addman">+ Вписать вручную</button><span class="st"></span>`;L.appendChild(ar);
-  const aw=document.createElement('div');aw.className='addwish';aw.dataset.si=si;aw.innerHTML=`<input placeholder="О чём новая тема? (можно пусто)"><button class="btn sm" data-a="addgo">Создать</button>`;L.appendChild(aw);
+  }); 
  });
- const ns=document.createElement('div');ns.className='newsec';ns.innerHTML=`<input id="nsname" placeholder="Новый раздел, например: Посты, февраль"><button class="btn sm" data-a="newsec">+ Раздел</button>`;L.appendChild(ns);
 }
 function itemText(sec,it,i){
  let t=`${i+1}. ${it.title}\nПерсонаж: ${it.char}\n`;
@@ -110,6 +112,10 @@ document.getElementById('copyAll').onclick=()=>copy(allText());
 document.addEventListener('click',e=>{
  const b=e.target.closest('[data-a]');if(!b)return;
  if(b.dataset.a==='newsec'){const v=document.getElementById('nsname').value.trim();if(!v){toast('Впишите название раздела');return}const car=/карусел/i.test(v);data.s.push({name:v,items:[],carousel:car});save();render();toast('Раздел добавлен');return}
+ if(b.closest('.addtop')&&(b.dataset.a==='addgo'||b.dataset.a==='addman')){const si=+document.getElementById('tsec').value;window._tsec=si;const sec=data.s[si];
+  if(b.dataset.a==='addman'){sec.items.push({title:'Новая тема',char:CHARS[0],desc:'',count:'',slides:[],added:true});save();render();const cs=document.querySelectorAll(`.card[data-si="${si}"] [data-f="title"]`);const el=cs[cs.length-1];if(el){el.scrollIntoView({block:'center'});el.focus();document.getSelection().selectAllChildren(el)}}
+  else addTopic(si,document.getElementById('twish').value.trim(),document.getElementById('ast'));
+  return}
  const row=b.closest('.addrow,.addwish');
  if(row){const si=+row.dataset.si;const sec=data.s[si];
   if(b.dataset.a==='addai'){const w=row.nextElementSibling;w.classList.toggle('on');if(w.classList.contains('on'))w.querySelector('input').focus()}
@@ -123,7 +129,7 @@ document.addEventListener('click',e=>{
  if(b.dataset.a==='regen'){const w=c.querySelector('.wish');w.classList.toggle('on');if(w.classList.contains('on'))w.querySelector('input').focus()}
  if(b.dataset.a==='go')regen(c,sec,ii,c.querySelector('.wish input').value.trim());
 });
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.addwish input')){e.preventDefault();e.target.nextElementSibling.click();return}if(e.key==='Enter'&&e.target.matches('#nsname')){e.preventDefault();e.target.nextElementSibling.click();return}if(e.key==='Enter'&&e.target.matches('.wish input')){e.preventDefault();e.target.nextElementSibling.click()}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='twish'){e.preventDefault();document.querySelector('[data-a="addgo"]').click();return}if(e.key==='Enter'&&e.target.matches('#nsname')){e.preventDefault();e.target.nextElementSibling.click();return}if(e.key==='Enter'&&e.target.matches('.wish input')){e.preventDefault();e.target.nextElementSibling.click()}});
 
 // запросы к Claude идут через сервер «Помощника» (ключ только там), без регистрации
 let HF=null,HREADY=null,HID=0;const HW={};

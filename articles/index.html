@@ -306,7 +306,7 @@ function topicsHTML(){const d=S.topics[S.b];if(!d)return '<div class="card mut">
  <div class="card"><b>Новая тема</b><label class="l">Раздел</label><select class="f" id="tsec">${d.s.map((sec,si)=>`<option value="${si}" ${si===(S.tsec??d.s.length-1)?'selected':''}>${esc(sec.name)}</option>`).join('')}</select>
   <label class="l">О чём тема</label><input class="f" id="twish" placeholder="Можно пусто, тогда нейросеть придумает сама">
   <div class="acts"><button class="btn" data-addtopic>+ Придумать тему</button><button class="btn ghost" data-addman>Вписать вручную</button></div><div class="st" id="ast"></div>
-  <details style="margin-top:10px"><summary class="mut">Новый раздел</summary><div class="ai" style="margin-top:8px"><input id="nsname" placeholder="Например: Посты, февраль или Карусели, февраль"><button class="btn sm" data-newsec>+ Раздел</button></div></details></div>
+  <label class="l">Новый раздел</label><div class="ai"><input id="nsname" placeholder="Например: Посты, февраль или Карусели, февраль"><button class="btn sm" data-newsec>+ Раздел</button></div></div>
  <div class="card"><div class="mut" style="margin-bottom:6px">Настройки для статей по темам</div>${typeSel(f)}${sizeChips(f)}<label class="l">Общие пожелания</label><input class="f" data-k="wish" value="${esc(f.wish)}" placeholder="Можно пусто">
   <div class="st" id="tsync">${Kit.token()?'':'Новые темы сохраняются только на этом устройстве, пока не подключён Диск'}</div></div>`;
  d.s.forEach((sec,si)=>{h+=`<h2>${esc(sec.name)}</h2>`;sec.items.forEach((it,ii)=>{const ex=by[it.title]||[];
