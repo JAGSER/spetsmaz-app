@@ -232,17 +232,17 @@ function F(){S.form[S.tab]=S.form[S.tab]||{};return S.form[S.tab]}
 // ---------- публикации и ВК ----------
 const PROXY='https://pomoshnik.jagser.deno.net';
 const VK_SCREEN={sp:'spetzmaz',sh:'dr.shuster'};
-const vkTok=()=>LS.get('vk_token','')||'';
-async function vk(method,params){const t=vkTok();if(!t)throw {code:'novk'};const r=await fetch(PROXY+'/vk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({method,params,token:t})});const d=await r.json();
- if(d.error){if(d.error.error_code===5)LS.set('vk_token','');throw new Error(d.error.error_msg||'ошибка ВК')}return d.response}
-async function vkGroup(b){const k='vk_gid_'+b;let g=LS.get(k,0);if(g)return g;const r=await vk('utils.resolveScreenName',{screen_name:VK_SCREEN[b]});if(!r||!r.object_id)throw new Error('Группа ВК не найдена');g=r.object_id;LS.set(k,g);return g}
-function vkConnect(onOk){const w=document.createElement('div');w.className='kit-modal';
+const vkTok=b=>LS.get('vk_token_'+(b||S.b),'')||'';
+async function vk(method,params,b){b=b||S.b;const t=vkTok(b);if(!t)throw {code:'novk'};const r=await fetch(PROXY+'/vk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({method,params,token:t})});const d=await r.json();
+ if(d.error){if(d.error.error_code===5)LS.set('vk_token_'+b,'');throw new Error(d.error.error_msg||'ошибка ВК')}return d.response}
+async function vkGroup(b){const k='vk_gid_'+b;let g=LS.get(k,0);if(g)return g;const r=await vk('utils.resolveScreenName',{screen_name:VK_SCREEN[b]},b);if(!r||!r.object_id)throw new Error('Группа ВК не найдена');g=r.object_id;LS.set(k,g);return g}
+function vkConnect(onOk,b){b=b||S.b;const w=document.createElement('div');w.className='kit-modal';
  const link='https://oauth.vk.com/authorize?client_id=2685278&scope=wall,photos,groups,offline&redirect_uri=https://oauth.vk.com/blank.html&display=page&response_type=token&revoke=1';
- w.innerHTML=`<div class="kit-box"><h3>Подключите ВКонтакте</h3><p>Нужен вход того, кто админ или редактор групп Спецмазь и Шустер. Нажмите кнопку, разрешите доступ, затем скопируйте из адресной строки всю ссылку (или часть после access_token=) и вставьте сюда. Это нужно один раз на этом устройстве.</p>
+ w.innerHTML=`<div class="kit-box"><h3>Подключите ВКонтакте: ${b==='sh'?'группа Доктор Шустер':'группа Спецмазь'}</h3><p>Нужен вход того, кто админ или редактор именно этой группы. У Спецмази и Шустера подключение отдельное. Нажмите кнопку, разрешите доступ, затем скопируйте из адресной строки всю ссылку (или часть после access_token=) и вставьте сюда. Это нужно один раз на этом устройстве.</p>
  <a class="kit-btn ghost" href="${link}" target="_blank" rel="noopener">Открыть вход ВК</a><div class="kit-row"><input placeholder="Вставьте ссылку или ключ"><button class="kit-btn">ОК</button></div><button class="kit-x">Закрыть</button></div>`;
  document.body.appendChild(w);w.querySelector('.kit-x').onclick=()=>w.remove();
- w.querySelector('.kit-row .kit-btn').onclick=async()=>{let v=w.querySelector('input').value.trim();const m=v.match(/access_token=([^&\s]+)/);if(m)v=m[1];if(!v)return;LS.set('vk_token',v);
-  try{const u=await vk('users.get',{});w.remove();toast('ВК подключён: '+(u[0]?u[0].first_name+' '+u[0].last_name:''));onOk&&onOk()}catch(e){LS.set('vk_token','');alert('Ключ не подошёл: '+e.message)}}}
+ w.querySelector('.kit-row .kit-btn').onclick=async()=>{let v=w.querySelector('input').value.trim();const m=v.match(/access_token=([^&\s]+)/);if(m)v=m[1];if(!v)return;LS.set('vk_token_'+b,v);
+  try{const u=await vk('users.get',{},b);await vkGroup(b);w.remove();toast('ВК подключён: '+(u[0]?u[0].first_name+' '+u[0].last_name:''));onOk&&onOk()}catch(e){LS.set('vk_token_'+b,'');alert('Ключ не подошёл: '+e.message)}}}
 const dtLocal=ms=>{if(!ms)return '';const d=new Date(ms);const z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`};
 const fromLocal=v=>v?new Date(v).getTime():0;
 const dayName=ms=>new Date(ms).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
@@ -255,15 +255,15 @@ function pubHTML(a){const P=a.plan||{};const imgs=postImages(a);return `<div cla
  ${P.vkPid?`<div class="mut" style="margin-top:6px;color:#157A43;font-weight:700">✓ Отложен в ВК на ${dayName(P.at)}, ${hm(P.at)}</div>`:''}
  <div class="acts">${P.vkPid?`<button class="btn sm" data-pub="vkupd">Обновить в ВК</button><button class="btn sm ghost" data-pub="vkdel">Убрать из отложенных ВК</button>`:`<button class="btn sm" data-pub="vk">Отложить в ВК</button>`}</div><div class="st" id="pst"></div></div>`}
 async function vkSchedule(a,upd){const st=$('#pst');const at=fromLocal(($('#pdate')||{}).value)||(a.plan&&a.plan.at);if(!at){toast('Укажите дату и время');return}if(at<Date.now()+60000){toast('Дата должна быть в будущем');return}
- if(!vkTok()){vkConnect(()=>vkSchedule(a,upd));return}
+ if(!vkTok(a.brand)){vkConnect(()=>vkSchedule(a,upd),a.brand);return}
  try{st.textContent='Отправляю в ВК…';const gid=await vkGroup(a.brand);a.plan=Object.assign({},a.plan||{},{at,vk:true});
   let att=a.plan.vkAtt||'';const imgs=postImages(a);
-  if(imgs.length&&(!att||a.plan.vkAttPost!==a.postId)){st.textContent='Загружаю картинки в ВК…';const r=await (await fetch(PROXY+'/vk-photo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:vkTok(),group_id:gid,urls:imgs})})).json();if(r.error)throw new Error(r.error);att=r.attachments.join(',');a.plan.vkAtt=att;a.plan.vkAttPost=a.postId}
+  if(imgs.length&&(!att||a.plan.vkAttPost!==a.postId)){st.textContent='Загружаю картинки в ВК…';const r=await (await fetch(PROXY+'/vk-photo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:vkTok(a.brand),group_id:gid,urls:imgs})})).json();if(r.error)throw new Error(r.error);att=r.attachments.join(',');a.plan.vkAtt=att;a.plan.vkAttPost=a.postId}
   const params={owner_id:-gid,from_group:1,message:plain(a),publish_date:Math.floor(at/1000)};if(att)params.attachments=att;
-  if(upd&&a.plan.vkPid){params.post_id=a.plan.vkPid;await vk('wall.edit',params)}else{const r=await vk('wall.post',params);a.plan.vkPid=r.post_id;a.plan.vkGid=gid}
+  if(upd&&a.plan.vkPid){params.post_id=a.plan.vkPid;await vk('wall.edit',params,a.brand)}else{const r=await vk('wall.post',params,a.brand);a.plan.vkPid=r.post_id;a.plan.vkGid=gid}
   a.updatedAt=Date.now();persist();render();toast('Отложено в ВК: '+dayName(at)+', '+hm(at),3500)}
- catch(e){if(e&&e.code==='novk'){vkConnect(()=>vkSchedule(a,upd));return}st.textContent='Не получилось: '+(e.message||e)}}
-async function vkUnschedule(a){if(!confirm('Убрать этот пост из отложенных ВК?'))return;const st=$('#pst');try{await vk('wall.delete',{owner_id:-a.plan.vkGid,post_id:a.plan.vkPid});delete a.plan.vkPid;a.updatedAt=Date.now();persist();render();toast('Убрано из отложенных ВК')}catch(e){st.textContent='Не получилось: '+(e.message||e)}}
+ catch(e){if(e&&e.code==='novk'){vkConnect(()=>vkSchedule(a,upd),a.brand);return}st.textContent='Не получилось: '+(e.message||e)}}
+async function vkUnschedule(a){if(!confirm('Убрать этот пост из отложенных ВК?'))return;const st=$('#pst');try{await vk('wall.delete',{owner_id:-a.plan.vkGid,post_id:a.plan.vkPid},a.brand);delete a.plan.vkPid;a.updatedAt=Date.now();persist();render();toast('Убрано из отложенных ВК')}catch(e){st.textContent='Не получилось: '+(e.message||e)}}
 // вкладка «План»
 async function loadVK(){S.vkLoaded=true;S.vk=S.vk||{};if(!vkTok()){render();return}
  try{const gid=await vkGroup(S.b);const r=await vk('wall.get',{owner_id:-gid,filter:'postponed',count:100});S.vk[S.b]={gid,items:r.items||[]};S.vkErr=''}catch(e){S.vkErr=e.message||String(e)}if(S.tab==='plan'&&!S.edit)render()}
@@ -271,7 +271,7 @@ function vkAtt(p){return (p.attachments||[]).map(x=>{const o=x[x.type];return o&
 function planHTML(){const list=arts().filter(a=>a.brand===S.b&&a.plan&&a.plan.at).sort((x,y)=>x.plan.at-y.plan.at);
  const V=(S.vk&&S.vk[S.b])||{items:[]};const linked=new Set(list.map(a=>a.plan.vkPid).filter(Boolean));
  const rows=[...list.map(a=>({at:a.plan.at,a})),...V.items.filter(p=>!linked.has(p.id)).map(p=>({at:p.date*1000,v:p}))].sort((x,y)=>x.at-y.at);
- let h=`<div class="mut" style="margin:12px 2px 0">${TAB_HINT.plan}</div><div class="card" style="padding:12px"><div class="acts" style="margin:0">${vkTok()?`<span class="badge gr">✓ ВК подключён</span><button class="btn sm ghost" data-vkrefresh>Обновить из ВК</button>`:`<button class="btn sm" data-vkconnect>Подключить ВКонтакте</button><span class="mut">чтобы видеть и ставить отложенные посты групп</span>`}</div>${S.vkErr?`<div class="st">ВК: ${esc(S.vkErr)}</div>`:''}</div>`;
+ let h=`<div class="mut" style="margin:12px 2px 0">${TAB_HINT.plan}</div><div class="card" style="padding:12px"><div class="acts" style="margin:0">${vkTok()?`<span class="badge gr">✓ ВК группы ${NAMES[S.b]} подключён</span><button class="btn sm ghost" data-vkoff>Отключить</button><button class="btn sm ghost" data-vkrefresh>Обновить из ВК</button>`:`<button class="btn sm" data-vkconnect>Подключить ВК группы ${NAMES[S.b]}</button><span class="mut">чтобы видеть и ставить её отложенные посты</span>`}</div>${S.vkErr?`<div class="st">ВК: ${esc(S.vkErr)}</div>`:''}</div>`;
  if(!rows.length)return h+'<div class="card mut">Пока ничего не запланировано. Откройте статью и укажите дату в блоке «Публикация».</div>';
  let day='';rows.forEach(r=>{const d=dayName(r.at);if(d!==day){day=d;h+=`<div class="pday">${d}</div>`}const past=r.at<Date.now();
   if(r.a){const a=r.a,P=a.plan;h+=`<div class="ti"><div class="tt"><b>${hm(r.at)} · ${esc(a.title)}</b><div>${P.vk?`<span class="badge ${P.vkPid?'gr':''}">${P.vkPid?'✓ ВК отложен':'ВК'}</span>`:''}${P.tg?'<span class="badge">Telegram</span>':''}${P.site?`<span class="badge ${a.postId?'gr':''}">Сайт${a.postId?' ✓':''}</span>`:''}${past?'<span class="badge">время прошло</span>':''}</div>
@@ -281,7 +281,7 @@ function planHTML(){const list=arts().filter(a=>a.brand===S.b&&a.plan&&a.plan.at
  return h}
 async function redateArt(id,v){const a=db.articles.find(x=>x.id===id);const at=fromLocal(v);if(!a||!at)return;const st=$('#pst-'+id);a.plan=Object.assign({},a.plan||{},{at});
  if(a.plan.vkPid){if(at<Date.now()+60000){st.textContent='Для ВК дата должна быть в будущем';return}st.textContent='Меняю дату в ВК…';
-  try{await vk('wall.edit',Object.assign({owner_id:-a.plan.vkGid,post_id:a.plan.vkPid,message:plain(a),publish_date:Math.floor(at/1000)},a.plan.vkAtt?{attachments:a.plan.vkAtt}:{}));st.textContent='✓ дата в ВК изменена'}catch(e){st.textContent='ВК: '+(e.message||e)}}
+  try{await vk('wall.edit',Object.assign({owner_id:-a.plan.vkGid,post_id:a.plan.vkPid,message:plain(a),publish_date:Math.floor(at/1000)},a.plan.vkAtt?{attachments:a.plan.vkAtt}:{}),a.brand);st.textContent='✓ дата в ВК изменена'}catch(e){st.textContent='ВК: '+(e.message||e)}}
  else st.textContent='✓ сохранено';a.updatedAt=Date.now();persist()}
 async function redateVK(pid,v){const V=S.vk[S.b];const p=V.items.find(x=>x.id===pid);const at=fromLocal(v);const st=$('#vst-'+pid);if(!p||!at)return;if(at<Date.now()+60000){st.textContent='Дата должна быть в будущем';return}
  st.textContent='Меняю дату…';try{const prm={owner_id:-V.gid,post_id:pid,message:p.text||'',publish_date:Math.floor(at/1000)};const att=vkAtt(p);if(att)prm.attachments=att;await vk('wall.edit',prm);p.date=Math.floor(at/1000);st.textContent='✓ дата изменена'}catch(e){st.textContent='ВК: '+(e.message||e)}}
@@ -446,6 +446,7 @@ document.addEventListener('click',async e=>{
  const am=t.closest('[data-addman]');if(am){const si=+am.dataset.addman;const sec=S.topics[S.b].s[si];const bi=S.brandInfo[S.b]||{};sec.items.push({title:'Новая тема',char:(bi.chars||[''])[0],desc:'',count:'',slides:[],added:true});saveTopics(S.b);render();const el=$(`[data-tf="title"][data-si="${si}"][data-ii="${sec.items.length-1}"]`);if(el){el.scrollIntoView({block:'center'});el.focus();getSelection().selectAllChildren(el)}return}
  const dt=t.closest('[data-deltopic]');if(dt){const [si,ii]=dt.dataset.deltopic.split('|').map(Number);if(!confirm('Удалить эту добавленную тему?'))return;S.topics[S.b].s[si].items.splice(ii,1);saveTopics(S.b);render();return}
  if(t.closest('[data-newsec]')){const v=($('#nsname').value||'').trim();if(!v){toast('Впишите название раздела');return}S.topics[S.b].s.push({name:v,items:[],carousel:/карусел/i.test(v)});saveTopics(S.b);render();toast('Раздел добавлен');return}
+ if(t.closest('[data-vkoff]')){LS.set('vk_token_'+S.b,'');LS.set('vk_gid_'+S.b,0);S.vkLoaded=false;S.vk&&delete S.vk[S.b];render();return}
  if(t.closest('[data-vkconnect]')){vkConnect(()=>{S.vkLoaded=false;render()});return}
  if(t.closest('[data-vkrefresh]')){S.vkLoaded=false;render();toast('Обновляю из ВК');return}
  const vd=t.closest('[data-vkdel]');if(vd){const pid=+vd.dataset.vkdel;if(!confirm('Удалить этот отложенный пост из ВК?'))return;try{await vk('wall.delete',{owner_id:-S.vk[S.b].gid,post_id:pid});S.vk[S.b].items=S.vk[S.b].items.filter(x=>x.id!==pid);render();toast('Удалено из отложенных ВК')}catch(e){toast('ВК: '+(e.message||e),4000)}return}
