@@ -13,7 +13,10 @@ async function readPublic(name){
  if(r.status===404)return null;if(!r.ok)throw new Error('disk '+r.status);
  const j=await r.json();if(!j.file)return null;
  const f=await fetch(j.file+(j.file.includes('?')?'&':'?')+'nc='+Date.now());if(!f.ok)throw new Error('disk file '+f.status);return f.json()}
+// чтение как у основного приложения: через публичную ссылку папки (надёжно со страницы сайта);
+// ссылка на скачивание с ключом остаётся запасным путём
 async function readAuth(name){
+ try{return await readPublic(name)}catch(e){console.log('readPublic',name,e)}
  const t=token();if(!t)return readPublic(name);
  const r=await fetch(`${API}/resources/download?path=${enc(DISK_PATH+'/'+name)}`,{headers:{Authorization:'OAuth '+t}});
  if(r.status===404)return null;if(r.status===401){LS.set('sm_token','');return readPublic(name)}if(!r.ok)throw new Error('disk '+r.status);
@@ -53,7 +56,7 @@ async function syncTopics(store,local){
 function pushTopics(store,data,onState){clearTimeout(topicsPushT);if(!token()){onState&&onState('local');return}
  topicsPushT=setTimeout(async()=>{try{const R=(await readAuth('_topics.json'))||{};const r=R[store];
   if(!(r&&r.data&&(r.data.updatedAt||0)>(data.updatedAt||0)))R[store]={data};
-  await write('_topics.json',R);onState&&onState('ok')}catch(e){onState&&onState('err')}},1500)}
+  await write('_topics.json',R);onState&&onState('ok')}catch(e){console.log('pushTopics',e);onState&&onState(e&&e.code==='notoken'?'local':'err',(e&&(e.message||e.code))||String(e))}},1500)}
 
 // ---------- окно подключения Диска ----------
 function connectBox(onOk){

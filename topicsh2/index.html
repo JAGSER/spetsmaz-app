@@ -66,7 +66,7 @@ try{data=JSON.parse(localStorage.getItem(STORE))}catch(e){}
 if(!data||data.v!==6)data={v:6,s:SECTIONS};
 const syncEl=()=>document.getElementById('sync');
 const syncTxt={ok:'Темы сохранены в общую базу на Диске',local:'Темы сохраняются только на этом устройстве. Подключите Диск в разделе «Статьи», чтобы список был общий',err:'Не удалось сохранить на Диск, попробую при следующей правке'};
-const save=()=>{data.updatedAt=Date.now();try{localStorage.setItem(STORE,JSON.stringify(data))}catch(e){}if(window.Kit)Kit.pushTopics(STORE,data,st=>{const e=syncEl();if(e)e.textContent=syncTxt[st]||''})};
+const save=()=>{data.updatedAt=Date.now();try{localStorage.setItem(STORE,JSON.stringify(data))}catch(e){}if(window.Kit)Kit.pushTopics(STORE,data,(st,msg)=>{const e=syncEl();if(e)e.textContent=(syncTxt[st]||'')+(st==='err'&&msg?' ('+msg+')':'')})};
 const artDone=()=>{try{const db=JSON.parse(localStorage.getItem('art_db'))||{};const m={};(db.articles||[]).forEach(a=>{if(!a.deleted&&a.topic&&a.topic.page===STORE.replace('topics_',''))m[a.topic.title]=a.postId?'на сайте':'статья'});return m}catch(e){return {}}};
 const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2200)}
