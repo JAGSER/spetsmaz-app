@@ -46,6 +46,9 @@ h2{font-size:19px;font-weight:800;margin:22px 0 8px;color:var(--acc2)}
 .ti .tt{flex:1;line-height:1.35}
 .ti .tt b{display:block;font-size:17px}
 .ti .tt span{font-size:15px;color:var(--mut)}
+.ti .tt b span{font-size:inherit;color:inherit}
+[contenteditable]{outline:none;border-radius:6px}
+.ti [contenteditable]:focus{background:var(--soft)}
 .badge{display:inline-block;background:var(--soft);color:var(--acc2);font-weight:700;font-size:13px;padding:3px 9px;border-radius:9px;margin:4px 6px 0 0}
 .badge.gr{background:#e6f6ec;color:#157A43}
 /* редактор */
@@ -121,7 +124,7 @@ async function loadTopics(b){
  const page=PAGES[b];if(S.topics[b])return S.topics[b];
  const h=await (await fetch('/'+page+'/',{cache:'no-cache'})).text();
  const g=n=>{const m=h.match(new RegExp('const '+n+'=(.*?);\\n'));return m?JSON.parse(m[1]):null};
- S.brandInfo[b]={brand:g('BRAND')||'',chars:g('CHARS')||[]};
+ S.brandInfo[b]={brand:g('BRAND')||'',chars:g('CHARS')||[],past:g('PAST')||[]};
  let data=null;try{data=JSON.parse(localStorage.getItem('topics_'+page))}catch(e){}
  if(!data||data.v!==6)data={v:6,s:g('SECTIONS')||[]};
  try{data=await Kit.syncTopics('topics_'+page,data)}catch(e){}
@@ -218,17 +221,19 @@ function setTab(t){S.tab=t;S.edit=null;history.replaceState(null,'',location.pat
 function chips(name,opts,val){return `<div class="chips" data-chip="${name}">${opts.map(([k,l])=>`<button data-v="${esc(k)}" class="${k===val?'on':''}">${esc(l)}</button>`).join('')}</div>`}
 function charChips(f){if(S.b!=='sh')return '';const cs=(S.brandInfo.sh||{}).chars||['панда в красной худи','коала в зелёной худи'];return `<label class="l">От чьего лица</label>${chips('char',[['авто','Автовыбор'],...cs.map(c=>[c,c])],f.char||'авто')}`}
 function typeSel(f){return `<label class="l">Тип материала</label><select class="f" data-k="type">${TYPES.map(t=>`<option ${t===(f.type||'Автовыбор')?'selected':''}>${t}</option>`).join('')}</select>`}
-function sizeChips(f,same){return `<label class="l">Объём</label>${chips('size',[...(same?[['same','Как в оригинале']]:[]),...Object.entries(SIZES).map(([k,v])=>[k,v[0]])],f.size||(same?'same':'art'))}`}
+const SIZE_HINT={same:'Примерно той же длины, что и оригинал.',post:'Пост: короткий текст под картинку в ВК или Telegram, 700-1200 знаков. Одна мысль, 3-5 советов или фактов, вопрос подписчикам.',art:'Статья: развёрнутый материал, 1800-2800 знаков. С подзаголовками и списками, раскрывает тему подробнее, чем подпись к картинке. Подходит для текста к посту на сайте.',long:'Большая статья: подробный разбор, 3500-5000 знаков. Для лонгрида: статья ВК, сайт, полный разбор темы с рецептами, составом, советами.'};
+function sizeChips(f,same){const v=f.size||(same?'same':'art');return `<label class="l">Объём</label>${chips('size',[...(same?[['same','Как в оригинале']]:[]),...Object.entries(SIZES).map(([k,v])=>[k,v[0]])],v)}<div class="mut" id="szhint" style="margin-top:6px">${SIZE_HINT[v]||''}</div>`}
+const TAB_HINT={new:'Новая статья с нуля на любую тему в стиле редакторов бренда.',rew:'Вставьте чужую статью, получите свой текст в стиле бренда без совпадений с оригиналом.',top:'Утверждённые темы постов. Здесь же можно добавлять новые темы и писать по ним статьи.',base:'Все написанные статьи этого бренда: поиск, правка, копирование, отправка на сайт.'};
 function F(){S.form[S.tab]=S.form[S.tab]||{};return S.form[S.tab]}
 
 function render(){
  document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t===S.tab&&!S.edit));
  const M=$('#main');
  if(S.edit){S.sel=null;M.innerHTML=editorHTML(S.edit);mountEditor();showSel();return}
- if(S.tab==='new'){const f=F();M.innerHTML=`<div class="card"><label class="l" style="margin-top:0">О чём статья</label><input class="f" data-k="theme" value="${esc(f.theme)}" placeholder="Например: как выбрать сироп к зимнему чаю (можно пусто)">
+ if(S.tab==='new'){const f=F();M.innerHTML=`<div class="mut" style="margin:12px 2px 0">${TAB_HINT.new}</div><div class="card"><label class="l" style="margin-top:0">О чём статья</label><input class="f" data-k="theme" value="${esc(f.theme)}" placeholder="Например: как выбрать сироп к зимнему чаю (можно пусто)">
   ${typeSel(f)}${sizeChips(f)}<label class="l">Пожелания</label><textarea class="f" data-k="wish" placeholder="Продукт, акцент, что упомянуть или избегать">${esc(f.wish)}</textarea>
   <div class="acts"><button class="btn" data-go="new">✍ Написать</button></div><div class="st" id="st"></div></div>`}
- else if(S.tab==='rew'){const f=F();M.innerHTML=`<div class="card"><label class="l" style="margin-top:0">Вставьте чужую статью</label><textarea class="f big" data-k="src" placeholder="Текст статьи целиком">${esc(f.src)}</textarea>
+ else if(S.tab==='rew'){const f=F();M.innerHTML=`<div class="mut" style="margin:12px 2px 0">${TAB_HINT.rew}</div><div class="card"><label class="l" style="margin-top:0">Вставьте чужую статью</label><textarea class="f big" data-k="src" placeholder="Текст статьи целиком">${esc(f.src)}</textarea>
   ${sizeChips(f,true)}<label class="l">Пожелания</label><textarea class="f" data-k="wish" placeholder="Например: привязать к нашему сиропу, убрать рецепт">${esc(f.wish)}</textarea>
   <div class="acts"><button class="btn" data-go="rew">♻ Переписать в нашем стиле</button></div><div class="st" id="st"></div></div>`}
  else if(S.tab==='top')M.innerHTML=topicsHTML();
@@ -236,15 +241,33 @@ function render(){
 }
 function topicsHTML(){const d=S.topics[S.b];if(!d)return '<div class="card mut">Загружаю темы…</div>';
  const f=F();const by={};arts().filter(a=>a.brand===S.b&&a.topic).forEach(a=>{(by[a.topic.title]=by[a.topic.title]||[]).push(a)});
- let h=`<div class="card"><div class="mut" style="margin-bottom:6px">Настройки для статей по темам</div>${typeSel(f)}${sizeChips(f)}<label class="l">Общие пожелания</label><input class="f" data-k="wish" value="${esc(f.wish)}" placeholder="Можно пусто">
-  <div class="acts"><a class="btn ghost sm" href="/${PAGES[S.b]}/">Открыть список тем, добавить новые</a></div></div>`;
- d.s.forEach((sec,si)=>{h+=`<h2>${esc(sec.name)}</h2>`;sec.items.forEach((it,ii)=>{const key=PAGES[S.b]+'|'+si+'|'+ii;const ex=by[it.title]||[];
-  h+=`<div class="ti" id="t-${si}-${ii}"><div class="tt"><b>${ii+1}. ${esc(it.title)}</b><span>${esc(it.char||'')}${it.desc?' · '+esc(it.desc):''}</span>${ex.map(a=>`<div><span class="badge ${a.postId?'gr':''}">${a.postId?'✓ на сайте':'✓ статья'}</span><a href="#" data-open="${a.id}" style="color:var(--acc2);font-size:15px">${esc(a.title)}</a></div>`).join('')}
-   <div class="st" id="st-${si}-${ii}"></div></div><button class="btn sm ${ex.length?'ghost':''}" data-gentopic="${si}|${ii}">${ex.length?'Ещё вариант':'✍ Написать'}</button></div>`})});
+ let h=`<div class="mut" style="margin:12px 2px 0">${TAB_HINT.top} Названия и описания можно править прямо в списке.</div><div class="card"><div class="mut" style="margin-bottom:6px">Настройки для статей по темам</div>${typeSel(f)}${sizeChips(f)}<label class="l">Общие пожелания</label><input class="f" data-k="wish" value="${esc(f.wish)}" placeholder="Можно пусто">
+  <div class="st" id="tsync">${Kit.token()?'':'Новые темы сохраняются только на этом устройстве, пока не подключён Диск'}</div></div>`;
+ d.s.forEach((sec,si)=>{h+=`<h2>${esc(sec.name)}</h2>`;sec.items.forEach((it,ii)=>{const ex=by[it.title]||[];
+  h+=`<div class="ti" id="t-${si}-${ii}"><div class="tt"><b><span>${ii+1}. </span><span contenteditable data-tf="title" data-si="${si}" data-ii="${ii}">${esc(it.title)}</span></b><span>${esc(it.char||'')} · </span><span contenteditable data-tf="desc" data-si="${si}" data-ii="${ii}">${esc(it.desc||'')}</span>${sec.carousel&&it.slides&&it.slides.length?`<span style="display:block">Картинки: ${esc(it.slides.join('; '))}</span>`:''}${ex.map(a=>`<div><span class="badge ${a.postId?'gr':''}">${a.postId?'✓ на сайте':'✓ статья'}</span><a href="#" data-open="${a.id}" style="color:var(--acc2);font-size:15px">${esc(a.title)}</a></div>`).join('')}
+   <div class="st" id="st-${si}-${ii}"></div></div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn sm ${ex.length?'ghost':''}" data-gentopic="${si}|${ii}">${ex.length?'Ещё вариант':'✍ Написать'}</button>${it.added?`<button class="btn sm ghost" data-deltopic="${si}|${ii}">Удалить</button>`:''}</div></div>`});
+  h+=`<div class="card" style="padding:12px"><div class="ai"><input data-twish="${si}" placeholder="О чём новая тема? (можно пусто)"><button class="btn sm" data-addtopic="${si}">+ Тема</button><button class="btn sm ghost" data-addman="${si}">Вручную</button></div><div class="st" id="ast-${si}"></div></div>`});
+ h+=`<div class="card" style="padding:12px"><div class="ai"><input id="nsname" placeholder="Новый раздел, например: Посты, февраль или Карусели, февраль"><button class="btn sm" data-newsec>+ Раздел</button></div></div>`;
  return h}
+function saveTopics(b){const d=S.topics[b];d.updatedAt=Date.now();LS.set('topics_'+PAGES[b],d);Kit.pushTopics('topics_'+PAGES[b],d,st=>{const e=$('#tsync');if(e)e.textContent=st==='ok'?'Темы сохранены в общую базу на Диске':st==='err'?'Не удалось сохранить темы на Диск':'Новые темы сохраняются только на этом устройстве, пока не подключён Диск'})}
+function publishedTitles(b){const c=LS.get('sm_cache',null);const t=[];if(c&&c.posts){const M=(c.meta&&c.meta.posts)||{};c.posts.filter(p=>p.mode===MODE[b]).forEach(p=>t.push((M[p.id]&&M[p.id].title)||p.title))}return t}
+async function makeTopic(b,si,wish,fromArt,st){const d=await loadTopics(b);const sec=d.s[si];const bi=S.brandInfo[b]||{};
+ const others=d.s.flatMap(s=>s.items.map(x=>x.title));const past=[...new Set([...(bi.past||[]),...publishedTitles(b)])].slice(0,400);
+ const shape=sec.carousel?'{"title":"короткое название карусели","char":"персонаж","desc":"описание одной фразой","count":"N, одна общая обложка и M дополнительных","slides":["тема доп. картинки 1","..."]} (M от 5 до 7, slides ровно M штук)':'{"title":"заголовок поста","char":"персонаж","desc":"описание одной фразой"}';
+ const prompt=`${bi.brand||''}
+Раздел: ${sec.name}. Придумай ОДНУ новую тему ${sec.carousel?'карусели':'поста с картинкой'} для этого раздела.
+${fromArt?`Тема должна быть картинкой к уже написанной статье ниже, точно по её содержанию:\nЗАГОЛОВОК: ${fromArt.title}\n${String(fromArt.body).slice(0,3000)}\n`:''}${wish?'Пожелание: '+wish+'\n':''}Персонаж строго один из: ${(bi.chars||[]).join(', ')}. Выбирай по логике персонажей.
+Стиль заголовков как у прошлых тем. ${fromArt?'':'Нельзя повторять или перефразировать темы ниже.'}
+Темы на странице: ${others.join('; ')}
+Уже вышедшие темы: ${past.join('; ')}
+Ответ строго JSON без пояснений: ${shape}`;
+ const t=await Kit.ask(prompt,'Отвечай по-русски. Только JSON без пояснений и без markdown. Не используй длинное тире.',m=>{if(st)st.textContent=m});
+ const r=JSON.parse(t.slice(t.indexOf('{'),t.lastIndexOf('}')+1));
+ const it={title:clean(r.title||'Новая тема'),char:r.char||(bi.chars||[''])[0],desc:clean(r.desc||''),count:r.count||'',slides:Array.isArray(r.slides)?r.slides.map(clean):[],added:true};
+ sec.items.push(it);saveTopics(b);return {it,si,ii:sec.items.length-1}}
 function baseHTML(){const q=S.filter.toLowerCase();const list=arts().filter(a=>a.brand===S.b&&(!q||(a.title+' '+a.body).toLowerCase().includes(q)));
  const ML={new:'Новая',rew:'Переписанная',topic:'По теме'};
- return `<div class="card" style="padding:10px"><input class="f" id="flt" value="${esc(S.filter)}" placeholder="Поиск по статьям ${NAMES[S.b]}"></div>
+ return `<div class="mut" style="margin:12px 2px 0">${TAB_HINT.base}</div><div class="card" style="padding:10px"><input class="f" id="flt" value="${esc(S.filter)}" placeholder="Поиск по статьям ${NAMES[S.b]}"></div>
  ${list.length?list.map(a=>`<div class="ti"><div class="tt"><b>${esc(a.title)}</b><span>${new Date(a.updatedAt||a.createdAt).toLocaleDateString('ru-RU')} · ${ML[a.mode]||''} · ${String(a.body||'').length} знаков</span><div>${a.postId?`<span class="badge gr">✓ на сайте: ${esc(a.postTitle||'')}</span>`:''}</div></div><button class="btn sm ghost" data-open="${a.id}">Открыть</button></div>`).join(''):'<div class="card mut">Пока нет статей. Напишите новую, перепишите чужую или выберите тему.</div>'}`}
 
 function editorHTML(a){return `<div class="card">
@@ -257,7 +280,7 @@ function editorHTML(a){return `<div class="card">
  <div class="ai" style="margin-top:8px"><input id="aiw" placeholder="Своё пожелание к правке"><button class="btn sm" data-ai="own">Применить</button></div>
  <div class="st" id="st"></div>
  <div class="acts"><button class="btn" data-act="site">📤 На сайт к посту</button><button class="btn ghost" data-act="vk">Копировать для ВК</button><button class="btn ghost" data-act="tg">Копировать для Telegram</button></div>
- <div class="acts"><button class="btn ghost sm" data-act="back">← К списку</button><button class="btn ghost sm" data-act="dup">Копия</button><button class="btn ghost sm" data-act="del">Удалить</button></div>
+ <div class="acts"><button class="btn ghost sm" data-act="back">← К списку</button><button class="btn ghost sm" data-act="imgtopic">🖼 Тема для картинки</button><button class="btn ghost sm" data-act="dup">Копия</button><button class="btn ghost sm" data-act="del">Удалить</button></div>
  ${a.src?`<details style="margin-top:14px"><summary class="mut">Оригинал</summary><div class="mut" style="white-space:pre-wrap;margin-top:8px">${esc(a.src)}</div></details>`:''}
  </div>`}
 let edT=null;
@@ -343,7 +366,7 @@ document.addEventListener('click',async e=>{
  const b=t.closest('.sw button');if(b){flushEditor();S.edit=null;setBrand(b.dataset.b);render();return}
  const tb=t.closest('#tabs button');if(tb){flushEditor();setTab(tb.dataset.t);return}
  if(t.closest('#disk')){if(Kit.token()){pushNow();toast('Синхронизирую с Диском')}else Kit.connectBox(()=>{setDisk('ok');pull().then(pushNow)});return}
- const ch=t.closest('[data-chip] button');if(ch){const n=ch.parentNode.dataset.chip;F()[n]=ch.dataset.v;LS.set('art_form',S.form);ch.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===ch));return}
+ const ch=t.closest('[data-chip] button');if(ch){const n=ch.parentNode.dataset.chip;F()[n]=ch.dataset.v;LS.set('art_form',S.form);if(n==='size'&&$('#szhint'))$('#szhint').textContent=SIZE_HINT[ch.dataset.v]||'';ch.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===ch));return}
  const op=t.closest('[data-open]');if(op){e.preventDefault();flushEditor();openArt(op.dataset.open);return}
  const go=t.closest('[data-go]');if(go){const f=F();const st=$('#st');
   if(go.dataset.go==='rew'&&!(f.src||'').trim()){toast('Вставьте текст статьи');return}
@@ -355,6 +378,12 @@ document.addEventListener('click',async e=>{
   try{const a=await doTopic(Object.assign({key:PAGES[S.b]+'|'+si+'|'+ii},it),F(),st);S.edit=a;S.undo=[];render();scrollTo(0,0);toast('Статья готова')}
   catch(err){st.textContent=err.message;gt.disabled=false}return}
  if(t.closest('[data-clrsel]')){e.preventDefault();S.sel=null;getSelection().removeAllRanges();showSel();return}
+ const at=t.closest('[data-addtopic]');if(at){const si=+at.dataset.addtopic;const st=$('#ast-'+si);at.disabled=true;st.textContent='Придумываю тему…';
+  try{await makeTopic(S.b,si,($(`[data-twish="${si}"]`)||{}).value||'',null,st);render();const sec=S.topics[S.b].s[si];const el=$(`#t-${si}-${sec.items.length-1}`);if(el){el.scrollIntoView({block:'center'});el.style.outline='3px solid var(--acc)'}toast('Тема добавлена')}
+  catch(err){st.textContent='Не получилось: '+err.message;at.disabled=false}return}
+ const am=t.closest('[data-addman]');if(am){const si=+am.dataset.addman;const sec=S.topics[S.b].s[si];const bi=S.brandInfo[S.b]||{};sec.items.push({title:'Новая тема',char:(bi.chars||[''])[0],desc:'',count:'',slides:[],added:true});saveTopics(S.b);render();const el=$(`[data-tf="title"][data-si="${si}"][data-ii="${sec.items.length-1}"]`);if(el){el.scrollIntoView({block:'center'});el.focus();getSelection().selectAllChildren(el)}return}
+ const dt=t.closest('[data-deltopic]');if(dt){const [si,ii]=dt.dataset.deltopic.split('|').map(Number);if(!confirm('Удалить эту добавленную тему?'))return;S.topics[S.b].s[si].items.splice(ii,1);saveTopics(S.b);render();return}
+ if(t.closest('[data-newsec]')){const v=($('#nsname').value||'').trim();if(!v){toast('Впишите название раздела');return}S.topics[S.b].s.push({name:v,items:[],carousel:/карусел/i.test(v)});saveTopics(S.b);render();toast('Раздел добавлен');return}
  const fm=t.closest('[data-fmt]');if(fm){fmt(fm.dataset.fmt);return}
  if(t.closest('[data-undo]')){const u=S.undo.pop();if(!u){toast('Нечего возвращать');return}Object.assign(S.edit,u,{updatedAt:Date.now()});persist();render();return}
  const ai=t.closest('[data-ai]');if(ai){let ins=ai.dataset.ai;if(ins==='own'){ins=$('#aiw').value.trim();if(!ins){toast('Впишите пожелание');return}}aiEdit(ins);return}
@@ -363,14 +392,20 @@ document.addEventListener('click',async e=>{
   if(k==='tg')copyText(plain(a),tgHTML(a));
   if(k==='site')sendToSite();
   if(k==='back'){S.edit=null;S.tab=a.topic&&S.tab==='top'?'top':'base';render()}
+  if(k==='imgtopic'){loadTopics(a.brand).then(d=>{const w=document.createElement('div');w.className='modal';
+   w.innerHTML=`<div class="box"><div class="hrow"><h3 style="flex:1;margin:0">В какой раздел добавить тему для картинки?</h3><button class="btn sm ghost" data-x>Закрыть</button></div><p class="mut">Нейросеть сделает тему поста или карусели по этой статье и добавит её в список тем.</p>${d.s.map((sec,si)=>`<div class="pi" data-sec="${si}"><div><b>${esc(sec.name)}</b><span class="mut">${sec.items.length} тем</span></div></div>`).join('')}</div>`;
+   document.body.appendChild(w);w.querySelector('[data-x]').onclick=()=>w.remove();
+   w.addEventListener('click',async e=>{const r=e.target.closest('[data-sec]');if(!r)return;w.remove();const st=$('#st');st.textContent='Придумываю тему для картинки…';
+    try{const {it,si,ii}=await makeTopic(a.brand,+r.dataset.sec,'',a,st);a.topic={page:PAGES[a.brand],key:PAGES[a.brand]+'|'+si+'|'+ii,title:it.title,desc:it.desc,char:it.char};a.updatedAt=Date.now();persist();render();toast('Тема добавлена: '+it.title,3500)}
+    catch(err){st.textContent='Не получилось: '+err.message}})})}
   if(k==='dup'){const c=newArt(Object.assign({},a,{id:uid(),title:a.title+' (копия)',postId:'',postTitle:'',sentAt:0,createdAt:Date.now(),updatedAt:Date.now()}));S.edit=c;render();toast('Копия создана')}
   if(k==='del'){if(!confirm('Удалить статью из базы?'))return;a.deleted=true;a.updatedAt=Date.now();persist();S.edit=null;S.tab='base';render()}
   return}
 });
 document.addEventListener('mousedown',e=>{if(e.target.closest('#tool button,[data-ai]'))e.preventDefault()});
-document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.k;if(k){F()[k]=e.target.value;LS.set('art_form',S.form)}if(e.target.id==='flt'){S.filter=e.target.value;const pos=e.target.selectionStart;render();const f=$('#flt');f.focus();f.setSelectionRange(pos,pos)}});
+let tEdT=null;document.addEventListener('input',e=>{const tf=e.target.dataset&&e.target.dataset.tf;if(tf){const it=S.topics[S.b].s[+e.target.dataset.si].items[+e.target.dataset.ii];it[tf]=e.target.textContent.trim();clearTimeout(tEdT);tEdT=setTimeout(()=>saveTopics(S.b),800);return}const k=e.target.dataset&&e.target.dataset.k;if(k){F()[k]=e.target.value;LS.set('art_form',S.form)}if(e.target.id==='flt'){S.filter=e.target.value;const pos=e.target.selectionStart;render();const f=$('#flt');f.focus();f.setSelectionRange(pos,pos)}});
 document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.k;if(k){F()[k]=e.target.value;LS.set('art_form',S.form)}});
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='aiw'){e.preventDefault();e.target.nextElementSibling.click()}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.tf){e.preventDefault();e.target.blur();return}if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.twish!==undefined){e.preventDefault();e.target.nextElementSibling.click();return}if(e.key==='Enter'&&e.target.id==='nsname'){e.preventDefault();e.target.nextElementSibling.click();return}if(e.key==='Enter'&&e.target.id==='aiw'){e.preventDefault();e.target.nextElementSibling.click()}});
 addEventListener('pagehide',flushEditor);
 
 // ---------- старт ----------
